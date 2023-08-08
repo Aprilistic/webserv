@@ -5,35 +5,34 @@
 #include "ngxCore.hpp"
 
 class ngxProcess {
-/* methods */
+  /* methods */
 public:
   ngxProcess();
   ~ngxProcess();
 
   /* initialize */
-  void ReloadConfig(); /* signal handling, post&prev replacement */
 
   /* fork */
   /* -- master -- */
-  void SpawnWorkers(); /* worker recreate option */
+  void SetWorkerGroup(bool updateSignal); /* worker recreate option */
   /* -- worker -- */
-  void DoWorkerThings(); /* signal handling - exit request from master, error notification */
+  void DoWorkerThings(); /* signal handling - exit request from master, error
+                            notification */
 
   /* waitpid */
-  void WaitWorkers(vector<int> &prevWorkers); /* retrieve workers */
+  void WaitWorkers(std::vector<int> &prevWorkers); /* retrieve workers */
 
 private:
-
-/* variables */
+  void ReloadConfig(); /* signal handling, post&prev replacement */
+  void SpawnWorker(int targetPID);
+  /* variables */
 public:
 private:
-  int mPid;
+  int mPID;
   int mStatus;
   int mChannel[2]; /* socket master-worker */
-  vector<int> mPrevWorkers;
-  vector<int> mPostWorkers;
-  ngxConfig *mPrevConfig;
-  ngxConfig *mPostConfig = NULL;
+  std::vector<int> mWorkers;
+  ngxConfig *mConfig;
 };
 
 #endif

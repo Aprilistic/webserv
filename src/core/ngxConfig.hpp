@@ -3,28 +3,28 @@
 
 #include "ngxCore.hpp"
 
-class ngxConfig
-{
-	/* methods */
-	public:
-		
-	protected:
-	private:
+class ngxConfig {
+  /* methods */
+public:
+  const int GetWorkerCount() const;
+  const int GetWorkerConnectionCount() const;
 
-	/* variables */
-	protected:
-	private:
-		/* MainContext */
-		int worker_processes = 4;
+protected:
+private:
+  /* variables */
+protected:
+private:
+  /* MainContext */
+  int mWorkerCount = 4;
 
-		/* EventsContext */
-		int worker_connections = 1024;
-		
-		/* HttpContext */
-		
-		/* ServerContext */
+  /* EventsContext */
+  int mWorkerConnectionCount = 1024;
 
-		/* LocationContext */
+  /* HttpContext */
+
+  /* ServerContext */
+
+  /* LocationContext */
 };
 
 #endif

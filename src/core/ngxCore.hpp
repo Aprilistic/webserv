@@ -1,8 +1,6 @@
 #ifndef NGXCORE_HPP
 #define NGXCORE_HPP
 
-using namespace std;
-
 #include <algorithm>
 #include <condition_variable>
 #include <fstream>
@@ -18,6 +16,7 @@ using namespace std;
 #include <vector>
 
 #include <csignal>
+#include <cassert>
 
 // External functs
 #include <arpa/inet.h>
@@ -35,6 +34,5 @@ using namespace std;
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-
 
 #endif
