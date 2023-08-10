@@ -62,10 +62,10 @@ void ngxWorkerGroup::removeWorkerGroup(void) {
 
   // while (mWorkers.size() > 0){
   //   int exitedPID = waitpid(-1, &mStatus, WNOHANG);
-  //   if (exitedPID < 0 || find(mWorkers.begin(), mWorkers.end(), exitedPID) == mWorkers.end()) {
+  //   if (exitedPID < 0 || std::find(mWorkers.begin(), mWorkers.end(), exitedPID) == mWorkers.end()) {
   //     assert("worker not found");
   //   }
-  //   mWorkers.erase(find(mWorkers.begin(), mWorkers.end(), exitedPID));
+  //   mWorkers.erase(std::find(mWorkers.begin(), mWorkers.end(), exitedPID));
   // }
   
 }
@@ -84,7 +84,7 @@ void ngxWorkerGroup::spawnWorker(int TargetPID) {
       mWorkers.push_back(mPID);
     } else { /* replacement worker */
       std::vector<int>::iterator it =
-          find(mWorkers.begin(), mWorkers.end(), TargetPID);
+          std::find(mWorkers.begin(), mWorkers.end(), TargetPID);
       if (it != mWorkers.end()) {
         *it = mPID;
       } else {
