@@ -2,20 +2,19 @@ NAME = webserv
 CXXFLAGS = -Wall -Wextra -Werror -MMD -std=c++98
 LDFLAGS = 
 
-INCLUDES = -I src/core \
-		-I src/event/modules \
-		-I src/event \
-		-I src/http/modules \
-		-I src/http \
-		-I src/stream
+INCLUDES = -I ./includes \
+			-I ./includes/core \
+			-I ./includes/event \
+			-I ./includes/http \
+			-I ./includes/stream
 OBJ_DIR = objs
 
-SRCS := $(wildcard src/core/*.cpp) \
-		$(wildcard src/event/modules/*.cpp) \
-		$(wildcard src/event/*.cpp) \
-		$(wildcard src/http/modules/*.cpp) \
-		$(wildcard src/http/*.cpp) \
-		$(wildcard src/stream/*.cpp)
+SRCS := $(wildcard srcs/core/*.cpp) \
+		$(wildcard srcs/event/modules/*.cpp) \
+		$(wildcard srcs/event/*.cpp) \
+		$(wildcard srcs/http/modules/*.cpp) \
+		$(wildcard srcs/http/*.cpp) \
+		$(wildcard srcs/stream/*.cpp)
 SRCS_DIR := $(dir $(SRCS))
 
 OBJS := $(addprefix $(OBJ_DIR)/, $(notdir $(SRCS:.cpp=.o)))
