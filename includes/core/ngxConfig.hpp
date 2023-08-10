@@ -13,7 +13,6 @@ protected:
 private:
   /* variables */
 protected:
-private:
   /* MainContext */
   int mWorkerCount = 4;
 

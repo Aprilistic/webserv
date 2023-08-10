@@ -9,6 +9,7 @@ void ngxProcess::SetWorkerGroup(bool bUpdateSignal) {
   }
 
   mConfig = new ngxConfig();
+  
   int workerCount = mConfig->GetWorkerCount();
   for (int index = 0; index < workerCount; index++) {
     spawnWorker(0);
