@@ -7,7 +7,7 @@ ngxWorker::ngxWorker(void) : mPID(0), mStatus(0), mServerSocketFd(0){
 }
 
 ngxWorker::~ngxWorker(void) {
-  closeWorkerGroup();
+  removeWorkerGroup();
   removeWorkerGroup();
 }
 
@@ -16,7 +16,5 @@ void ngxWorker::openServerSocket(void) {}
 void ngxWorker::createWorkerGroup(void) {}
 
 void ngxWorker::monitorWorkerGroup(void) {}
-
-void ngxWorker::closeWorkerGroup(void) {}
 
 void ngxWorker::removeWorkerGroup(void) {}
