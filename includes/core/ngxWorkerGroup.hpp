@@ -1,13 +1,20 @@
-#ifndef NGXWORKER_HPP
-#define NGXWORKER_HPP
+#ifndef NGXWORKERGROUP_HPP
+#define NGXWORKERGROUP_HPP
 
 #include "ngxConfig.hpp"
 #include "ngxCore.hpp"
 
-class ngxWorker : public ngxConfig {
+#define NGX_WORKERGROUP_INIT (0)
+#define NGX_WORKERGROUP_RUN (1)
+#define NGX_WORKERGROUP_STOP (2)
+
+
+class ngxWorkerGroup : public ngxConfig {
 public:
-  ngxWorker(void);
-  ~ngxWorker(void);
+  ngxWorkerGroup(void);
+  ~ngxWorkerGroup(void);
+
+  const int getStatus(void) const;
 
 private:
   void openServerSocket(void);  /* socket 생성, bind */
@@ -17,6 +24,9 @@ private:
 
   void closeServerSocket(void); /* socket close */
   void removeWorkerGroup(void); /* worker remove */
+
+  void spawnWorker(int TargetPID);
+  void doWorkerThings(void);
 
 public:
 private:
