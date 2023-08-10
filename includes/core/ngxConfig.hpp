@@ -6,6 +6,8 @@
 class ngxConfig {
   /* methods */
 public:
+  ngxConfig();
+
   const int GetWorkerCount() const;
   const int GetWorkerConnectionCount() const;
 
@@ -14,15 +16,14 @@ private:
   /* variables */
 protected:
   /* MainContext */
-  int mWorkerCount = 4;
+  int mWorkerCount;
 
   /* EventsContext */
-  int mWorkerConnectionCount = 1024;
+  int mWorkerConnectionCount;
 
   /* HttpContext */
 
   /* ServerContext */
-
   /* LocationContext */
 };
 

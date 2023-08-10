@@ -8,7 +8,6 @@
 #define NGX_WORKERGROUP_RUN (1)
 #define NGX_WORKERGROUP_STOP (2)
 
-
 class ngxWorkerGroup : public ngxConfig {
 public:
   ngxWorkerGroup(void);

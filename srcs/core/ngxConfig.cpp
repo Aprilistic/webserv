@@ -1,11 +1,10 @@
 #include "ngxConfig.hpp"
 
-const int ngxConfig::GetWorkerCount() const 
-{
-	return mWorkerCount;
-}
+ngxConfig::ngxConfig()
+    : mWorkerCount(4), mWorkerConnectionCount(1024) {}
 
-const int ngxConfig::GetWorkerConnectionCount() const 
-{
-	return mWorkerConnectionCount;
+const int ngxConfig::GetWorkerCount() const { return mWorkerCount; }
+
+const int ngxConfig::GetWorkerConnectionCount() const {
+  return mWorkerConnectionCount;
 }
