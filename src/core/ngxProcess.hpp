@@ -14,23 +14,32 @@ public:
 
   /* fork */
   /* -- master -- */
-  void SetWorkerGroup(bool updateSignal); /* worker recreate option */
+  void BindSocket(); /* lintening server socket */
+  void SetWorkerGroup(bool bUpdateSignal); /* worker recreate option */
+  void MonitorWorkers(); /* waitpid - replace worker process */
   /* -- worker -- */
+  void 
   void DoWorkerThings(); /* signal handling - exit request from master, error
                             notification */
 
-  /* waitpid */
-  void WaitWorkers(std::vector<int> &prevWorkers); /* retrieve workers */
-
 private:
-  void ReloadConfig(); /* signal handling, post&prev replacement */
-  void SpawnWorker(int targetPID);
-  /* variables */
+  /* -- master -- */
+  void reloadConfig(); /* signal handling, post&prev replacement */
+  void spawnWorker(int targetPID);
+  void waitWorkers(std::vector<int> &workers); /* retrieve workers */
+
+  void handleSIGHUP(); /* reload signal handling */
+  void handleSIGQUIT(); /* exit signal handling */
+  // void handleSIGTERM(); /* terminate signal handling */
+  /* -- worker -- */
+  
+/* variables */
 public:
 private:
   int mPID;
   int mStatus;
   int mChannel[2]; /* socket master-worker */
+  // std::vector<std::vector<int>> mChannel; /* socket master-worker */
   std::vector<int> mWorkers;
   ngxConfig *mConfig;
 };

@@ -1,8 +1,8 @@
 #include "ngxProcess.hpp"
 
-void ngxProcess::SetWorkerGroup(bool updateSignal) {
+void ngxProcess::SetWorkerGroup(bool bUpdateSignal) {
   std::vector<int> prevWorkers;
-  if (updateSignal){
+  if (bUpdateSignal){
     prevWorkers = mWorkers;
     mWorkers.clear();
     delete(mConfig);
@@ -11,11 +11,23 @@ void ngxProcess::SetWorkerGroup(bool updateSignal) {
   mConfig = new ngxConfig();
   int workerCount = mConfig->GetWorkerCount();
   for (int index = 0; index < workerCount; index++) {
-    SpawnWorker(0);
+    spawnWorker(0);
   }
 
-  if (updateSignal){
+  if (bUpdateSignal){
     kqueue_massage(); /* */
-    WaitWorkers(prevWorkers);
+    waitWorkers(prevWorkers);
   }
+}
+
+void ngxProcess::waitWorkers(std::vector<int> &workers)
+{
+}
+
+void ngxProcess::handleSIGHUP() {
+  SetWorkerGroup(true);
+}
+
+void ngxProcess::handleSIGQUIT() {
+  waitWorkers(mWorkers);
 }

@@ -4,7 +4,7 @@ ngxProcess::ngxProcess() : mPID(0), mStatus(0) {}
 
 ngxProcess::~ngxProcess() { delete mConfig; }
 
-void ngxProcess::SpawnWorker(int targetPID) {
+void ngxProcess::spawnWorker(int TargetPID) {
   mPID = fork();
 
   if (mPID < 0) {
@@ -14,11 +14,11 @@ void ngxProcess::SpawnWorker(int targetPID) {
     DoWorkerThings();
   } else {
     // parent
-    if (targetPID == 0) { /* new worker */
+    if (TargetPID == 0) { /* new worker */
       mWorkers.push_back(mPID);
     } else { /* replacement worker */
       std::vector<int>::iterator it =
-          find(mWorkers.begin(), mWorkers.end(), targetPID);
+          find(mWorkers.begin(), mWorkers.end(), TargetPID);
       if (it != mWorkers.end()) {
         *it = mPID;
       } else {
