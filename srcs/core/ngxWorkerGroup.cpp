@@ -1,18 +1,16 @@
 #include "ngxWorkerGroup.hpp"
 
 ngxWorkerGroup::ngxWorkerGroup(void)
-  : mPID(0)
-  , mStatus(NGX_WORKERGROUP_INIT)
-  , mServerSocketFd(0)
-{
+    : mPID(0)
+    , mStatus(NGX_WORKERGROUP_INIT)
+    , mServerSocketFd(0) {
   openServerSocket();
   createWorkerGroup();
   monitorWorkerGroup();
 }
 
-ngxWorkerGroup::~ngxWorkerGroup(void)
-{
-  mStatus == NGX_WORKERGROUP_STOP;
+ngxWorkerGroup::~ngxWorkerGroup(void) {
+  mStatus = NGX_WORKERGROUP_STOP;
   closeServerSocket();
   removeWorkerGroup();
 }
@@ -28,15 +26,13 @@ void ngxWorkerGroup::createWorkerGroup(void) {
   mStatus = NGX_WORKERGROUP_RUN;
 }
 
-void ngxWorkerGroup::monitorWorkerGroup(void)
-{
-  while (mStatus == NGX_WORKERGROUP_RUN)
-  {
-    if (mStatus == NGX_WORKERGROUP_STOP){
+void ngxWorkerGroup::monitorWorkerGroup(void) {
+  while (mStatus == NGX_WORKERGROUP_RUN) {
+    if (mStatus == NGX_WORKERGROUP_STOP) {
       assert("interrupt by signal, returned to destructed class");
     }
     int brokenPID = waitpid(-1, &mStatus, WNOHANG);
-    if (mStatus == NGX_WORKERGROUP_RUN){
+    if (mStatus == NGX_WORKERGROUP_RUN) {
       spawnWorker(brokenPID);
     }
   }
@@ -62,12 +58,12 @@ void ngxWorkerGroup::removeWorkerGroup(void) {
 
   // while (mWorkers.size() > 0){
   //   int exitedPID = waitpid(-1, &mStatus, WNOHANG);
-  //   if (exitedPID < 0 || std::find(mWorkers.begin(), mWorkers.end(), exitedPID) == mWorkers.end()) {
+  //   if (exitedPID < 0 || std::find(mWorkers.begin(), mWorkers.end(),
+  //   exitedPID) == mWorkers.end()) {
   //     assert("worker not found");
   //   }
   //   mWorkers.erase(std::find(mWorkers.begin(), mWorkers.end(), exitedPID));
   // }
-  
 }
 
 void ngxWorkerGroup::spawnWorker(int TargetPID) {
