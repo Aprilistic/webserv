@@ -10,7 +10,8 @@ ngxWorkerGroup::ngxWorkerGroup(void)
   monitorWorkerGroup();
 }
 
-ngxWorkerGroup::~ngxWorkerGroup(void) {
+ngxWorkerGroup::~ngxWorkerGroup(void)
+{
   mStatus == NGX_WORKERGROUP_STOP;
   closeServerSocket();
   removeWorkerGroup();

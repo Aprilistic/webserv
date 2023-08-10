@@ -15,7 +15,7 @@ void ngxMaster::startNginx(void) {
 void ngxMaster::reloadNginx(void) {
 	ngxWorkerGroup *prevWorkerGroup = mWorkerGroup;
 	mWorkerGroup = new ngxWorkerGroup();
-	// check
+
 	while (mWorkerGroup->getStatus() == NGX_WORKERGROUP_INIT) {
 		usleep(100);
 	}
