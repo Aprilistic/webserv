@@ -15,11 +15,14 @@ void ngxMaster::startNginx(void) {
 void ngxMaster::reloadNginx(void) {
 	ngxWorkerGroup *prevWorkerGroup = mWorkerGroup;
 	mWorkerGroup = new ngxWorkerGroup();
-
+	// check
+	while (mWorkerGroup->getStatus() == NGX_WORKERGROUP_INIT) {
+		usleep(100);
+	}
 	if (mWorkerGroup->getStatus() == NGX_WORKERGROUP_RUN) {
-		delete mWorkerGroup;
-		mWorkerGroup = prevWorkerGroup;
-		return;
+		delete prevWorkerGroup;
+	} else {
+		assert("failed to reload nginx");
 	}
 }
 
