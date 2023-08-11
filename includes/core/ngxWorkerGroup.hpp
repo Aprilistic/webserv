@@ -24,13 +24,14 @@ private:
 
   void spawnWorker(int TargetPID);
   void waitWorker(int Mode);
-  
+
   void doWorkerThings(void);
 
 public:
 private:
   int mPID;
-  int mStatus;
+  int mProcessType;
+  int mWorkerGroupStatus;
   int mServerSocketFd;
   std::vector<int> mWorkers;
 };

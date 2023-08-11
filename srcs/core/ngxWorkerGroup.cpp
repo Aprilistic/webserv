@@ -4,18 +4,18 @@
 #define RECOVER_IF_FAIL (1)
 
 ngxWorkerGroup::ngxWorkerGroup(void)
-    : mPID(0), mStatus(NGX_WORKERGROUP_INIT), mServerSocketFd(0) {
+    : mPID(0), mWorkerGroupStatus(NGX_WORKERGROUP_INIT), mServerSocketFd(0) {
   openServerSocket();
   createWorkerGroup();
 }
 
 ngxWorkerGroup::~ngxWorkerGroup(void) {
-  mStatus = NGX_WORKERGROUP_STOP;
+  mWorkerGroupStatus = NGX_WORKERGROUP_STOP;
   closeServerSocket();
   removeWorkerGroup();
 }
 
-const int ngxWorkerGroup::getStatus(void) const { return mStatus; }
+const int ngxWorkerGroup::getStatus(void) const { return mWorkerGroupStatus; }
 
 void ngxWorkerGroup::openServerSocket(void) {}
 
@@ -23,7 +23,7 @@ void ngxWorkerGroup::createWorkerGroup(void) {
   for (int i = 0; i < mWorkerCount; i++) {
     spawnWorker(0);
   }
-  mStatus = NGX_WORKERGROUP_RUN;
+  mWorkerGroupStatus = NGX_WORKERGROUP_RUN;
   waitWorker(RECOVER_IF_FAIL);
 }
 
@@ -33,7 +33,7 @@ void ngxWorkerGroup::closeServerSocket(void) {
 }
 
 void ngxWorkerGroup::removeWorkerGroup(void) {
-  mStatus = NGX_WORKERGROUP_STOP;
+  mWorkerGroupStatus = NGX_WORKERGROUP_STOP;
   for (int i = 0; i < mWorkerCount; i++) {
     kill(mWorkers[i], SIGQUIT); /* ⭐️⭐️⭐️⭐️⭐️ */
   }
@@ -92,7 +92,7 @@ void ngxWorkerGroup::waitWorker(int Mode) {
       if (WEXITSTATUS(status)) {
         assert("worker exited with non-zero status"); /* ⭐️⭐️⭐️⭐️⭐️ */
       }
-      if (Mode == RECOVER_IF_FAIL && mStatus == NGX_WORKERGROUP_RUN) {
+      if (Mode == RECOVER_IF_FAIL && mWorkerGroupStatus == NGX_WORKERGROUP_RUN) {
         spawnWorker(pid);
       }
     }
