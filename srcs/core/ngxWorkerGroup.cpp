@@ -4,7 +4,10 @@
 #define RECOVER_IF_FAIL (1)
 
 ngxWorkerGroup::ngxWorkerGroup(void)
-    : mPID(0), mWorkerGroupStatus(NGX_WORKERGROUP_INIT), mServerSocketFd(0) {
+    : mPID(0)
+    , mProcessType(NGX_PROCESS_MASTER)
+    , mWorkerGroupStatus(NGX_WORKERGROUP_INIT)
+    , mServerSocketFd(0) {
   openServerSocket();
   createWorkerGroup();
 }

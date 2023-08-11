@@ -35,4 +35,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#define NGX_PROCESS_MASTER (0)
+#define NGX_PROCESS_WORKER (1)
+
 #endif
