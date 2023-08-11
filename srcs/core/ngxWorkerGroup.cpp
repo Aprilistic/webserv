@@ -91,7 +91,7 @@ void ngxWorkerGroup::waitWorker(int Mode) {
       if (WEXITSTATUS(status)) {
         assert("worker exited with non-zero status"); /* ⭐️⭐️⭐️⭐️⭐️ */
       }
-      if (Mode == RECOVER_IF_FAIL && NGX_WORKERGROUP_RUN) {
+      if (Mode == RECOVER_IF_FAIL && mStatus == NGX_WORKERGROUP_RUN) {
         spawnWorker(pid);
       }
     }
