@@ -33,6 +33,7 @@ void ngxWorkerGroup::closeServerSocket(void) {
 }
 
 void ngxWorkerGroup::removeWorkerGroup(void) {
+  mStatus = NGX_WORKERGROUP_STOP;
   for (int i = 0; i < mWorkerCount; i++) {
     kill(mWorkers[i], SIGQUIT); /* ⭐️⭐️⭐️⭐️⭐️ */
   }
