@@ -35,7 +35,14 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+//Process Thread
+#include "NgxProcess.hpp"
+#include "NgxThread.hpp"
+
 #define NGX_PROCESS_MASTER (0)
 #define NGX_PROCESS_WORKER (1)
+
+
+
 
 #endif

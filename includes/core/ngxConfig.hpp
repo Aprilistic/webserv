@@ -1,12 +1,12 @@
 #ifndef NGXCONFIG_HPP
 #define NGXCONFIG_HPP
 
-#include "ngxCore.hpp"
+#include "NgxCore.hpp"
 
-class ngxConfig {
+class NgxConfig {
   /* methods */
 public:
-  ngxConfig();
+  NgxConfig();
 
   const int GetWorkerCount() const;
   const int GetWorkerConnectionCount() const;

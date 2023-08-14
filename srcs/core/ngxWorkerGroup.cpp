@@ -1,28 +1,26 @@
-#include "ngxWorkerGroup.hpp"
+#include "NgxWorkerGroup.hpp"
 
 #define QUIT_WHEN_NOCHILD (0)
 #define RECOVER_IF_FAIL (1)
 
-ngxWorkerGroup::ngxWorkerGroup(void)
-    : mPID(0)
-    , mProcessType(NGX_PROCESS_MASTER)
-    , mWorkerGroupStatus(NGX_WORKERGROUP_INIT)
-    , mServerSocketFd(0) {
+NgxWorkerGroup::NgxWorkerGroup(void)
+    : mPID(0), mProcessType(NGX_PROCESS_MASTER),
+      mWorkerGroupStatus(NGX_WORKERGROUP_INIT), mServerSocketFd(0) {
   openServerSocket();
   createWorkerGroup();
 }
 
-ngxWorkerGroup::~ngxWorkerGroup(void) {
+NgxWorkerGroup::~NgxWorkerGroup(void) {
   mWorkerGroupStatus = NGX_WORKERGROUP_STOP;
   closeServerSocket();
   removeWorkerGroup();
 }
 
-const int ngxWorkerGroup::getStatus(void) const { return mWorkerGroupStatus; }
+const int NgxWorkerGroup::GetStatus(void) const { return mWorkerGroupStatus; }
 
-void ngxWorkerGroup::openServerSocket(void) {}
-
-void ngxWorkerGroup::createWorkerGroup(void) {
+void NgxWorkerGroup::openServerSocket(void) {}
+  
+void NgxWorkerGroup::createWorkerGroup(void) {
   for (int i = 0; i < mWorkerCount; i++) {
     spawnWorker(0);
   }
@@ -30,12 +28,12 @@ void ngxWorkerGroup::createWorkerGroup(void) {
   waitWorker(RECOVER_IF_FAIL);
 }
 
-void ngxWorkerGroup::closeServerSocket(void) {
+void NgxWorkerGroup::closeServerSocket(void) {
   /* kqueue unregister */
   close(mServerSocketFd);
 }
 
-void ngxWorkerGroup::removeWorkerGroup(void) {
+void NgxWorkerGroup::removeWorkerGroup(void) {
   mWorkerGroupStatus = NGX_WORKERGROUP_STOP;
   for (int i = 0; i < mWorkerCount; i++) {
     kill(mWorkers[i], SIGQUIT); /* ⭐️⭐️⭐️⭐️⭐️ */
@@ -43,7 +41,7 @@ void ngxWorkerGroup::removeWorkerGroup(void) {
   waitWorker(QUIT_WHEN_NOCHILD);
 }
 
-void ngxWorkerGroup::spawnWorker(int TargetPID) {
+void NgxWorkerGroup::spawnWorker(int targetPID) {
   mPID = fork();
 
   if (mPID < 0) {
@@ -53,11 +51,11 @@ void ngxWorkerGroup::spawnWorker(int TargetPID) {
     doWorkerThings();
   } else {
     // parent
-    if (TargetPID == 0) { /* new worker */
+    if (targetPID == 0) { /* new worker */
       mWorkers.push_back(mPID);
     } else { /* replacement worker */
       std::vector<int>::iterator it =
-          std::find(mWorkers.begin(), mWorkers.end(), TargetPID);
+          std::find(mWorkers.begin(), mWorkers.end(), targetPID);
       if (it != mWorkers.end()) {
         *it = mPID;
       } else {
@@ -67,7 +65,7 @@ void ngxWorkerGroup::spawnWorker(int TargetPID) {
   }
 }
 
-void ngxWorkerGroup::waitWorker(int Mode) {
+void NgxWorkerGroup::waitWorker(int mode) {
   int pid;
   int status;
 
@@ -81,7 +79,7 @@ void ngxWorkerGroup::waitWorker(int Mode) {
     if (pid < 0) {
       if (errno == EINTR) {
         continue;
-      } else if (Mode == QUIT_WHEN_NOCHILD && errno == ECHILD) {
+      } else if (mode == QUIT_WHEN_NOCHILD && errno == ECHILD) {
         break;
       } else {
         assert("waitpid() failed");
@@ -95,7 +93,8 @@ void ngxWorkerGroup::waitWorker(int Mode) {
       if (WEXITSTATUS(status)) {
         assert("worker exited with non-zero status"); /* ⭐️⭐️⭐️⭐️⭐️ */
       }
-      if (Mode == RECOVER_IF_FAIL && mWorkerGroupStatus == NGX_WORKERGROUP_RUN) {
+      if (mode == RECOVER_IF_FAIL &&
+          mWorkerGroupStatus == NGX_WORKERGROUP_RUN) {
         spawnWorker(pid);
       }
     }

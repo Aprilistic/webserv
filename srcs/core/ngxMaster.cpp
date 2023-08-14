@@ -1,31 +1,23 @@
-#include "ngxMaster.hpp"
+#include "NgxMaster.hpp"
 
-ngxMaster::ngxMaster(void) {
-	startNginx();
+NgxMaster::NgxMaster(void) { startNginx(); }
+
+NgxMaster::~NgxMaster(void) { stopNginx(); }
+
+void NgxMaster::startNginx(void) { mWorkerGroup = new NgxWorkerGroup(); }
+
+void NgxMaster::reloadNginx(void) {
+  NgxWorkerGroup *prevWorkerGroup = mWorkerGroup;
+  mWorkerGroup = new NgxWorkerGroup();
+
+  while (mWorkerGroup->GetStatus() == NGX_WORKERGROUP_INIT) {
+    usleep(100);
+  }
+  if (mWorkerGroup->GetStatus() == NGX_WORKERGROUP_RUN) {
+    delete prevWorkerGroup;
+  } else {
+    assert("failed to reload nginx");
+  }
 }
 
-ngxMaster::~ngxMaster(void) {
-	stopNginx();
-}
-
-void ngxMaster::startNginx(void) {
-	mWorkerGroup = new ngxWorkerGroup();
-}
-
-void ngxMaster::reloadNginx(void) {
-	ngxWorkerGroup *prevWorkerGroup = mWorkerGroup;
-	mWorkerGroup = new ngxWorkerGroup();
-
-	while (mWorkerGroup->getStatus() == NGX_WORKERGROUP_INIT) {
-		usleep(100);
-	}
-	if (mWorkerGroup->getStatus() == NGX_WORKERGROUP_RUN) {
-		delete prevWorkerGroup;
-	} else {
-		assert("failed to reload nginx");
-	}
-}
-
-void ngxMaster::stopNginx(void) {
-	delete mWorkerGroup;
-}
+void NgxMaster::stopNginx(void) { delete mWorkerGroup; }

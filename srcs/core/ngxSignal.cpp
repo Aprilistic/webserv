@@ -1,6 +1,6 @@
-#include "ngxSignal.hpp"
+#include "NgxSignal.hpp"
 
-void ngxSignal::initSignal(void) {
+void NgxSignal::InitSignal(void) {
   sigset_t set;
   sigemptyset(&set);
   sigaddset(&set, SIGQUIT);
@@ -10,7 +10,7 @@ void ngxSignal::initSignal(void) {
   sigprocmask(SIG_BLOCK, &set, NULL);
 }
 
-void ngxSignal::signalHandler(int ProcessType, int Signal) {
+void NgxSignal::signalHandler(int ProcessType, int Signal) {
 
   switch (ProcessType) {
   case NGX_PROCESS_MASTER:
@@ -28,7 +28,7 @@ void ngxSignal::signalHandler(int ProcessType, int Signal) {
       /* code */
       break;
     default:
-      assert("ngxSignal::signalHandler: Signal is not defined");
+      assert("NgxSignal::signalHandler: Signal is not defined");
       break;
     }
     break;
@@ -48,42 +48,42 @@ void ngxSignal::signalHandler(int ProcessType, int Signal) {
       /* code */
       break;
     default:
-      assert("ngxSignal::signalHandler: Signal is not defined");
+      assert("NgxSignal::signalHandler: Signal is not defined");
       break;
     }
   default:
-    assert("ngxSignal::signalHandler: ProcessType is not defined");
+    assert("NgxSignal::signalHandler: ProcessType is not defined");
     break;
   }
 }
 
-void ngxSignal::setShutdownSignal(void) {
+void NgxSignal::setShutdownSignal(void) {
   struct sigaction sa;
-  sa.sa_handler = ngxSignal::signalHandler;
+  sa.sa_handler = NgxSignal::signalHandler;
   sigemptyset(&sa.sa_mask);
   sa.sa_flags = 0;
   sigaction(SIGQUIT, &sa, NULL);
 }
 
-void ngxSignal::setTerminateSignal(void) {
+void NgxSignal::setTerminateSignal(void) {
   struct sigaction sa;
-  sa.sa_handler = ngxSignal::signalHandler;
+  sa.sa_handler = NgxSignal::signalHandler;
   sigemptyset(&sa.sa_mask);
   sa.sa_flags = 0;
   sigaction(SIGTERM, &sa, NULL);
 }
 
-void ngxSignal::setNoAcceptSignal(void) {
+void NgxSignal::setNoAcceptSignal(void) {
   struct sigaction sa;
-  sa.sa_handler = ngxSignal::signalHandler;
+  sa.sa_handler = NgxSignal::signalHandler;
   sigemptyset(&sa.sa_mask);
   sa.sa_flags = 0;
   sigaction(SIGWINCH, &sa, NULL);
 }
 
-void ngxSignal::setReconfigureSignal(void) {
+void NgxSignal::setReconfigureSignal(void) {
   struct sigaction sa;
-  sa.sa_handler = ngxSignal::signalHandler;
+  sa.sa_handler = NgxSignal::signalHandler;
   sigemptyset(&sa.sa_mask);
   sa.sa_flags = 0;
   sigaction(SIGHUP, &sa, NULL);

@@ -1,24 +1,24 @@
 #ifndef NGXSIGNAL_HPP
 #define NGXSIGNAL_HPP
 
-#include "ngxCore.hpp"
+#include "NgxCore.hpp"
 
 #define NGX_SHUTDOWN_SIGNAL SIGQUIT
 #define NGX_TERMINATE_SIGNAL SIGTERM
 #define NGX_NOACCEPT_SIGNAL SIGWINCH
 #define NGX_RECONFIGURE_SIGNAL SIGHUP
 
-class ngxSignal {
+class NgxSignal {
 public:
-  static void initSignal(void);
+  static void InitSignal(void);
 
 private:
-  ngxSignal(void);
-  ~ngxSignal(void);
-	
-  static void signalHandler(int ProcessType, int Signal);
+  NgxSignal(void);
+  ~NgxSignal(void);
 
-  static void setSignal(int Signal);
+  static void signalHandler(int processType, int signal);
+
+  static void setSignal(int signal);
   static void clearSignal(void);
 
   static void setShutdownSignal(void);
