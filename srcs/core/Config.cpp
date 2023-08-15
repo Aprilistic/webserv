@@ -20,4 +20,6 @@ void Config::openConfFile(const std::string &path) {
   }
 }
 
-std::map<std::string, ServerInfo>  Config::parseConfFile() {}
+Config::parseConfFile() {
+  
+}

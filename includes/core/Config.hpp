@@ -22,4 +22,16 @@ private:
   std::stringstream mConfBuffer;
 };
 
+class CoreModule {
+protected:
+  int mTimeOut; /* Round-Robin time slice */
+  int mClientMaxBodySize;
+  std::string mUploadStore;
+};
+
+class ServerContext : public CoreModule {
+public:
+private:
+}
+
 #endif
