@@ -23,15 +23,28 @@ private:
 };
 
 class CoreModule {
+public:
 protected:
   int mTimeOut; /* Round-Robin time slice */
   int mClientMaxBodySize;
   std::string mUploadStore;
 };
 
-class ServerContext : public CoreModule {
+class ServerContext : public CoreModule
+{
 public:
 private:
-}
+  int mListen; // int mPort; std::string mHost;
+  std::string mServerName;
+
+  // location context
+  std::string mRoot;
+  std::vector<std::string> mIndex;
+  std::vector<int> mErrorPageNum;
+  std::string mErrorPage;
+  std::map<std::string, std::map<std::string, std::string> > mLocations; /* <location_dir, <key, filename>> */
+
+  /* variables */
+};
 
 #endif
