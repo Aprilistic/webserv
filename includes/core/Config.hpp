@@ -9,10 +9,11 @@ class Config {
   /* methods */
 public:
   Config(const std::string &path);
+  int SetConfig(const std::string &path);
 
 protected:
 private:
-  bool openConfFile(const std::string &path);
+  void openConfFile(const std::string &path);
   void parseConfFile(void);
 
   /* variables */
