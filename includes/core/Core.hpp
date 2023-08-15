@@ -1,5 +1,5 @@
-#ifndef NGXCORE_HPP
-#define NGXCORE_HPP
+#ifndef CORE_HPP
+#define CORE_HPP
 
 #include <algorithm>
 #include <condition_variable>
@@ -34,15 +34,5 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-
-//Process Thread
-#include "NgxProcess.hpp"
-#include "NgxThread.hpp"
-
-#define NGX_PROCESS_MASTER (0)
-#define NGX_PROCESS_WORKER (1)
-
-
-
 
 #endif
