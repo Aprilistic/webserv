@@ -3,28 +3,22 @@
 
 #include "Core.hpp"
 
+#define CONF_BUFFER (4096)
+
 class Config {
   /* methods */
 public:
-  Config();
-
-  const int GetWorkerCount() const;
-  const int GetWorkerConnectionCount() const;
+  Config(const std::string &path);
 
 protected:
 private:
+  bool openConfFile(const std::string &path);
+  void parseConfFile(void);
+
   /* variables */
 protected:
-  /* MainContext */
-  int mWorkerCount;
-
-  /* EventsContext */
-  int mWorkerConnectionCount;
-
-  /* HttpContext */
-
-  /* ServerContext */
-  /* LocationContext */
+private:
+  std::stringstream mConfBuffer;
 };
 
 #endif
