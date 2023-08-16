@@ -3,8 +3,6 @@
 
 #include "Core.hpp"
 
-#define CONF_BUFFER (4096)
-
 class Config {
   /* methods */
 public:
@@ -44,7 +42,8 @@ private:
   std::string mErrorPage;
   std::map<std::string, std::map<std::string, std::string> > mLocations; /* <location_dir, <key, filename>> */
 
-  /* variables */
+  /* ServerContext */
+  /* LocationContext */
 };
 
 #endif
