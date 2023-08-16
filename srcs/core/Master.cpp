@@ -1,7 +1,7 @@
 #include "Master.hpp"
 
 Master::Master(const std::string &path) {
-  Config::SetConfig(path);
+  // Config::SetConfig(path);
   startServer();
 }
 

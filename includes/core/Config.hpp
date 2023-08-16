@@ -3,40 +3,41 @@
 
 #include "Core.hpp"
 
+class ServerBlock;
+class LocationBlock;
 class Config {
   /* methods */
 public:
   Config(const std::string &path);
   int SetConfig(const std::string &path);
 
-protected:
 private:
+  void checkSyntax(void);
   void openConfFile(const std::string &path);
   void parseConfFile(void);
-
   /* variables */
-protected:
 private:
   std::stringstream mConfBuffer;
+  std::map<std::string, ServerBlock> mServers;
 };
 
-class ServerInfo {
+class ServerBlock {
 public:
-  void ParseConfig(std::string &fileName);
-private:
-  void setServer(int level, ServerInfo parentData);
-  void setLocation(int level, LocationInfo parentData);
+  ServerBlock(void);
+  ~ServerBlock(void);
 
+private:
+  LocationBlock *mRoot;
+  std::map<std::string, LocationBlock *> mLocation; /* URI 경로, 노드 주소 */
+};
+
+class LocationBlock {
 public:
 private:
-  std::map<int, std::string> mErrorPage;
-  int mClientMaxBodySize;
-  std::string mAlias;
-  bool mbAutoIndex;
-  std::string mIndex;
-  std::map<int, std::string> mListen;
-  std::string mServerName;
-  std::map<int, std::string> mReturn;
-  std::vector<std::string> mLimitExcept;
+  std::string mFragment; /* URI */
+  std::map<std::string, std::vector<std::string>> mDirectives;
+  LocationBlock *mParent; /* NULL이면 rootNode */
+  std::map<std::string, LocationBlock *> mChildren;
 };
+
 #endif

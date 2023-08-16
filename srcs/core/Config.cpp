@@ -1,8 +1,8 @@
 #include "Config.hpp"
 
-std::map<std::string, > Config::SetConfig(const std::string &path) {
+Config::SetConfig(const std::string &path) {
   openConfFile(path);
-  return (parseConfFile());
+  parseConfFile(void);
 }
 
 void Config::openConfFile(const std::string &path) {
@@ -20,6 +20,56 @@ void Config::openConfFile(const std::string &path) {
   }
 }
 
-Config::parseConfFile() {
-  
-}
+// Config::parseExample(std::string filename) {
+//   std::ifstream config(filename);
+//   std::string line;
+//   std::string currentSection;
+
+//   if (config.is_open() == false) {
+//     std::cerr << "Error: Could not open config file " << filename << std::endl;
+//     exit(EXIT_FAILURE);
+//   }
+//   while (std::getline(config, line)) {
+//     line = line.substr(0, line.find("#")); // Remove comments
+//     std::string trimmedLine;
+//     std::remove_copy(line.begin(), line.end(), std::back_inserter(trimmedLine),
+//                      ' ');
+
+//     if (trimmedLine.empty())
+//       continue;
+
+//     if (currentSection.empty() && trimmedLine.back() == '{') {
+//       currentSection = trimmedLine.substr(0, trimmedLine.size() - 1);
+//       sections[currentSection] = {};
+//     } else if (!currentSection.empty() && trimmedLine == "}") {
+//       currentSection.clear();
+//       directives.clear();
+//     } else {
+//       parseLine(trimmedLine);
+//       if (!currentSection.empty()) {
+//         sections[currentSection].push_back(directives);
+//         directives.clear();
+//       }
+//     }
+//   }
+// }
+
+// Config::parseConfFile(void) {
+
+//   std::string token;
+
+//   while (mConfBuffer.empty() == false) {
+//     token << mConfBuffer;
+
+//     if (token == "{") {
+//     }
+//     if (token == "server") {
+//       ServerBlock serverBlock;
+//       serverBlock.parseServerBlock();
+//       mServers.push_back(serverBlock);
+//     } else {
+//       std::cerr << "Error: Invalid token " << token << std::endl;
+//       exit(EXIT_FAILURE);
+//     }
+//   }
+// }
