@@ -34,7 +34,7 @@ $(OBJ_DIR) :
 	mkdir $@
 
 $(OBJ_DIR)/%.o : %.cpp
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+	$(CXX) $(INCLUDES) -c $< -o $@
 
 clean :
 	rm -rf $(OBJ_DIR)

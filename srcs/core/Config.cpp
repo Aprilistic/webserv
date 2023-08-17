@@ -1,7 +1,12 @@
 #include "Config.hpp"
 
-int Config::SetConfig(const std::string &path) {
+Config::Config(const std::string &path) { SetConfig(path); }
+
+void Config::SetConfig(const std::string &path) {
   openConfFile(path);
+  removeComment();
+  addBlank();
+  tokenize();
   parseConfFile();
 }
 
@@ -20,76 +25,52 @@ void Config::openConfFile(const std::string &path) {
   }
 }
 
-void Config::tokenizer(void) {
-  char ch;
+void Config::removeComment(void) {
+  std::stringstream cleanBuffer;
+  std::string line;
+  int commentPos;
 
-  bool bDoubleQuote = false;
-  bool bSingleQuote = false;
-  bool bComment = false;
-  bool bLiteral = false;
+  while (std::getline(mConfBuffer, line)) {
+    commentPos = line.find('#');
+    if (commentPos != std::string::npos)
+      line.erase(commentPos);
+    cleanBuffer << line << std::endl;
+  }
+  mConfBuffer.str(cleanBuffer.str());
+  mConfBuffer.clear();
+}
 
+void Config::addBlank(void) {
+  std::string content;
+  content = mConfBuffer.str();
+  for (int index = 0; index < content.size(); index++) {
+    if (content[index] == '{' || content[index] == '}' ||
+        content[index] == ';') {
+      content.insert(index, " ");
+      index += 2;
+      content.insert(index, " ");
+    }
+  }
+  mConfBuffer.str("");
+  mConfBuffer << content;
+}
+
+void Config::tokenize(void) {
   std::string token;
 
-  "server { max_body 1}";
-  while (mConfBuffer.good() == true) {
-    mConfBuffer >> ch;
-    if (ch == '{')
-
-      token += ch;
+  while (true) {
+    mConfBuffer >> token;
+    if (mConfBuffer.eof() == true) {
+      break;
+    }
+    mTokens.push_back(token);
+    token.clear();
   }
 }
 
-// Config::parseExample(std::string filename) {
-//   std::ifstream config(filename);
-//   std::string line;
-//   std::string currentSection;
-
-//   if (config.is_open() == false) {
-//     std::cerr << "Error: Could not open config file " << filename <<
-//     std::endl; exit(EXIT_FAILURE);
-//   }
-//   while (std::getline(config, line)) {
-//     line = line.substr(0, line.find("#")); // Remove comments
-//     std::string trimmedLine;
-//     std::remove_copy(line.begin(), line.end(),
-//     std::back_inserter(trimmedLine),
-//                      ' ');
-
-//     if (trimmedLine.empty())
-//       continue;
-
-//     if (currentSection.empty() && trimmedLine.back() == '{') {
-//       currentSection = trimmedLine.substr(0, trimmedLine.size() - 1);
-//       sections[currentSection] = {};
-//     } else if (!currentSection.empty() && trimmedLine == "}") {
-//       currentSection.clear();
-//       directives.clear();
-//     } else {
-//       parseLine(trimmedLine);
-//       if (!currentSection.empty()) {
-//         sections[currentSection].push_back(directives);
-//         directives.clear();
-//       }
-//     }
-//   }
-// }
-
-// Config::parseConfFile(void) {
-
-//   std::string token;
-
-//   while (mConfBuffer.empty() == false) {
-//     token << mConfBuffer;
-
-//     if (token == "{") {
-//     }
-//     if (token == "server") {
-//       ServerBlock serverBlock;
-//       serverBlock.parseServerBlock();
-//       mServers.push_back(serverBlock);
-//     } else {
-//       std::cerr << "Error: Invalid token " << token << std::endl;
-//       exit(EXIT_FAILURE);
-//     }
-//   }
-// }
+void Config::parseConfFile(void) {
+  for (std::vector<std::string>::iterator it = mTokens.begin();
+       it != mTokens.end(); ++it) {
+    std::cout << *it << std::endl;
+  }
+}
