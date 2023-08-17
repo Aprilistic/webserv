@@ -1,7 +1,7 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include "/Users/hyeoan/goinfre/web/includes/core/Core.hpp"
+#include "Core.hpp"
 
 // class ServerBlock;
 // class LocationBlock;

@@ -1,4 +1,4 @@
-#include "/Users/hyeoan/goinfre/web/includes/core/Config.hpp"
+#include "Config.hpp"
 
 int main(int argc, char** argv)
 {
