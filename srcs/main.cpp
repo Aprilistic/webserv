@@ -1,10 +1,13 @@
-#include "Core.hpp"
-#include "Master.hpp"
+#include "Config.hpp"
 
-int main(int ac, char **av) {
-  if (ac == 2) {
-    Master master(av[1]);
-  } else {
-    std::cout << "Usage: ./webserv [conf_file]" << std::endl;
-  }
-  return (0);
+int main(int argc, char** argv)
+{
+	if (argc != 2)
+	{
+		std::cerr << "Error: Invalid arguments" << std::endl;
+		return (1);
+	}
+	Config config(argv[1]);
+	// config.SetConfig(argv[1]);
+	return (0);
+}
