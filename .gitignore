@@ -30,6 +30,7 @@
 *.exe
 *.out
 *.app
+webserv
 
 # Misc
 .DS_Store
