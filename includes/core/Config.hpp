@@ -9,35 +9,72 @@ class Config {
   /* methods */
 public:
   Config(const std::string &path);
-void SetConfig(const std::string &path);
+  void SetConfig(const std::string &path);
 
 private:
-void openConfFile(const std::string &path);
-void parseConfFile(void);
-void removeComment(void);
-void addBlank(void);
-void tokenize(void);
+  void openConfFile(const std::string &path);
+  void parseConfFile(void);
+  void removeComment(void);
+  void addBlank(void);
+  void tokenize(void);
+
   /* variables */
 private:
   std::stringstream mConfBuffer;
-//   std::map<std::string, ServerBlock> mServers;
+  //   std::map<std::string, ServerBlock> mServers;
+  Node mConfigTree;
   std::vector<std::string> mTokens;
 };
 
-// class ServerBlock {
-// public:
-// private:
-//   LocationBlock *mRoot;
-//   std::map<std::string, LocationBlock *> mLocation; /* URI 경로, 노드 주소 */
-// };
+/* Level Bit Flags */
+#define NONE (0)
+#define HTTP (1 << 0)
+#define SERVER (1 << 1)
+#define LOCATION (1 << 2)
 
-// class LocationBlock {
-// public:
-// private:
-//   std::string mFragment; /* URI */
-//   std::map<std::string, std::vector<std::string> > mDirectives;
-//   LocationBlock *mParent; /* NULL이면 rootNode */
-//   std::map<std::string, LocationBlock *> mChildren;
-// };
+/* Value Count Bit Flags */
+#define NONE (1 << 3)
+#define SINGLE (1 << 4)
+#define MULTIPLE (1 << 5)
+
+#define NEED_BRAKETS (1 << 6)
+#define NEED_SEMICOLON (1 << 7)
+#define NEED_BRANCH (1 << 8)
+
+/* Token Type Flags */
+#define DIRECTIVE (1 << 0)
+#define OPEN_BRACKET (1 << 1)
+#define CLOSE_BRACKET (1 << 2)
+#define SEMICOLON (1 << 3)
+#define UNDEFINED (1 << 4)
+
+const std::vector<std::string> HTTPDirectives =
+    ("client_max_body_size", "error_page", "autoindex", "index", "alias",
+     "root");
+
+const std::vector<std::string> ServerDirectives =
+    ("server_name", "listen");
+
+const std::vector<std::string> LocationDirectives =
+    ("location");
+
+class Node {
+public:
+  Node(std::vector<std::string> &configTokens);
+  void CreateTree(int curLevel, Node *parent,
+                  std::vector<std::string> &configTokens,
+                  std::vector<std::string>::iterator &token);
+
+private:
+  long long getAllowedOptions(std::string directive);
+  int getTokenType(std::string directive);
+
+public:
+private:
+  std::map<std::string, std::vector<std::string>> mDirectives;
+  std::vector<Node> mChildren;
+  std::map<std::string, Node *> mHashMap;
+  int mLevel;
+};
 
 #endif
