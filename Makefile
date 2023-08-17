@@ -14,7 +14,8 @@ SRCS := $(wildcard srcs/core/*.cpp) \
 		$(wildcard srcs/event/*.cpp) \
 		$(wildcard srcs/http/modules/*.cpp) \
 		$(wildcard srcs/http/*.cpp) \
-		$(wildcard srcs/stream/*.cpp)
+		$(wildcard srcs/stream/*.cpp) \
+		$(wildcard srcs/*.cpp)
 SRCS_DIR := $(dir $(SRCS))
 
 OBJS := $(addprefix $(OBJ_DIR)/, $(notdir $(SRCS:.cpp=.o)))

@@ -8,12 +8,11 @@
 
 class Master {
 public:
-  Master(void);
+  Master(const std::string &path);
   ~Master(void);
 
 private:
   void startServer(void);
-  void reloadServer(void);
   void stopServer(void);
 
 public:
