@@ -15,12 +15,12 @@ private:
   void checkSyntax(void);
   void openConfFile(const std::string &path);
   void parseConfFile(void);
+  void tokenizer(void);
   /* variables */
 private:
   std::stringstream mConfBuffer;
   std::map<std::string, ServerBlock> mServers;
 };
-
 class ServerBlock {
 public:
   ServerBlock(void);

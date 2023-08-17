@@ -1,8 +1,8 @@
 #include "Config.hpp"
 
-Config::SetConfig(const std::string &path) {
+int Config::SetConfig(const std::string &path) {
   openConfFile(path);
-  parseConfFile(void);
+  parseConfFile();
 }
 
 void Config::openConfFile(const std::string &path) {
@@ -20,19 +20,39 @@ void Config::openConfFile(const std::string &path) {
   }
 }
 
+void Config::tokenizer(void) {
+  char ch;
+
+  bool bDoubleQuote = false;
+  bool bSingleQuote = false;
+  bool bComment = false;
+  bool bLiteral = false;
+
+  std::string token;
+
+  "server { max_body 1}";
+  while (mConfBuffer.good() == true) {
+    mConfBuffer >> ch;
+    if (ch == '{')
+
+      token += ch;
+  }
+}
+
 // Config::parseExample(std::string filename) {
 //   std::ifstream config(filename);
 //   std::string line;
 //   std::string currentSection;
 
 //   if (config.is_open() == false) {
-//     std::cerr << "Error: Could not open config file " << filename << std::endl;
-//     exit(EXIT_FAILURE);
+//     std::cerr << "Error: Could not open config file " << filename <<
+//     std::endl; exit(EXIT_FAILURE);
 //   }
 //   while (std::getline(config, line)) {
 //     line = line.substr(0, line.find("#")); // Remove comments
 //     std::string trimmedLine;
-//     std::remove_copy(line.begin(), line.end(), std::back_inserter(trimmedLine),
+//     std::remove_copy(line.begin(), line.end(),
+//     std::back_inserter(trimmedLine),
 //                      ' ');
 
 //     if (trimmedLine.empty())
