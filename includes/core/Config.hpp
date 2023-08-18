@@ -25,20 +25,10 @@
 #define SEMICOLON (1 << 3)
 #define UNDEFINED (1 << 4)
 
-// const std::vector<std::string> HTTPDirectives = {"client_max_body_size",
-//                                                  "error_page",
-//                                                  "autoindex",
-//                                                  "index",
-//                                                  "alias",
-//                                                  "root"}; // no need root
-
-// const std::vector<std::string> ServerDirectives = {"server_name", "listen"}; // Where is return?
-
-// const std::vector<std::string> LocationDirectives = {"location"}; // Where is limit_except?
-
-extern const std::vector<std::string> HTTPDirectives;
-extern const std::vector<std::string> ServerDirectives;
-extern const std::vector<std::string> LocationDirectives;
+const std::string HTTPDirectives[] = {"client_max_body_size", "error_page",
+                                      "autoindex", "index", "alias"};
+const std::string ServerDirectives[] = {"server_name", "listen", "return"};
+const std::string LocationDirectives[] = {"limit_except"};
 
 class Node {
 public:
@@ -48,12 +38,12 @@ public:
                   std::vector<std::string>::iterator &token);
 
 private:
-  long long getAllowedOptions(std::string directive);
+  int getAllowedOptions(std::string directive);
   int getTokenType(std::string directive);
 
 public:
 private:
-  std::map<std::string, std::vector<std::string> > mDirectives;
+  std::map<std::string, std::vector<std::string>> mDirectives;
   std::vector<Node> mChildren;
   std::map<std::string, Node *> mHashMap;
   int mLevel;
@@ -76,7 +66,7 @@ private:
 private:
   std::stringstream mConfBuffer;
   //   std::map<std::string, ServerBlock> mServers;
-  Node mConfigTree;
+  Node *mConfigTree;
   std::vector<std::string> mTokens;
 };
 
