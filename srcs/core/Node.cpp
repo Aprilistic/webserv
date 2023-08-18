@@ -47,7 +47,7 @@ Node::Node(std::vector<std::string> &configTokens,
     tokenInfo = getTokenInfo(*token);
     token++;
 
-    if ((tokenInfo & level) == 0){
+    if ((tokenInfo & level) == 0) {
       std::cerr << "Error: Invalid token level" << std::endl;
       exit(1);
     }
@@ -102,9 +102,7 @@ int Node::getTokenInfo(std::string token) {
 }
 
 void Node::addDirective(std::vector<std::string> &configTokens,
-       std::vector<std::string>::iterator &token){
-
-}
+                        std::vector<std::string>::iterator &token) {}
 
 void Node::deleteTree(void) {
   if (mChildren.size() == 0)
