@@ -48,15 +48,16 @@ private:
 #define SEMICOLON (1 << 3)
 #define UNDEFINED (1 << 4)
 
-const std::vector<std::string> HTTPDirectives =
-    ("client_max_body_size", "error_page", "autoindex", "index", "alias",
-     "root");
+const std::vector<std::string> HTTPDirectives = {"client_max_body_size",
+                                                 "error_page",
+                                                 "autoindex",
+                                                 "index",
+                                                 "alias",
+                                                 "root"};
 
-const std::vector<std::string> ServerDirectives =
-    ("server_name", "listen");
+const std::vector<std::string> ServerDirectives = {"server_name", "listen"};
 
-const std::vector<std::string> LocationDirectives =
-    ("location");
+const std::vector<std::string> LocationDirectives = {"location"};
 
 class Node {
 public:

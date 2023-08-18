@@ -29,10 +29,10 @@ int Node::getTokenType(std::string token) {
 }
 
 long long Node::getAllowedOptions(std::string directive) {
-	long long ret;
-	/* Option check return*/
+  long long ret;
+  /* Option check return*/
 
-	return ret;
+  return ret;
 }
 
 void Node::CreateTree(int curLevel, Node *parent,

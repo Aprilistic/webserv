@@ -1,6 +1,8 @@
 #include "Config.hpp"
 
-Config::Config(const std::string &path) { SetConfig(path); }
+Config::Config(const std::string &path) : mConfigTree(mTokens) {
+  SetConfig(path);
+}
 
 void Config::SetConfig(const std::string &path) {
   openConfFile(path);
