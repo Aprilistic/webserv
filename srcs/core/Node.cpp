@@ -4,6 +4,34 @@
 //   CreateTree(NONE, this, configTokens, configTokens.begin());
 // }
 
+std::vector<std::string> initializeHTTPDirectives() {
+    std::vector<std::string> temp;
+    temp.push_back("client_max_body_size");
+    temp.push_back("error_page");
+    temp.push_back("autoindex");
+    temp.push_back("index");
+    temp.push_back("alias");
+    temp.push_back("root");
+    return temp;
+}
+
+std::vector<std::string> initializeServerDirectives() {
+    std::vector<std::string> temp;
+    temp.push_back("server_name");
+    temp.push_back("listen");
+    return temp;
+}
+
+std::vector<std::string> initializeLocationDirectives() {
+    std::vector<std::string> temp;
+    temp.push_back("location");
+    return temp;
+}
+
+const std::vector<std::string> HTTPDirectives = initializeHTTPDirectives();
+const std::vector<std::string> ServerDirectives = initializeServerDirectives();
+const std::vector<std::string> LocationDirectives = initializeLocationDirectives();
+
 int Node::getTokenType(std::string token) {
   if (token == "{") {
     return (OPEN_BRACKET);
@@ -46,3 +74,4 @@ void Node::CreateTree(int curLevel, Node *parent,
     /* Recursively create nodes and continue check syntax */
   }
 }
+
