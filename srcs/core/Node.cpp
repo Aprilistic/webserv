@@ -1,4 +1,4 @@
-#include "Config.hpp"
+#include "Node.hpp"
 
 /* Level Bit Flags */
 #define NONE_LEVEL (0)
@@ -9,17 +9,22 @@
 #define DIRECTIVE (1 << 4)
 #define SINGLE_VALUE (1 << 5)
 #define MULTI_VALUE (1 << 6)
-#define ERROR (1 << 7)
+#define VALUE (1 << 7)
+#define ERROR (1 << 8)
 
 /* context */
 #define HTTP (HTTP_LEVEL | CREATE_NODE)
 #define SERVER (SERVER_LEVEL | CREATE_NODE)
 #define LOCATION (LOCATION_LEVEL | CREATE_NODE)
 /* http server location */
-#define ERROR_PAGE (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE | MULTI_VALUE)
-#define CLIENT_MAX_BODY_SIZE (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE | SINGLE_VALUE)
-#define AUTO_INDEX (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE | SINGLE_VALUE)
-#define INDEX (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE | MULTI_VALUE)
+#define ERROR_PAGE                                                             \
+  (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE | MULTI_VALUE)
+#define CLIENT_MAX_BODY_SIZE                                                   \
+  (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE | SINGLE_VALUE)
+#define AUTO_INDEX                                                             \
+  (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE | SINGLE_VALUE)
+#define INDEX                                                                  \
+  (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE | MULTI_VALUE)
 /* server */
 #define LISTEN (SERVER_LEVEL | DIRECTIVE | MULTI_VALUE)
 #define SERVER_NAME (SERVER_LEVEL | DIRECTIVE | SINGLE_VALUE)
@@ -28,17 +33,40 @@
 /* location */
 #define ALIAS (LOCATION_LEVEL | DIRECTIVE | SINGLE_VALUE)
 #define LIMIT_EXCEPT (LOCATION_LEVEL | DIRECTIVE | MULTI_VALUE)
-/* { } ;*/
+/* { } ; */
 #define OPEN_BRACKET (NONE_LEVEL | HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL)
 #define CLOSE_BRACKET (NONE_LEVEL | HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL)
 #define SEMICOLON (NONE_LEVEL | HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL)
 
-Node::Node(std::vector<std::string> &configTokens) : mLevel(NONE_LEVEL) {
-  std::vector<std::string>::iterator token = configTokens.begin();
-  CreateTree(HTTP, this, configTokens, token);
+Node::Node(std::vector<std::string> &configTokens,
+           std::vector<std::string>::iterator &token, Node *parent, int level)
+    : mParent(parent) {
+  int tokenInfo;
+
+  for (; token != configTokens.end(); token++) {
+    tokenInfo = getTokenInfo(*token);
+    token++;
+
+    if ((tokenInfo & level) == 0){
+      std::cerr << "Error: Invalid token level" << std::endl;
+      exit(1);
+    }
+
+    if (tokenInfo & CREATE_NODE) {
+      Node *newNode = new Node(configTokens, token, this, level + 1);
+      mChildren.push_back(newNode);
+    } else if (tokenInfo & DIRECTIVE) {
+      addDirective(configTokens, token);
+    } else if (tokenInfo & OPEN_BRACKET) {
+    } else if (tokenInfo & CLOSE_BRACKET) {
+      return;
+    }
+  }
 }
 
-int Node::getTokenType(std::string token) {
+Node::~Node(void) { deleteTree(); }
+
+int Node::getTokenInfo(std::string token) {
   if (token == "{") {
     return (OPEN_BRACKET);
   } else if (token == "}") {
@@ -69,22 +97,21 @@ int Node::getTokenType(std::string token) {
     return (ALIAS);
   } else if (token == "limit_except") {
     return (LIMIT_EXCEPT);
-  } 
-
-  return (ERROR);
+  }
+  return (VALUE);
 }
 
-void Node::CreateTree(int curLevel, Node *parent,
-                      std::vector<std::string> &configTokens,
-                      std::vector<std::string>::iterator &token) {
-  int tokenType;
-  int allowedOptions = 0;
+void Node::addDirective(std::vector<std::string> &configTokens,
+       std::vector<std::string>::iterator &token){
 
-  for (; token != configTokens.end(); token++) {
-    /* Recursively create nodes and continue check syntax */
-    if (getTokenType(*token))
-      CreateTree(curLevel + 1, parent, configTokens, token);
-    else
-      LineParse(curLevel, parent, configTokens, token);
+}
+
+void Node::deleteTree(void) {
+  if (mChildren.size() == 0)
+    return;
+  for (std::vector<Node *>::iterator it = mChildren.begin();
+       it != mChildren.end(); ++it) {
+    (*it)->deleteTree();
+    delete (*it);
   }
 }

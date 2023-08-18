@@ -2,30 +2,14 @@
 #define CONFIG_HPP
 
 #include "Core.hpp"
+#include "Node.hpp"
 
-
-class Node {
-public:
-  Node(std::vector<std::string> &configTokens);
-  void CreateTree(int curLevel, Node *parent,
-                  std::vector<std::string> &configTokens,
-                  std::vector<std::string>::iterator &token);
-
-private:
-  int getTokenType(std::string token);
-
-public:
-private:
-  std::map<std::string, std::vector<std::string>> mDirectives;
-  std::vector<Node> mChildren;
-  std::map<std::string, Node *> mHashMap;
-  int mLevel;
-};
 
 class Config {
   /* methods */
 public:
   Config(const std::string &path);
+  ~Config(void);
   void SetConfig(const std::string &path);
 
 private:
@@ -35,6 +19,8 @@ private:
   void addBlank(void);
   void tokenize(void);
 
+  void createTree(void);
+  void deleteTree(void);
   /* variables */
 private:
   std::stringstream mConfBuffer;

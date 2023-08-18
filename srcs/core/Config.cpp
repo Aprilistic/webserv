@@ -2,7 +2,10 @@
 
 Config::Config(const std::string &path) : mConfigTree(mTokens) {
   SetConfig(path);
+  
 }
+
+Config::~Config(void) { deleteTree(); }
 
 void Config::SetConfig(const std::string &path) {
   openConfFile(path);
@@ -75,4 +78,13 @@ void Config::parseConfFile(void) {
        it != mTokens.end(); ++it) {
     std::cout << *it << std::endl;
   }
+}
+
+void Config::createTree(void){
+  std::vector<std::string>::iterator token = mTokens.begin();
+  mConfigTree = new Node(mTokens, token, NULL, 0);
+}
+
+void Config::deleteTree(void){
+  delete mConfigTree;
 }
