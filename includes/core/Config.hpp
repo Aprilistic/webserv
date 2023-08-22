@@ -4,7 +4,6 @@
 #include "Core.hpp"
 #include "Node.hpp"
 
-
 class Config {
   /* methods */
 public:
@@ -14,7 +13,7 @@ public:
 
 private:
   void openConfFile(const std::string &path);
-  void parseConfFile(void);
+  void printConfFile(void);
   void removeComment(void);
   void addBlank(void);
   void tokenize(void);

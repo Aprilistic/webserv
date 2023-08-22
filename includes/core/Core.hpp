@@ -15,8 +15,8 @@
 #include <thread>
 #include <vector>
 
-#include <csignal>
 #include <cassert>
+#include <csignal>
 
 // External functs
 #include <arpa/inet.h>
@@ -34,5 +34,10 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+
+void Error(const std::string &msg) {
+  std::cerr << msg << std::endl;
+  exit(1);
+}
 
 #endif
