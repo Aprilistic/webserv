@@ -45,7 +45,6 @@ Node::Node(std::vector<std::string> &configTokens,
 
   for (; token != configTokens.end(); token++) {
     tokenInfo = getTokenInfo(*token);
-    token++;
 
     if ((tokenInfo & level) == 0) {
       std::cerr << "Error: Invalid token level" << std::endl;
@@ -53,6 +52,7 @@ Node::Node(std::vector<std::string> &configTokens,
     }
 
     if (tokenInfo & CREATE_NODE) {
+      token++;
       Node *newNode = new Node(configTokens, token, this, level + 1);
       mChildren.push_back(newNode);
     } else if (tokenInfo & DIRECTIVE) {
@@ -102,7 +102,26 @@ int Node::getTokenInfo(std::string token) {
 }
 
 void Node::addDirective(std::vector<std::string> &configTokens,
-                        std::vector<std::string>::iterator &token) {}
+                        std::vector<std::string>::iterator &token) {
+  std::string directive = *token;
+  std::vector<std::string> values;
+  int tokenInfo;
+
+  token++;
+  tokenInfo = getTokenInfo(*token);
+  if (tokenInfo & SINGLE_VALUE) {
+    values.push_back(*token);
+  } else if (tokenInfo & MULTI_VALUE) {
+    while (tokenInfo & MULTI_VALUE) {
+      values.push_back(*token);
+      token++;
+      tokenInfo = getTokenInfo(*token);
+    }
+  } else {
+    std::cerr << "Error: Invalid token" << std::endl;
+    exit(1);
+  }
+}
 
 void Node::deleteTree(void) {
   if (mChildren.size() == 0)
