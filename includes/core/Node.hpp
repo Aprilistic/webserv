@@ -21,7 +21,6 @@ private:
   std::map<std::string, std::vector<std::string>> mDirectives;
   Node *mParent;
   std::vector<Node *> mChildren;
-  std::map<std::string, Node *> mHashMap;
 };
 
 #endif
