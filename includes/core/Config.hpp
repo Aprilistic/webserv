@@ -1,7 +1,6 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include "Core.hpp"
 #include "Node.hpp"
 
 class Config {

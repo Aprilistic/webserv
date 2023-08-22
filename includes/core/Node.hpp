@@ -18,7 +18,7 @@ private:
 
 public:
 private:
-  std::map<std::string, std::vector<std::string>> mDirectives;
+  std::map<std::string, std::vector<std::string> > mDirectives;
   Node *mParent;
   std::vector<Node *> mChildren;
 };

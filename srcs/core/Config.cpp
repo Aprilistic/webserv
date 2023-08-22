@@ -10,18 +10,19 @@ void Config::SetConfig(const std::string &path) {
   addBlank();
   tokenize();
   printConfFile();
+  createTree();
 }
 
 void Config::openConfFile(const std::string &path) {
   std::ifstream confFile(path);
   if (confFile.is_open() == false) {
-    Error("Error: Could not open confFile ");
+    sendError("Error: Could not open confFile ");
   }
 
   mConfBuffer << confFile.rdbuf();
   confFile.close();
   if (mConfBuffer.good() == false) {
-    Error("Error: confFile stream ");
+    sendError("Error: confFile stream ");
   }
 }
 

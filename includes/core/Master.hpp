@@ -2,7 +2,6 @@
 #define MASTER_HPP
 
 #include "Config.hpp"
-#include "Core.hpp"
 
 /* Signal hadling SIGHUP, SIGQUIT or SIGTERM */
 

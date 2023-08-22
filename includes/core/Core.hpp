@@ -35,9 +35,6 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-void Error(const std::string &msg) {
-  std::cerr << msg << std::endl;
-  exit(1);
-}
+void sendError(const std::string &msg);
 
 #endif
