@@ -7,32 +7,29 @@
 #define LOCATION_LEVEL (1 << 3)
 #define CREATE_NODE (1 << 4)
 #define DIRECTIVE (1 << 5)
-#define SINGLE_VALUE (1 << 6)
-#define MULTI_VALUE (1 << 7)
-#define VALUE (1 << 8)
-#define ERROR (1 << 9)
+#define VALUE (1 << 6)
+#define ERROR (1 << 7)
 
 /* context */
 #define HTTP (HTTP_LEVEL | CREATE_NODE)
 #define SERVER (SERVER_LEVEL | CREATE_NODE)
-#define LOCATION (LOCATION_LEVEL | SINGLE_VALUE | CREATE_NODE)
+#define LOCATION (LOCATION_LEVEL | VALUE | CREATE_NODE)
 /* http server location */
 #define ERROR_PAGE                                                             \
-  (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE | MULTI_VALUE)
+  (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE | VALUE)
 #define CLIENT_MAX_BODY_SIZE                                                   \
-  (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE | SINGLE_VALUE)
+  (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE | VALUE)
 #define AUTO_INDEX                                                             \
-  (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE | SINGLE_VALUE)
-#define INDEX                                                                  \
-  (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE | MULTI_VALUE)
+  (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE | VALUE)
+#define INDEX (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE | VALUE)
 /* server */
-#define LISTEN (SERVER_LEVEL | DIRECTIVE | MULTI_VALUE)
-#define SERVER_NAME (SERVER_LEVEL | DIRECTIVE | SINGLE_VALUE)
+#define LISTEN (SERVER_LEVEL | DIRECTIVE | VALUE)
+#define SERVER_NAME (SERVER_LEVEL | DIRECTIVE | VALUE)
 /* server location */
-#define RETURN (SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE | MULTI_VALUE)
+#define RETURN (SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE | VALUE)
 /* location */
-#define ALIAS (LOCATION_LEVEL | DIRECTIVE | SINGLE_VALUE)
-#define LIMIT_EXCEPT (LOCATION_LEVEL | DIRECTIVE | MULTI_VALUE)
+#define ALIAS (LOCATION_LEVEL | DIRECTIVE | VALUE)
+#define LIMIT_EXCEPT (LOCATION_LEVEL | DIRECTIVE | VALUE)
 /* { } ; */
 #define OPEN_BRACKET (NONE_LEVEL | HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL)
 #define CLOSE_BRACKET (NONE_LEVEL | HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL)
@@ -55,7 +52,7 @@ Node::Node(std::vector<std::string> &configTokens,
       bCreateNode = true;
     }
 
-    if (tokenInfo & (CREATE_NODE | SINGLE_VALUE)) { /* location */
+    if (tokenInfo & (CREATE_NODE | VALUE)) { /* location */
       tokenInfo = getTokenInfo(*(++token));
       if (tokenInfo & (OPEN_BRACKET | CLOSE_BRACKET | SEMICOLON)) {
         Error("invalid number of arguments in \"location\" directive\n");
@@ -80,14 +77,14 @@ Node::Node(std::vector<std::string> &configTokens,
         if (tokenInfo & CREATE_NODE) {
           break;
         }
-        addDirective(configTokens, token);
+        addDirective(configTokens, token); /* 함수 종료 시, *token == ";" */
       }
     }
-  }
-  /* 현재 토큰 위치 고려 */
-  tokenInfo = getTokenInfo(*(++token));
-  if (~(tokenInfo & CLOSE_BRACKET)) {
-    Error("Error: Bracket not closed\n");
+    /* 현재 토큰 위치 고려 */
+    tokenInfo = getTokenInfo(*(++token));
+    if (~(tokenInfo & CLOSE_BRACKET)) {
+      Error("Error: Bracket not closed\n");
+    }
   }
 }
 
@@ -125,7 +122,7 @@ int Node::getTokenInfo(std::string token) {
   } else if (token == "limit_except") {
     return (LIMIT_EXCEPT);
   }
-  return (VALUE);
+  return (ERROR);
 }
 
 void Node::addDirective(std::vector<std::string> &configTokens,
