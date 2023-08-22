@@ -15,7 +15,7 @@
 /* context */
 #define HTTP (HTTP_LEVEL | CREATE_NODE)
 #define SERVER (SERVER_LEVEL | CREATE_NODE)
-#define LOCATION (LOCATION_LEVEL | CREATE_NODE)
+#define LOCATION (LOCATION_LEVEL | SINGLE_VALUE | CREATE_NODE)
 /* http server location */
 #define ERROR_PAGE                                                             \
   (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE | MULTI_VALUE)
@@ -44,23 +44,48 @@ Node::Node(std::vector<std::string> &configTokens,
   int tokenInfo;
 
   for (; token != configTokens.end(); token++) {
+    bool bCreateNode = false;
     tokenInfo = getTokenInfo(*token);
 
     if ((tokenInfo & level) == 0) {
-      std::cerr << "Error: Invalid token level" << std::endl;
-      exit(1);
+      Error("Error: Invalid token level");
     }
 
     if (tokenInfo & CREATE_NODE) {
-      token++;
-      Node *newNode = new Node(configTokens, token, this, level + 1);
-      mChildren.push_back(newNode);
-    } else if (tokenInfo & DIRECTIVE) {
-      addDirective(configTokens, token);
-    } else if (tokenInfo & OPEN_BRACKET) {
-    } else if (tokenInfo & CLOSE_BRACKET) {
-      return;
+      bCreateNode = true;
     }
+
+    if (tokenInfo & (CREATE_NODE | SINGLE_VALUE)) { /* location */
+      tokenInfo = getTokenInfo(*(++token));
+      if (tokenInfo & (OPEN_BRACKET | CLOSE_BRACKET | SEMICOLON)) {
+        Error("invalid number of arguments in \"location\" directive\n");
+      }
+    }
+
+    tokenInfo = getTokenInfo(*(++token));
+    if (~(tokenInfo & OPEN_BRACKET)) {
+      Error("Error: Invalid token level");
+    }
+
+    if (bCreateNode) {
+      Node *newNode = new Node(configTokens, ++token, this, level + 1);
+      mChildren.push_back(newNode);
+    } else {
+      for (; token != configTokens.end(); token++) {
+        /* addDirective 이후 토큰 위치 고려 */
+        tokenInfo = getTokenInfo(*token);
+        if (tokenInfo & CREATE_NODE) {
+          break;
+        }
+        addDirective(configTokens, token);
+      }
+    }
+
+    /* addDirective 이후 토큰 위치 고려 */
+  }
+  tokenInfo = getTokenInfo(*(++token));
+  if (~(tokenInfo & CLOSE_BRACKET)) {
+    Error("Error: Invalid token level");
   }
 }
 
@@ -105,21 +130,11 @@ void Node::addDirective(std::vector<std::string> &configTokens,
                         std::vector<std::string>::iterator &token) {
   std::string directive = *token;
   std::vector<std::string> values;
-  int tokenInfo;
 
-  token++;
-  tokenInfo = getTokenInfo(*token);
-  if (tokenInfo & SINGLE_VALUE) {
-    values.push_back(*token);
-  } else if (tokenInfo & MULTI_VALUE) {
-    while (tokenInfo & MULTI_VALUE) {
-      values.push_back(*token);
-      token++;
-      tokenInfo = getTokenInfo(*token);
-    }
-  } else {
-    std::cerr << "Error: Invalid token" << std::endl;
-    exit(1);
+  std::map<std::string, std::vector<std::string>>::iterator it =
+      mDirectives.find(directive);
+
+  if (it != mDirectives.end()) {
   }
 }
 

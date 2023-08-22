@@ -1,9 +1,6 @@
 #include "Config.hpp"
 
-Config::Config(const std::string &path) {
-  SetConfig(path);
-  
-}
+Config::Config(const std::string &path) { SetConfig(path); }
 
 Config::~Config(void) { deleteTree(); }
 
@@ -12,21 +9,19 @@ void Config::SetConfig(const std::string &path) {
   removeComment();
   addBlank();
   tokenize();
-  parseConfFile();
+  printConfFile();
 }
 
 void Config::openConfFile(const std::string &path) {
   std::ifstream confFile(path);
   if (confFile.is_open() == false) {
-    std::cerr << "Error: Could not open confFile " << path << std::endl;
-    exit(EXIT_FAILURE);
+    Error("Error: Could not open confFile ");
   }
 
   mConfBuffer << confFile.rdbuf();
   confFile.close();
   if (mConfBuffer.good() == false) {
-    std::cerr << "Error: confFile stream " << path << std::endl;
-    exit(EXIT_FAILURE);
+    Error("Error: confFile stream ");
   }
 }
 
@@ -73,18 +68,16 @@ void Config::tokenize(void) {
   }
 }
 
-void Config::parseConfFile(void) {
+void Config::printConfFile(void) {
   for (std::vector<std::string>::iterator it = mTokens.begin();
        it != mTokens.end(); ++it) {
     std::cout << *it << std::endl;
   }
 }
 
-void Config::createTree(void){
+void Config::createTree(void) {
   std::vector<std::string>::iterator token = mTokens.begin();
   mConfigTree = new Node(mTokens, token, NULL, 0);
 }
 
-void Config::deleteTree(void){
-  delete mConfigTree;
-}
+void Config::deleteTree(void) { delete mConfigTree; }
