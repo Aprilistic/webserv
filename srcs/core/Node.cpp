@@ -7,29 +7,26 @@
 #define LOCATION_LEVEL (1 << 3)
 #define CREATE_NODE (1 << 4)
 #define DIRECTIVE (1 << 5)
-#define VALUE (1 << 6)
-#define ERROR (1 << 7)
+#define ERROR (1 << 6)
 
 /* context */
 #define HTTP (HTTP_LEVEL | CREATE_NODE)
 #define SERVER (SERVER_LEVEL | CREATE_NODE)
-#define LOCATION (LOCATION_LEVEL | VALUE | CREATE_NODE)
+#define LOCATION (LOCATION_LEVEL | CREATE_NODE)
 /* http server location */
-#define ERROR_PAGE                                                             \
-  (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE | VALUE)
+#define ERROR_PAGE (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE)
 #define CLIENT_MAX_BODY_SIZE                                                   \
-  (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE | VALUE)
-#define AUTO_INDEX                                                             \
-  (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE | VALUE)
-#define INDEX (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE | VALUE)
+  (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE)
+#define AUTO_INDEX (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE)
+#define INDEX (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE)
 /* server */
-#define LISTEN (SERVER_LEVEL | DIRECTIVE | VALUE)
-#define SERVER_NAME (SERVER_LEVEL | DIRECTIVE | VALUE)
+#define LISTEN (SERVER_LEVEL | DIRECTIVE)
+#define SERVER_NAME (SERVER_LEVEL | DIRECTIVE)
 /* server location */
-#define RETURN (SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE | VALUE)
+#define RETURN (SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE)
 /* location */
-#define ALIAS (LOCATION_LEVEL | DIRECTIVE | VALUE)
-#define LIMIT_EXCEPT (LOCATION_LEVEL | DIRECTIVE | VALUE)
+#define ALIAS (LOCATION_LEVEL | DIRECTIVE)
+#define LIMIT_EXCEPT (LOCATION_LEVEL | DIRECTIVE)
 /* { } ; */
 #define OPEN_BRACKET (NONE_LEVEL | HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL)
 #define CLOSE_BRACKET (NONE_LEVEL | HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL)
@@ -48,11 +45,9 @@ Node::Node(std::vector<std::string> &configTokens,
       Error("Error: Invalid token level");
     }
 
-    if (tokenInfo & CREATE_NODE) {
-      bCreateNode = true;
-    }
+    bCreateNode = tokenInfo & CREATE_NODE;
 
-    if (tokenInfo & (CREATE_NODE | VALUE)) { /* location */
+    if (tokenInfo == LOCATION) { /* location */
       tokenInfo = getTokenInfo(*(++token));
       if (tokenInfo & (OPEN_BRACKET | CLOSE_BRACKET | SEMICOLON)) {
         Error("invalid number of arguments in \"location\" directive\n");
@@ -127,14 +122,25 @@ int Node::getTokenInfo(std::string token) {
 
 void Node::addDirective(std::vector<std::string> &configTokens,
                         std::vector<std::string>::iterator &token) {
-  std::string directive = *token;
-  std::vector<std::string> values;
+  std::string key = *token;
 
-  std::map<std::string, std::vector<std::string>>::iterator it =
-      mDirectives.find(directive);
-
-  if (it != mDirectives.end()) {
+  if (mDirectives.find(key) != mDirectives.end()) {
+    Error("Error: Directive already exists\n");
   }
+
+  std::vector<std::string> values;
+  token++;
+  for (; token != configTokens.end(); token++) {
+    int tokenInfo = getTokenInfo(*token);
+    if (tokenInfo & (OPEN_BRACKET | CLOSE_BRACKET)) {
+      Error("Error: Invalid number of arguments\n");
+    }
+    if (tokenInfo & SEMICOLON) {
+      break;
+    }
+    values.push_back(*token);
+  }
+  mDirectives[key] = values;
 }
 
 void Node::deleteTree(void) {
