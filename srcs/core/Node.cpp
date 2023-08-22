@@ -1,16 +1,16 @@
 #include "Node.hpp"
 
 /* Level Bit Flags */
-#define NONE_LEVEL (0)
-#define HTTP_LEVEL (1 << 0)
-#define SERVER_LEVEL (1 << 1)
-#define LOCATION_LEVEL (1 << 2)
-#define CREATE_NODE (1 << 3)
-#define DIRECTIVE (1 << 4)
-#define SINGLE_VALUE (1 << 5)
-#define MULTI_VALUE (1 << 6)
-#define VALUE (1 << 7)
-#define ERROR (1 << 8)
+#define NONE_LEVEL (1)
+#define HTTP_LEVEL (1 << 1)
+#define SERVER_LEVEL (1 << 2)
+#define LOCATION_LEVEL (1 << 3)
+#define CREATE_NODE (1 << 4)
+#define DIRECTIVE (1 << 5)
+#define SINGLE_VALUE (1 << 6)
+#define MULTI_VALUE (1 << 7)
+#define VALUE (1 << 8)
+#define ERROR (1 << 9)
 
 /* context */
 #define HTTP (HTTP_LEVEL | CREATE_NODE)
@@ -62,13 +62,16 @@ Node::Node(std::vector<std::string> &configTokens,
       }
     }
 
-    tokenInfo = getTokenInfo(*(++token));
-    if (~(tokenInfo & OPEN_BRACKET)) {
-      Error("Error: Invalid token level");
+    if (bCreateNode == true) {
+      tokenInfo = getTokenInfo(*(++token));
+      if (~(tokenInfo & OPEN_BRACKET)) {
+        Error("Error: Bracket not opened\n");
+      }
     }
 
     if (bCreateNode) {
-      Node *newNode = new Node(configTokens, ++token, this, level + 1);
+      Node *newNode = new Node(configTokens, ++token, this,
+                               (level & LOCATION_LEVEL) ? level : level << 1);
       mChildren.push_back(newNode);
     } else {
       for (; token != configTokens.end(); token++) {
@@ -80,12 +83,11 @@ Node::Node(std::vector<std::string> &configTokens,
         addDirective(configTokens, token);
       }
     }
-
-    /* addDirective 이후 토큰 위치 고려 */
   }
+  /* 현재 토큰 위치 고려 */
   tokenInfo = getTokenInfo(*(++token));
   if (~(tokenInfo & CLOSE_BRACKET)) {
-    Error("Error: Invalid token level");
+    Error("Error: Bracket not closed\n");
   }
 }
 

@@ -77,7 +77,7 @@ void Config::printConfFile(void) {
 
 void Config::createTree(void) {
   std::vector<std::string>::iterator token = mTokens.begin();
-  mConfigTree = new Node(mTokens, token, NULL, 0);
+  mConfigTree = new Node(mTokens, token, NULL, 1);
 }
 
 void Config::deleteTree(void) { delete mConfigTree; }
