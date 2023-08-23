@@ -51,10 +51,6 @@ Node::Node(std::vector<std::string> &configTokens,
         tokenInfo = getTokenInfo(*(++token));
         bLocationFlag = true;
         location = *token;
-
-        std::cout << std::bitset<10>(tokenInfo) << " : " << *token << std::endl;
-
-        /* Save location info */
       }
 
       tokenInfo = getTokenInfo(*(++token));
