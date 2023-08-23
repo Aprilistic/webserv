@@ -10,7 +10,7 @@
 #define OPEN_BRACKET (1 << 6)
 #define CLOSE_BRACKET (1 << 7)
 #define SEMICOLON (1 << 8)
-#define ERROR (1 << 9)
+#define VALUE (1 << 9)
 
 /* context */
 #define HTTP (NONE_LEVEL | CREATE_NODE)
@@ -47,8 +47,10 @@ Node::Node(std::vector<std::string> &configTokens,
     if (tokenInfo & CREATE_NODE) {
       if (tokenInfo == LOCATION) { /* location */
         tokenInfo = getTokenInfo(*(++token));
+        std::cout << std::bitset<10>(tokenInfo) << " : " << *token << std::endl;
 
         /* Save location info */
+
       }
 
       tokenInfo = getTokenInfo(*(++token));
@@ -106,7 +108,7 @@ int Node::getTokenInfo(std::string token) {
   } else if (token == "limit_except") {
     return (LIMIT_EXCEPT);
   }
-  return (ERROR);
+  return (VALUE);
 }
 
 void Node::addDirective(std::vector<std::string> &configTokens,
