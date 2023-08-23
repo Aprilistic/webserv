@@ -7,16 +7,8 @@ Config::~Config(void) { deleteTree(); }
 void Config::SetConfig(const std::string &path) {
   Token token(path);
   mTokens = token.mTokens;
-  // printConfFile();
   createTree();
-  printTree();
-}
-
-void Config::printConfFile(void) {
-  for (std::vector<std::string>::iterator it = mTokens.begin();
-       it != mTokens.end(); ++it) {
-    std::cout << *it << std::endl;
-  }
+  // printTree();
 }
 
 void Config::createTree(void) {
