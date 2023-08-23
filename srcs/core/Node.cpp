@@ -44,13 +44,17 @@ Node::Node(std::vector<std::string> &configTokens,
       sendError("Error: Invalid token level");
     }
 
+    bool bLocationFlag = false;
+    std::string location;
     if (tokenInfo & CREATE_NODE) {
       if (tokenInfo == LOCATION) { /* location */
         tokenInfo = getTokenInfo(*(++token));
+        bLocationFlag = true;
+        location = *token;
+
         std::cout << std::bitset<10>(tokenInfo) << " : " << *token << std::endl;
 
         /* Save location info */
-
       }
 
       tokenInfo = getTokenInfo(*(++token));
@@ -60,6 +64,9 @@ Node::Node(std::vector<std::string> &configTokens,
 
       Node *newNode = new Node(configTokens, ++token, this,
                                (level & LOCATION_LEVEL) ? level : level << 1);
+      if (bLocationFlag) {
+        newNode->mDirectives["location"].push_back(location);
+      }
       mChildren.push_back(newNode);
     } else if (tokenInfo & OPEN_BRACKET) {
       sendError("Error: Wrong bracket");
