@@ -8,10 +8,10 @@ public:
   Node(std::vector<std::string> &configTokens,
        std::vector<std::string>::iterator &token, Node *parent, int level);
   ~Node(void);
+  void PrintTree(int level);
 
 private:
   int getTokenInfo(std::string token);
-
   void addDirective(std::vector<std::string> &configTokens,
        std::vector<std::string>::iterator &token);
   void deleteTree(void);

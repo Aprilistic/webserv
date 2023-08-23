@@ -9,8 +9,9 @@ void Config::SetConfig(const std::string &path) {
   removeComment();
   addBlank();
   tokenize();
-  printConfFile();
+  // printConfFile();
   createTree();
+  printTree();
 }
 
 void Config::openConfFile(const std::string &path) {
@@ -80,5 +81,7 @@ void Config::createTree(void) {
   std::vector<std::string>::iterator token = mTokens.begin();
   mConfigTree = new Node(mTokens, token, NULL, 1);
 }
+
+void Config::printTree(void) { mConfigTree->PrintTree(0); }
 
 void Config::deleteTree(void) { delete mConfigTree; }

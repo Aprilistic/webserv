@@ -41,14 +41,13 @@ Node::Node(std::vector<std::string> &configTokens,
     tokenInfo = getTokenInfo(*token);
 
     if ((tokenInfo & level) == 0 && tokenInfo != CLOSE_BRACKET) {
-      printf("tokenInfo = %d\nlevel = %d\n", tokenInfo, level);
       sendError("Error: Invalid token level");
     }
-    
+
     if (tokenInfo & CREATE_NODE) {
       if (tokenInfo == LOCATION) { /* location */
         tokenInfo = getTokenInfo(*(++token));
-         
+
         /* Save location info */
       }
 
@@ -132,11 +131,39 @@ void Node::addDirective(std::vector<std::string> &configTokens,
   mDirectives[key] = values;
 }
 
+void Node::PrintTree(int level) {
+  for (int i = 0; i < level; i++) {
+    printf("  ");
+  }
+  printf("Node: %d\n", level);
+  for (std::map<std::string, std::vector<std::string> >::iterator it =
+           mDirectives.begin();
+       it != mDirectives.end(); ++it) {
+    for (int i = 0; i < level; i++) {
+      printf("  ");
+    }
+    printf("key = %s\n", it->first.c_str());
+    for (int i = 0; i < level; i++) {
+      printf("  ");
+    }
+    printf("values = ");
+    for (std::vector<std::string>::iterator it2 = it->second.begin();
+         it2 != it->second.end(); ++it2) {
+      printf("%s ", it2->c_str());
+    }
+    printf("\n");
+  }
+  for (std::vector<Node *>::iterator it = mChildren.begin();
+       it != mChildren.end(); ++it) {
+    (*it)->PrintTree(level + 1);
+  }
+}
+
 void Node::deleteTree(void) {
-   for (std::vector<Node *>::iterator it = mChildren.begin(); it != mChildren.end(); ++it) {
+  for (std::vector<Node *>::iterator it = mChildren.begin();
+       it != mChildren.end(); ++it) {
     (*it)->deleteTree();
     delete (*it);
   }
   mChildren.clear();
 }
- 

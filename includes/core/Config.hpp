@@ -13,6 +13,7 @@ public:
 private:
   void openConfFile(const std::string &path);
   void printConfFile(void);
+  void printTree(void);
   void removeComment(void);
   void addBlank(void);
   void tokenize(void);
@@ -22,7 +23,6 @@ private:
   /* variables */
 private:
   std::stringstream mConfBuffer;
-  //   std::map<std::string, ServerBlock> mServers;
   Node *mConfigTree;
   std::vector<std::string> mTokens;
 };
