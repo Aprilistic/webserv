@@ -53,17 +53,17 @@ Node::Node(std::vector<std::string> &configTokens,
 
       tokenInfo = getTokenInfo(*(++token));
       if ((tokenInfo & OPEN_BRACKET) == 0) {
-        sendError("Error: Bracket not opened\n");
+        sendError("Error: Bracket not opened");
       }
 
       Node *newNode = new Node(configTokens, ++token, this,
                                (level & LOCATION_LEVEL) ? level : level << 1);
       mChildren.push_back(newNode);
     } else if (tokenInfo & OPEN_BRACKET) {
-      sendError("Error: Wrong bracket\n");
+      sendError("Error: Wrong bracket");
     } else if (tokenInfo & CLOSE_BRACKET) {
       if (level == NONE_LEVEL && (token != configTokens.end())) {
-        sendError("Error: Wrong bracket\n");
+        sendError("Error: Wrong bracket");
       }
       return;
     } else {
@@ -114,7 +114,7 @@ void Node::addDirective(std::vector<std::string> &configTokens,
   std::string key = *token;
 
   if (mDirectives.find(key) != mDirectives.end()) {
-    sendError("Error: Directive already exists\n");
+    sendError("Error: Directive already exists");
   }
   std::vector<std::string> values;
   token++;
@@ -126,7 +126,7 @@ void Node::addDirective(std::vector<std::string> &configTokens,
     values.push_back(*token);
   }
   if (token == configTokens.end()) {
-    sendError("Error: Syntax Error\n");
+    sendError("Error: Syntax Error");
   }
   mDirectives[key] = values;
 }
