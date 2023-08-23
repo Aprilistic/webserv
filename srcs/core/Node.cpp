@@ -44,9 +44,9 @@ Node::Node(std::vector<std::string> &configTokens,
       sendError("Error: Invalid token level");
     }
 
-    bool bLocationFlag = false;
-    std::string location;
     if (tokenInfo & CREATE_NODE) {
+      bool bLocationFlag = false;
+      std::string location;
       if (tokenInfo == LOCATION) { /* location */
         tokenInfo = getTokenInfo(*(++token));
         bLocationFlag = true;
@@ -145,7 +145,7 @@ void Node::PrintTree(int level) {
     printf("  ");
   }
   printf("Node: %d\n", level);
-  for (std::map<std::string, std::vector<std::string> >::iterator it =
+  for (std::map<std::string, std::vector<std::string>>::iterator it =
            mDirectives.begin();
        it != mDirectives.end(); ++it) {
     for (int i = 0; i < level; i++) {
