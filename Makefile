@@ -49,7 +49,7 @@ re :
 	make all -j4
 
 leaks :
-	valgrind --leak-check=full --show-leak-kinds=all --log-file=leaks.txt ./$(NAME) ./configs/example.conf
+	valgrind --leak-check=full --show-leak-kinds=all --log-file=leaks.txt $(PWD)/$(NAME) $(PWD)/configs/example.conf
 
 .PHONY : all clean fclean re leaks
 
