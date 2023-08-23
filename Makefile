@@ -38,14 +38,19 @@ $(OBJ_DIR)/%.o : %.cpp
 
 clean :
 	rm -rf $(OBJ_DIR)
+	rm -rf ./$(NAME).dSYM
 
 fclean : clean
 	rm -f webserv
+	rm -f leaks.txt
 
 re : 
 	make fclean
-	make all
+	make all -j4
 
-.PHONY : all clean fclean re
+leaks :
+	valgrind --leak-check=full --show-leak-kinds=all --log-file=leaks.txt ./$(NAME) ./configs/example.conf
+
+.PHONY : all clean fclean re leaks
 
 -include $(DEPS)
