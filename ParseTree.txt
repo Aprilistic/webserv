@@ -1,0 +1,58 @@
+토큰검사
+	http, server, location:
+		생성자 호출, new Node(...)
+		CreateTree(Node *var_to_be_allocated, and other things to create tree) // this is called in constructor
+
+		braket: 괄호는 노드 분기 시에만 등장(확인필요)
+
+	ohter directives:
+		AddDirective() // Keep read token, do until meet ';'
+		return is added to mDirectives hashMap
+
+	error:
+		오류, 종료 유도
+
+
+코드 흐름
+	토큰 종류 확인: 분기, 지시자, 괄호
+	스코프 검사: 현재 레벨, 허용 레벨 비교
+
+	
+
+	분기: 
+			location: 경로 등장 가능
+			http, server: 바로 braket
+
+	지시자:
+			옵션 검사
+				중복 검사: hashMap 확인
+				밸류 여부: Single, Multiple
+
+			// http, server, location 모든 컨텍스트에 있을 수 있음	
+			error_page: error_code, path
+				value : 404 500 /path/error.html (error 범위 확인 필요)
+			client_max_body_size: size
+				value : 1m (범위 체크해서 받을 지 말지 정하기 1T 같은 단위 입력시 error)
+			alias: path
+				value : /path
+			autoindex: on/off
+				value : off (on/off 제외 syntax error)
+			index: path
+				value : index.html (여러개 받을지 말지)
+			
+			// server 컨텍스트에만 있을 수 있음
+			listen: port, default_server
+				value : 80 default_server(디폴트 서버의 경우 중복 불가 -> syntax error)
+			server_name: domain
+				value : localhost (중복불가)
+
+			// server, location 컨텍스트에 있을  수 있음
+			return: code, path
+				value : 301 /path (300 and 399)
+
+			// location 컨텍스트에만 있을 수 있음 
+			limit_except: method
+				value : GET POST
+
+			 
+				

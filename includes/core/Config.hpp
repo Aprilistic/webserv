@@ -1,30 +1,26 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include "Core.hpp"
+#include "Node.hpp"
+#include "Token.hpp"
 
 class Config {
   /* methods */
 public:
-  Config();
+  Config(const std::string &path);
+  ~Config(void);
+  void SetConfig(const std::string &path);
 
-  const int GetWorkerCount() const;
-  const int GetWorkerConnectionCount() const;
-
-protected:
 private:
+  void printConfFile(void);
+  void printTree(void);
+
+  void createTree(void);
+  void deleteTree(void);
   /* variables */
-protected:
-  /* MainContext */
-  int mWorkerCount;
-
-  /* EventsContext */
-  int mWorkerConnectionCount;
-
-  /* HttpContext */
-
-  /* ServerContext */
-  /* LocationContext */
+private:
+  Node *mConfigTree;
+  std::vector<std::string> mTokens;
 };
 
 #endif

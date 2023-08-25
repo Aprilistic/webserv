@@ -30,9 +30,12 @@
 *.exe
 *.out
 *.app
+webserv
+leaks.txt
 
 # Misc
 .DS_Store
+*.dSYM/
 
 # vscode
 .vscode

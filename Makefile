@@ -10,11 +10,12 @@ INCLUDES = -I ./includes \
 OBJ_DIR = objs
 
 SRCS := $(wildcard srcs/core/*.cpp) \
-		$(wildcard srcs/event/modules/*.cpp) \
-		$(wildcard srcs/event/*.cpp) \
-		$(wildcard srcs/http/modules/*.cpp) \
-		$(wildcard srcs/http/*.cpp) \
-		$(wildcard srcs/stream/*.cpp)
+		$(wildcard srcs/*.cpp)
+# $(wildcard srcs/event/modules/*.cpp) \
+# $(wildcard srcs/event/*.cpp) \
+# $(wildcard srcs/http/modules/*.cpp) \
+# $(wildcard srcs/http/*.cpp) \
+# $(wildcard srcs/stream/*.cpp)
 SRCS_DIR := $(dir $(SRCS))
 
 OBJS := $(addprefix $(OBJ_DIR)/, $(notdir $(SRCS:.cpp=.o)))
@@ -33,18 +34,23 @@ $(OBJ_DIR) :
 	mkdir $@
 
 $(OBJ_DIR)/%.o : %.cpp
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+	$(CXX) $(INCLUDES) -c $< -o $@
 
 clean :
 	rm -rf $(OBJ_DIR)
+	rm -rf ./$(NAME).dSYM
 
 fclean : clean
 	rm -f webserv
+	rm -f leaks.txt
 
 re : 
 	make fclean
-	make all
+	make all -j4
 
-.PHONY : all clean fclean re
+leaks :
+	valgrind --leak-check=full --show-leak-kinds=all --log-file=leaks.txt $(PWD)/$(NAME) $(PWD)/configs/example.conf
+
+.PHONY : all clean fclean re leaks
 
 -include $(DEPS)
