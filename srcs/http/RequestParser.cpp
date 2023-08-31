@@ -8,6 +8,7 @@ RequestParser::~RequestParser() {}
 
 eParseResult RequestParser::parse(Request &req, const char *begin,
                                   const char *end) {
+
   return consume(req, begin, end);
 }
 
@@ -33,6 +34,8 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
       if (input == ' ') {
         mState = RequestUriStart;
       } else if (!isChar(input) || isControl(input) || isSpecial(input)) {
+        if (input == '\0')
+          return ParsingIncompleted;
         return ParsingError;
       } else {
         req.mMethod.push_back(input);
