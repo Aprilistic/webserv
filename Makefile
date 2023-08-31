@@ -10,11 +10,10 @@ INCLUDES = -I ./includes \
 OBJ_DIR = objs
 
 SRCS := $(wildcard srcs/core/*.cpp) \
+		$(wildcard srcs/http/*.cpp) \
 		$(wildcard srcs/*.cpp)
 # $(wildcard srcs/event/modules/*.cpp) \
 # $(wildcard srcs/event/*.cpp) \
-# $(wildcard srcs/http/modules/*.cpp) \
-# $(wildcard srcs/http/*.cpp) \
 # $(wildcard srcs/stream/*.cpp)
 SRCS_DIR := $(dir $(SRCS))
 

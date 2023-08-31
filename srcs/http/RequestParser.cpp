@@ -1,24 +1,19 @@
-#include "HttpRequestParser.hpp"
+#include "RequestParser.hpp"
 
-HttpRequestParser::HttpRequestParser(): state(RequestMethodStart), contentSize(0), chunkSize(0), chunked(false) {}
+RequestParser::RequestParser()
+    : state(RequestMethodStart), contentSize(0), chunkSize(0), chunked(false) {}
 
-HttpRequestParser::ParseResult
-HttpRequestParser::parse(Request & req,
-  const char * begin,
-    const char * end) {
+ParseResult RequestParser::parse(Request &req, const char *begin, const char *end) {
   return consume(req, begin, end);
 }
 
-bool HttpRequestParser::checkIfConnection(const Request::HeaderItem & item) {
+bool RequestParser::checkIfConnection(const Request::HeaderItem &item) {
   return strcasecmp(item.name.c_str(), "Connection") == 0;
 }
 
-HttpRequestParser::ParseResult
-HttpRequestParser::consume(Request & req,
-  const char * begin,
-    const char * end) {
+ParseResult RequestParser::consume(Request &req, const char *begin, const char *end) {
   while (begin != end) {
-    char input = * begin++;
+    char input = *begin++;
 
     switch (state) {
     case RequestMethodStart:
@@ -156,7 +151,8 @@ HttpRequestParser::consume(Request & req,
     case HeaderLws:
       if (input == '\r') {
         state = ExpectingNewline_2;
-      } else if (input == ' ' || input == '\t') {} else if (isControl(input)) {
+      } else if (input == ' ' || input == '\t') {
+      } else if (isControl(input)) {
         return ParsingError;
       } else {
         state = HeaderValue;
@@ -182,7 +178,7 @@ HttpRequestParser::consume(Request & req,
     case HeaderValue:
       if (input == '\r') {
         if (req.method == "POST" || req.method == "PUT") {
-          Request::HeaderItem & h = req.headers.back();
+          Request::HeaderItem &h = req.headers.back();
 
           if (strcasecmp(h.name.c_str(), "Content-Length") == 0) {
             contentSize = atoi(h.value.c_str());
@@ -207,19 +203,19 @@ HttpRequestParser::consume(Request & req,
       }
       break;
     case ExpectingNewline_3: {
-      std::vector < Request::HeaderItem > ::iterator it = std::find_if(req.headers.begin(),
-        req.headers.end(),
-        checkIfConnection);
+      std::vector<Request::HeaderItem>::iterator it = std::find_if(
+          req.headers.begin(), req.headers.end(), checkIfConnection);
 
       if (it != req.headers.end()) {
-        if (strcasecmp(it -> value.c_str(), "Keep-Alive") == 0) {
+        if (strcasecmp(it->value.c_str(), "Keep-Alive") == 0) {
           req.keepAlive = true;
         } else // == Close
         {
           req.keepAlive = false;
         }
       } else {
-        if (req.versionMajor > 1 || (req.versionMajor == 1 && req.versionMinor == 1))
+        if (req.versionMajor > 1 ||
+            (req.versionMajor == 1 && req.versionMinor == 1))
           req.keepAlive = true;
       }
 
@@ -351,17 +347,13 @@ HttpRequestParser::consume(Request & req,
   return ParsingIncompleted;
 }
 
-inline bool HttpRequestParser::isChar(int c) {
-  return c >= 0 && c <= 127;
-}
+inline bool RequestParser::isChar(int c) { return c >= 0 && c <= 127; }
 
 // Check if a byte is an HTTP control character.
-inline bool HttpRequestParser::isControl(int c) {
-  return (c >= 0 && c <= 31) || (c == 127);
-}
+inline bool RequestParser::isControl(int c) { return (c >= 0 && c <= 31) || (c == 127); }
 
 // Check if a byte is defined as an HTTP special character.
-inline bool HttpRequestParser::isSpecial(int c) {
+inline bool RequestParser::isSpecial(int c) {
   switch (c) {
   case '(':
   case ')':
@@ -389,6 +381,4 @@ inline bool HttpRequestParser::isSpecial(int c) {
 }
 
 // Check if a byte is a digit.
-inline bool HttpRequestParser::isDigit(int c) {
-  return c >= '0' && c <= '9';
-}
+inline bool RequestParser::isDigit(int c) { return c >= '0' && c <= '9'; }
