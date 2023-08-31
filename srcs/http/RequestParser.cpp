@@ -4,6 +4,8 @@ RequestParser::RequestParser()
     : mState(RequestMethodStart), mContentsize(0), mChunkSize(0),
       mChunked(false) {}
 
+RequestParser::~RequestParser() {}
+
 eParseResult RequestParser::parse(Request &req, const char *begin,
                                   const char *end) {
   return consume(req, begin, end);
