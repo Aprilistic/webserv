@@ -16,13 +16,13 @@ public:
   std::string inspect() const;
 
 public:
-  std::string method;
-  std::string uri;
-  int versionMajor;
-  int versionMinor;
-  std::vector<HeaderItem> headers;
-  std::vector<char> content;
-  bool keepAlive;
+  std::string mMethod;
+  std::string mUri;
+  int mVersionMajor;
+  int mVersionMinor;
+  std::vector<HeaderItem> mHeaders;
+  std::vector<char> mContent;
+  bool mKeepAlive;
 };
 
 #endif

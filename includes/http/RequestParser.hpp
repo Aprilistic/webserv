@@ -4,9 +4,9 @@
 #include "Core.hpp"
 #include "Request.hpp"
 
-enum ParseResult { ParsingCompleted, ParsingIncompleted, ParsingError };
-// The current state of the parser.
-enum State {
+enum eParseResult { ParsingCompleted, ParsingIncompleted, ParsingError };
+// The current mState of the parser.
+enum eState {
   RequestMethodStart,
   RequestMethod,
   RequestUriStart,
@@ -64,11 +64,11 @@ public:
   RequestParser();
   ~RequestParser();
 
-  ParseResult parse(Request &req, const char *begin, const char *end);
+  eParseResult parse(Request &req, const char *begin, const char *end);
 
 private:
   static bool checkIfConnection(const Request::HeaderItem &item);
-  ParseResult consume(Request &req, const char *begin, const char *end);
+  eParseResult consume(Request &req, const char *begin, const char *end);
   // Check if a byte is an HTTP character.
   inline bool isChar(int c);
   // Check if a byte is an HTTP control character.
@@ -80,11 +80,11 @@ private:
 
 public:
 private:
-  size_t contentSize;
-  std::string chunkSizeStr;
-  size_t chunkSize;
-  bool chunked;
-  int state;
+  size_t mContentsize;
+  std::string mChunkSizeStr;
+  size_t mChunkSize;
+  bool mChunked;
+  int mState;
 };
 
 #endif // LIBAHTTP_REQUESTPARSER_H

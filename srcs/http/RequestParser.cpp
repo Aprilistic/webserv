@@ -1,9 +1,11 @@
 #include "RequestParser.hpp"
 
 RequestParser::RequestParser()
-    : state(RequestMethodStart), contentSize(0), chunkSize(0), chunked(false) {}
+    : mState(RequestMethodStart), mContentsize(0), mChunkSize(0),
+      mChunked(false) {}
 
-ParseResult RequestParser::parse(Request &req, const char *begin, const char *end) {
+eParseResult RequestParser::parse(Request &req, const char *begin,
+                                  const char *end) {
   return consume(req, begin, end);
 }
 
@@ -11,241 +13,242 @@ bool RequestParser::checkIfConnection(const Request::HeaderItem &item) {
   return strcasecmp(item.name.c_str(), "Connection") == 0;
 }
 
-ParseResult RequestParser::consume(Request &req, const char *begin, const char *end) {
+eParseResult RequestParser::consume(Request &req, const char *begin,
+                                    const char *end) {
   while (begin != end) {
     char input = *begin++;
 
-    switch (state) {
+    switch (mState) {
     case RequestMethodStart:
       if (!isChar(input) || isControl(input) || isSpecial(input)) {
         return ParsingError;
       } else {
-        state = RequestMethod;
-        req.method.push_back(input);
+        mState = RequestMethod;
+        req.mMethod.push_back(input);
       }
       break;
     case RequestMethod:
       if (input == ' ') {
-        state = RequestUriStart;
+        mState = RequestUriStart;
       } else if (!isChar(input) || isControl(input) || isSpecial(input)) {
         return ParsingError;
       } else {
-        req.method.push_back(input);
+        req.mMethod.push_back(input);
       }
       break;
     case RequestUriStart:
       if (isControl(input)) {
         return ParsingError;
       } else {
-        state = RequestUri;
-        req.uri.push_back(input);
+        mState = RequestUri;
+        req.mUri.push_back(input);
       }
       break;
     case RequestUri:
       if (input == ' ') {
-        state = RequestHttpVersion_h;
+        mState = RequestHttpVersion_h;
       } else if (input == '\r') {
-        req.versionMajor = 0;
-        req.versionMinor = 9;
+        req.mVersionMajor = 0;
+        req.mVersionMinor = 9;
 
         return ParsingCompleted;
       } else if (isControl(input)) {
         return ParsingError;
       } else {
-        req.uri.push_back(input);
+        req.mUri.push_back(input);
       }
       break;
     case RequestHttpVersion_h:
       if (input == 'H') {
-        state = RequestHttpVersion_ht;
+        mState = RequestHttpVersion_ht;
       } else {
         return ParsingError;
       }
       break;
     case RequestHttpVersion_ht:
       if (input == 'T') {
-        state = RequestHttpVersion_htt;
+        mState = RequestHttpVersion_htt;
       } else {
         return ParsingError;
       }
       break;
     case RequestHttpVersion_htt:
       if (input == 'T') {
-        state = RequestHttpVersion_http;
+        mState = RequestHttpVersion_http;
       } else {
         return ParsingError;
       }
       break;
     case RequestHttpVersion_http:
       if (input == 'P') {
-        state = RequestHttpVersion_slash;
+        mState = RequestHttpVersion_slash;
       } else {
         return ParsingError;
       }
       break;
     case RequestHttpVersion_slash:
       if (input == '/') {
-        req.versionMajor = 0;
-        req.versionMinor = 0;
-        state = RequestHttpVersion_majorStart;
+        req.mVersionMajor = 0;
+        req.mVersionMinor = 0;
+        mState = RequestHttpVersion_majorStart;
       } else {
         return ParsingError;
       }
       break;
     case RequestHttpVersion_majorStart:
       if (isDigit(input)) {
-        req.versionMajor = input - '0';
-        state = RequestHttpVersion_major;
+        req.mVersionMajor = input - '0';
+        mState = RequestHttpVersion_major;
       } else {
         return ParsingError;
       }
       break;
     case RequestHttpVersion_major:
       if (input == '.') {
-        state = RequestHttpVersion_minorStart;
+        mState = RequestHttpVersion_minorStart;
       } else if (isDigit(input)) {
-        req.versionMajor = req.versionMajor * 10 + input - '0';
+        req.mVersionMajor = req.mVersionMajor * 10 + input - '0';
       } else {
         return ParsingError;
       }
       break;
     case RequestHttpVersion_minorStart:
       if (isDigit(input)) {
-        req.versionMinor = input - '0';
-        state = RequestHttpVersion_minor;
+        req.mVersionMinor = input - '0';
+        mState = RequestHttpVersion_minor;
       } else {
         return ParsingError;
       }
       break;
     case RequestHttpVersion_minor:
       if (input == '\r') {
-        state = ResponseHttpVersion_newLine;
+        mState = ResponseHttpVersion_newLine;
       } else if (isDigit(input)) {
-        req.versionMinor = req.versionMinor * 10 + input - '0';
+        req.mVersionMinor = req.mVersionMinor * 10 + input - '0';
       } else {
         return ParsingError;
       }
       break;
     case ResponseHttpVersion_newLine:
       if (input == '\n') {
-        state = HeaderLineStart;
+        mState = HeaderLineStart;
       } else {
         return ParsingError;
       }
       break;
     case HeaderLineStart:
       if (input == '\r') {
-        state = ExpectingNewline_3;
-      } else if (!req.headers.empty() && (input == ' ' || input == '\t')) {
-        state = HeaderLws;
+        mState = ExpectingNewline_3;
+      } else if (!req.mHeaders.empty() && (input == ' ' || input == '\t')) {
+        mState = HeaderLws;
       } else if (!isChar(input) || isControl(input) || isSpecial(input)) {
         return ParsingError;
       } else {
-        req.headers.push_back(Request::HeaderItem());
-        req.headers.back().name.reserve(16);
-        req.headers.back().value.reserve(16);
-        req.headers.back().name.push_back(input);
-        state = HeaderName;
+        req.mHeaders.push_back(Request::HeaderItem());
+        req.mHeaders.back().name.reserve(16);
+        req.mHeaders.back().value.reserve(16);
+        req.mHeaders.back().name.push_back(input);
+        mState = HeaderName;
       }
       break;
     case HeaderLws:
       if (input == '\r') {
-        state = ExpectingNewline_2;
+        mState = ExpectingNewline_2;
       } else if (input == ' ' || input == '\t') {
       } else if (isControl(input)) {
         return ParsingError;
       } else {
-        state = HeaderValue;
-        req.headers.back().value.push_back(input);
+        mState = HeaderValue;
+        req.mHeaders.back().value.push_back(input);
       }
       break;
     case HeaderName:
       if (input == ':') {
-        state = SpaceBeforeHeaderValue;
+        mState = SpaceBeforeHeaderValue;
       } else if (!isChar(input) || isControl(input) || isSpecial(input)) {
         return ParsingError;
       } else {
-        req.headers.back().name.push_back(input);
+        req.mHeaders.back().name.push_back(input);
       }
       break;
     case SpaceBeforeHeaderValue:
       if (input == ' ') {
-        state = HeaderValue;
+        mState = HeaderValue;
       } else {
         return ParsingError;
       }
       break;
     case HeaderValue:
       if (input == '\r') {
-        if (req.method == "POST" || req.method == "PUT") {
-          Request::HeaderItem &h = req.headers.back();
+        if (req.mMethod == "POST" || req.mMethod == "PUT") {
+          Request::HeaderItem &h = req.mHeaders.back();
 
-          if (strcasecmp(h.name.c_str(), "Content-Length") == 0) {
-            contentSize = atoi(h.value.c_str());
-            req.content.reserve(contentSize);
+          if (strcasecmp(h.name.c_str(), "mContent-Length") == 0) {
+            mContentsize = atoi(h.value.c_str());
+            req.mContent.reserve(mContentsize);
           } else if (strcasecmp(h.name.c_str(), "Transfer-Encoding") == 0) {
-            if (strcasecmp(h.value.c_str(), "chunked") == 0)
-              chunked = true;
+            if (strcasecmp(h.value.c_str(), "mChunked") == 0)
+              mChunked = true;
           }
         }
-        state = ExpectingNewline_2;
+        mState = ExpectingNewline_2;
       } else if (isControl(input)) {
         return ParsingError;
       } else {
-        req.headers.back().value.push_back(input);
+        req.mHeaders.back().value.push_back(input);
       }
       break;
     case ExpectingNewline_2:
       if (input == '\n') {
-        state = HeaderLineStart;
+        mState = HeaderLineStart;
       } else {
         return ParsingError;
       }
       break;
     case ExpectingNewline_3: {
       std::vector<Request::HeaderItem>::iterator it = std::find_if(
-          req.headers.begin(), req.headers.end(), checkIfConnection);
+          req.mHeaders.begin(), req.mHeaders.end(), checkIfConnection);
 
-      if (it != req.headers.end()) {
+      if (it != req.mHeaders.end()) {
         if (strcasecmp(it->value.c_str(), "Keep-Alive") == 0) {
-          req.keepAlive = true;
+          req.mKeepAlive = true;
         } else // == Close
         {
-          req.keepAlive = false;
+          req.mKeepAlive = false;
         }
       } else {
-        if (req.versionMajor > 1 ||
-            (req.versionMajor == 1 && req.versionMinor == 1))
-          req.keepAlive = true;
+        if (req.mVersionMajor > 1 ||
+            (req.mVersionMajor == 1 && req.mVersionMinor == 1))
+          req.mKeepAlive = true;
       }
 
-      if (chunked) {
-        state = ChunkSize;
-      } else if (contentSize == 0) {
+      if (mChunked) {
+        mState = mChunkSize;
+      } else if (mContentsize == 0) {
         if (input == '\n')
           return ParsingCompleted;
         else
           return ParsingError;
       } else {
-        state = Post;
+        mState = Post;
       }
       break;
     }
     case Post:
-      --contentSize;
-      req.content.push_back(input);
+      --mContentsize;
+      req.mContent.push_back(input);
 
-      if (contentSize == 0) {
+      if (mContentsize == 0) {
         return ParsingCompleted;
       }
       break;
     case ChunkSize:
       if (isalnum(input)) {
-        chunkSizeStr.push_back(input);
+        mChunkSizeStr.push_back(input);
       } else if (input == ';') {
-        state = ChunkExtensionName;
+        mState = ChunkExtensionName;
       } else if (input == '\r') {
-        state = ChunkSizeNewLine;
+        mState = ChunkSizeNewLine;
       } else {
         return ParsingError;
       }
@@ -254,9 +257,9 @@ ParseResult RequestParser::consume(Request &req, const char *begin, const char *
       if (isalnum(input) || input == ' ') {
         // skip
       } else if (input == '=') {
-        state = ChunkExtensionValue;
+        mState = ChunkExtensionValue;
       } else if (input == '\r') {
-        state = ChunkSizeNewLine;
+        mState = ChunkSizeNewLine;
       } else {
         return ParsingError;
       }
@@ -265,30 +268,30 @@ ParseResult RequestParser::consume(Request &req, const char *begin, const char *
       if (isalnum(input) || input == ' ') {
         // skip
       } else if (input == '\r') {
-        state = ChunkSizeNewLine;
+        mState = ChunkSizeNewLine;
       } else {
         return ParsingError;
       }
       break;
     case ChunkSizeNewLine:
       if (input == '\n') {
-        chunkSize = strtol(chunkSizeStr.c_str(), NULL, 16);
-        chunkSizeStr.clear();
-        req.content.reserve(req.content.size() + chunkSize);
+        mChunkSize = strtol(mChunkSizeStr.c_str(), NULL, 16);
+        mChunkSizeStr.clear();
+        req.mContent.reserve(req.mContent.size() + mChunkSize);
 
-        if (chunkSize == 0)
-          state = ChunkSizeNewLine_2;
+        if (mChunkSize == 0)
+          mState = ChunkSizeNewLine_2;
         else
-          state = ChunkData;
+          mState = ChunkData;
       } else {
         return ParsingError;
       }
       break;
     case ChunkSizeNewLine_2:
       if (input == '\r') {
-        state = ChunkSizeNewLine_3;
+        mState = ChunkSizeNewLine_3;
       } else if (isalpha(input)) {
-        state = ChunkTrailerName;
+        mState = ChunkTrailerName;
       } else {
         return ParsingError;
       }
@@ -304,7 +307,7 @@ ParseResult RequestParser::consume(Request &req, const char *begin, const char *
       if (isalnum(input)) {
         // skip
       } else if (input == ':') {
-        state = ChunkTrailerValue;
+        mState = ChunkTrailerValue;
       } else {
         return ParsingError;
       }
@@ -313,28 +316,28 @@ ParseResult RequestParser::consume(Request &req, const char *begin, const char *
       if (isalnum(input) || input == ' ') {
         // skip
       } else if (input == '\r') {
-        state = ChunkSizeNewLine;
+        mState = ChunkSizeNewLine;
       } else {
         return ParsingError;
       }
       break;
     case ChunkData:
-      req.content.push_back(input);
+      req.mContent.push_back(input);
 
-      if (--chunkSize == 0) {
-        state = ChunkDataNewLine_1;
+      if (--mChunkSize == 0) {
+        mState = ChunkDataNewLine_1;
       }
       break;
     case ChunkDataNewLine_1:
       if (input == '\r') {
-        state = ChunkDataNewLine_2;
+        mState = ChunkDataNewLine_2;
       } else {
         return ParsingError;
       }
       break;
     case ChunkDataNewLine_2:
       if (input == '\n') {
-        state = ChunkSize;
+        mState = mChunkSize;
       } else {
         return ParsingError;
       }
@@ -350,7 +353,9 @@ ParseResult RequestParser::consume(Request &req, const char *begin, const char *
 inline bool RequestParser::isChar(int c) { return c >= 0 && c <= 127; }
 
 // Check if a byte is an HTTP control character.
-inline bool RequestParser::isControl(int c) { return (c >= 0 && c <= 31) || (c == 127); }
+inline bool RequestParser::isControl(int c) {
+  return (c >= 0 && c <= 31) || (c == 127);
+}
 
 // Check if a byte is defined as an HTTP special character.
 inline bool RequestParser::isSpecial(int c) {
