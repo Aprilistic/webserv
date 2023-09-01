@@ -4,7 +4,7 @@ RequestSyntax::RequestSyntax() : mState(SUCCESSFUL_OK) {}
 
 RequestSyntax::~RequestSyntax() {}
 
-eSyntaxResult RequestSyntax::syntax(Request &request) {
+eStatustCode RequestSyntax::syntax(Request &request) {
   if (method(request) != SUCCESSFUL_OK) {
     return mState;
   }
@@ -23,7 +23,7 @@ eSyntaxResult RequestSyntax::syntax(Request &request) {
   return SUCCESSFUL_OK;
 }
 
-eSyntaxResult RequestSyntax::method(Request &request) {
+eStatustCode RequestSyntax::method(Request &request) {
   if (request.mMethod == "GET" || request.mMethod == "POST" ||
       request.mMethod == "DELETE") {
     return SUCCESSFUL_OK;
@@ -34,7 +34,7 @@ eSyntaxResult RequestSyntax::method(Request &request) {
   }
 }
 
-eSyntaxResult RequestSyntax::requestTarget(Request &request) {
+eStatustCode RequestSyntax::requestTarget(Request &request) {
   if (request.mUri.empty()) {
 	mState = CLIENT_ERROR_BAD_REQUEST;
     return mState;
@@ -44,13 +44,13 @@ eSyntaxResult RequestSyntax::requestTarget(Request &request) {
   }
 }
 
-eSyntaxResult RequestSyntax::httpVersion(Request &request) {
+eStatustCode RequestSyntax::httpVersion(Request &request) {
   if (request.mVersionMajor != 1 || request.mVersionMinor != 1)
     return mState;
   return SUCCESSFUL_OK;
 }
 
-eSyntaxResult RequestSyntax::headerField(Request &request) {
+eStatustCode RequestSyntax::headerField(Request &request) {
   if (request.mHeaders.empty())
     return mState;
   for (std::vector<Request::HeaderItem>::iterator it = request.mHeaders.begin();
@@ -59,6 +59,6 @@ eSyntaxResult RequestSyntax::headerField(Request &request) {
   return SUCCESSFUL_OK;
 }
 
-eSyntaxResult RequestSyntax::messageBody(Request &request) {
+eStatustCode RequestSyntax::messageBody(Request &request) {
   return SUCCESSFUL_OK;
 }

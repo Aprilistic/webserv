@@ -4,7 +4,7 @@
 #include "Core.hpp"
 #include "Request.hpp"
 
-enum eSyntaxResult
+enum eStatustCode
 {
 	INFORMATIONAL_CONTINUE = 100,
 	INFORMATIONAL_SWITCHING_PROTOCOLS = 101,
@@ -59,13 +59,13 @@ class RequestSyntax {
 		RequestSyntax();
 		~RequestSyntax();
 
-		eSyntaxResult syntax(Request &request);
-		eSyntaxResult method(Request& request); //mMethod
-		eSyntaxResult requestTarget(Request& request);// mUri
-		eSyntaxResult httpVersion(Request& request); // mVersionMajor, mVersionMinor
-		eSyntaxResult headerField(Request& request); // mHeaders<field-name, field-value>
-		eSyntaxResult messageBody(Request& request); // mContent
+		eStatustCode syntax(Request &request);
+		eStatustCode method(Request& request); //mMethod
+		eStatustCode requestTarget(Request& request);// mUri
+		eStatustCode httpVersion(Request& request); // mVersionMajor, mVersionMinor
+		eStatustCode headerField(Request& request); // mHeaders<field-name, field-value>
+		eStatustCode messageBody(Request& request); // mContent
 	private:
-		eSyntaxResult mState;
+		eStatustCode mState;
 };
 #endif

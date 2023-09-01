@@ -30,7 +30,7 @@ int main(int, char **) {
 
   if (res == ParsingCompleted) {
     std::string res;
-    if (syntax.syntax(request) == SyntaxSuccess) {
+    if (syntax.syntax(request) == SUCCESSFUL_OK) {
       std::cout << request.inspect() << std::endl;
     } else {
       std::cout << "Syntax error" << std::endl;
