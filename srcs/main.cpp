@@ -13,22 +13,31 @@
 
 #include "Request.hpp"
 #include "RequestParser.hpp"
+#include "RequestSyntax.hpp"
 
 int main(int, char **) {
-  const char text[] =
-      "GE";
+  const char text[] = "GeT  / HTTP/1.1\r\n";
 
   Request request;
   RequestParser parser;
+  RequestSyntax syntax;
 
   eParseResult res = parser.parse(request, text, text + sizeof(text));
-  const char test[] = "T / HTTP/1.1\r\nHost: localhost:8080\r\nUser-Agent: curl/7.64.1\r\nAccept: */*\r\n\r\n";
+  const char test[] =
+      "Host: localhost:8080\r\nUser-Agent: curl/7.64.1\r\nAccept: */*\r\n\r\n";
   if (res == ParsingIncompleted)
-	res = parser.parse(request, test, test + sizeof(test));
+    res = parser.parse(request, test, test + sizeof(test));
 
   if (res == ParsingCompleted) {
-    std::cout << request.inspect() << std::endl;
+    std::string res;
+    if (syntax.syntax(request) == SyntaxSuccess) {
+      std::cout << request.inspect() << std::endl;
+    } else {
+      std::cout << "Syntax error" << std::endl;
+    }
     return EXIT_SUCCESS;
+  } else if (res == ParsingIncompleted) {
+    std::cout << "incom" << std::endl;
   } else {
     std::cerr << "Parsing failed" << std::endl;
     return EXIT_FAILURE;
