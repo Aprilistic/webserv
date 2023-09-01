@@ -66,6 +66,5 @@ class RequestSyntax {
 		eStatustCode headerField(Request& request); // mHeaders<field-name, field-value>
 		eStatustCode messageBody(Request& request); // mContent
 	private:
-		eStatustCode mState;
 };
 #endif

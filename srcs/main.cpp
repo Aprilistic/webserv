@@ -16,7 +16,7 @@
 #include "RequestSyntax.hpp"
 
 int main(int, char **) {
-  const char text[] = "GeT  / HTTP/1.1\r\n";
+  const char text[] = "GET  / HTTP/1.1\r\n";
 
   Request request;
   RequestParser parser;
@@ -33,7 +33,7 @@ int main(int, char **) {
     if (syntax.syntax(request) == SUCCESSFUL_OK) {
       std::cout << request.inspect() << std::endl;
     } else {
-      std::cout << "Syntax error" << std::endl;
+      std::cout << syntax.syntax(request) << std::endl;
     }
     return EXIT_SUCCESS;
   } else if (res == ParsingIncompleted) {
