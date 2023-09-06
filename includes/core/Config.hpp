@@ -7,19 +7,18 @@
 class Config {
   /* methods */
 public:
-  Config(const std::string &path);
+  Config(const std::string &path, Node* mConfigTree);
   ~Config(void);
-  void SetConfig(const std::string &path);
+  void SetConfig(const std::string &path, Node* mConfigTree);
 
 private:
   void printConfFile(void);
-  void printTree(void);
+  void printTree(Node* mConfigTree);
 
-  void createTree(void);
-  void deleteTree(void);
+  void createTree(Node* mConfigTree);
+  void deleteTree(Node* mConfigTree);
   /* variables */
 private:
-  Node *mConfigTree;
   std::vector<std::string> mTokens;
 };
 
