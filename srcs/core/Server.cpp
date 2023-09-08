@@ -1,14 +1,8 @@
 #include "Server.hpp"
 
-Server::Server(Node* mConfigTree, std::map<int, std::vector<Server*> > mServersMap)
+Server::Server(Node* mConfigTree)
 {
-	CreateServer(mConfigTree, mServersMap);
-	//RunServer(mServers);
-}
-
-void Server::CreateServer(Node* mConfigTree, std::map<int, std::vector<Server*> > mServersMap)
-{
-	std::cout << "Hi" << std::endl;
+	// mConfigTree 순회하면서 서버에 값 세팅
 }
 
 Server::~Server()

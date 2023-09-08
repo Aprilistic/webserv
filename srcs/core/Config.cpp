@@ -1,31 +1,42 @@
 #include "Config.hpp"
 
-Config::Config(const std::string &path, Node* mConfigTree)
-{
-	SetConfig(path, mConfigTree);
-		// tokenize
-		// createTree
-	//validate
-		// 
+Config::Config(const std::string &path,
+               std::map<int, std::vector<Server *>> mServersMap) {
+  SetConfig(path);
+  // tokenize
+  // createTree
+
+
+  // validate or checksum or ...
+  //
+  // CreatServer(mServersMap);
 }
 
-Config::~Config(void)
-{
-	// deleteTree(mConfigTree);
+void Config::CreateServer(std::map<int, std::vector<Server *>> mServersMap) {
+  int serverCount = 4; // mConfigTree -> n
+
+  for (int i = 0; i < serverCount; i++)
+  {
+    mServersMap[i].push_back(new Server(mConfigTree));
+  }
 }
 
-void Config::SetConfig(const std::string &path, Node* mConfigTree) {
+Config::~Config(void) {
+  // deleteTree(mConfigTree);
+}
+
+void Config::SetConfig(const std::string &path) {
   Token token(path);
   mTokens = token.mTokens;
-  createTree(mConfigTree);
+  createTree();
   // printTree();
 }
 
-void Config::createTree(Node* mConfigTree) {
+void Config::createTree(void) {
   std::vector<std::string>::iterator token = mTokens.begin();
   mConfigTree = new Node(mTokens, token, NULL, 1);
 }
 
-void Config::printTree(Node* mConfigTree) { mConfigTree->PrintTree(0); }
+void Config::printTree(void) { mConfigTree->PrintTree(0); }
 
 // void Config::deleteTree(void) { delete mConfigTree; }

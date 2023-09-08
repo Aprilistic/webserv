@@ -11,11 +11,12 @@ public:
   ~Master(void);
 
 private:
-  void startServer(void);
-  void stopServer(void);
+  void startMaster(void);
+  void stopMaster(void);
 
 public:
 private:
+  std::map<int, std::vector<Server *>> mServersMap;
 };
 
 #endif

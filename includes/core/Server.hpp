@@ -1,15 +1,11 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include "WebServer.hpp"
 class Node;
-
 class Server
 {
 	public:
-		Server(Node* mConfigTree, std::map<int, std::vector<Server*> > mServersMap);
-		void CreateServer(Node* mConfigTree, std::map<int, std::vector<Server*> > mServersMap);
-		//void RunServer();
+		Server(Node* mConfigTree);
 		~Server();
 	private:
 		// http, server, location context
