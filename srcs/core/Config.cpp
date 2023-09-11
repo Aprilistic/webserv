@@ -45,7 +45,7 @@ void CheckErrorPage(std::vector<std::string> &value) {
     std::cerr << "Error: Insufficient arguments provided. Please provide at "
                  "least two arguments."
               << std::endl;
-    // return (1) or ~
+      // return or ~
   }
 
   for (std::vector<std::string>::iterator it = value.begin();
@@ -55,14 +55,14 @@ void CheckErrorPage(std::vector<std::string> &value) {
       if (isdigit(*strIt) == false) {
         std::cerr << "Error: Invalid character found in status code argument."
                   << std::endl;
-        // return (1) or ~
+      // return or ~
       }
     }
     int statusCode = std::atoi(it->c_str());
     if (statusCode < 300 || statusCode > 599) {
       std::cerr << "Error: Status code out of valid range (300-599)."
                 << std::endl;
-      // return (1) or ~
+      // return or ~
     }
   }
   // 마지막값은 유효성 검사하지 않아도 됨
@@ -71,7 +71,7 @@ void CheckErrorPage(std::vector<std::string> &value) {
 void CheckClientMaxBodySize(std::vector<std::string> &value) {
   if (value.size() != 1) {
     std::cerr << "The number of values is not exactly 1!" << std::endl;
-    // return (1) or ~
+      // return or ~
   }
   int multiplier;
   char lastChar = value[0].back();
@@ -111,7 +111,7 @@ void CheckClientMaxBodySize(std::vector<std::string> &value) {
 
   if (num < 0) {
     std::cerr << "Only positive numbers are possible" << std::endl;
-    // return (1) or ~
+      // return or ~
   }
   // mClientMaxBodySize = (num * multiplier);
 }
@@ -121,7 +121,7 @@ void CheckIndex(std::vector<std::string> &value) {
     std::cerr
         << "Error: No arguments provided. At least one argument is required."
         << std::endl;
-    // return (1) or ~
+      // return or ~
   }
 }
 
@@ -129,20 +129,47 @@ void CheckAutoIndex(std::vector<std::string> &value) {
 
   if (value.size() != 1) {
     std::cerr << "The number of values is not exactly 1!" << std::endl;
-    // return (1) or ~
+      // return or ~
   }
   std::string upperName = value[0];
   std::transform(upperName.begin(), upperName.end(), upperName.begin(),
                  ::toupper);
   if (value[0] != "ON" && value[0] != "OFF") {
     std::cerr << "The value is not ON or OFF!" << std::endl;
-    // return (1) or ~
+      // return or ~
   }
-  // return (0);
 }
 
 void CheckListen();
 void CheckServerName();
-void CheckReturn();
+
+
+void CheckReturn(std::vector<std::string> &value)
+{
+	if (value.size() != 2)
+	{
+    	std::cerr << "Error: Incorrect number of arguments. Exactly two arguments are required." << std::endl;
+     	 // return or ~
+	}
+    std::string firstValue = value[0];
+
+    for (int i = 0; i < firstValue.size(); i++)
+    {
+        if (isdigit(firstValue[i]) == false)
+        {
+        	std::cerr << "Error: Invalid character found in status code argument." << std::endl;
+      		// return or ~
+        }
+    }
+
+	int num = atoi(firstValue.c_str());
+	if (num < 0 || num > 999)
+	{
+		std::cerr << "Error: The first value must be a number within the range 0-999." << std::endl;
+	    // return or ~
+	}
+}
+
+
 void CheckAlias();
 void CheckLimitExcept();
