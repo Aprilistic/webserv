@@ -8,10 +8,10 @@
 class Config {
   /* methods */
 public:
-  Config(const std::string &path, std::map<int, std::vector<Server *>> mServersMap);
+  Config(const std::string &path, std::map<int, std::vector<Server *> > mServersMap);
   ~Config(void);
   void SetConfig(const std::string &path);
-  void CreateServer(std::map<int, std::vector<Server *>> mServersMap);
+  void CreateServer(std::map<int, std::vector<Server *> > mServersMap);
 private:
   void printConfFile(void);
   void printTree(void);

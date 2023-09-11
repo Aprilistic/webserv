@@ -2,6 +2,7 @@
 #define MASTER_HPP
 
 #include "Config.hpp"
+#include "Core.hpp"
 
 /* Signal hadling SIGHUP, SIGQUIT or SIGTERM */
 
@@ -16,7 +17,7 @@ private:
 
 public:
 private:
-  std::map<int, std::vector<Server *>> mServersMap;
+  std::map<int, std::vector<Server *> > mServersMap;
 };
 
 #endif

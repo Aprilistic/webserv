@@ -2,8 +2,8 @@
 #include "Master.hpp"
 
 Master::Master(const std::string &path) {
-  //Config config(path, mServersMap)
-  startMaster();
+  Config config(path, mServersMap);
+//   startMaster();
 }
 
 Master::~Master(void) { stopMaster(); }

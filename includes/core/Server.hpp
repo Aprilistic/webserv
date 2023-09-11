@@ -1,6 +1,8 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
+#include "Core.hpp"
+
 class Node;
 class Server
 {

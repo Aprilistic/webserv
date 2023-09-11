@@ -1,4 +1,4 @@
-#include "WebServer.hpp"
+#include "Master.hpp"
 
 int main(int argc, char** argv)
 {
@@ -8,7 +8,7 @@ int main(int argc, char** argv)
 	}
 	else if (argc == 2)
 	{
-		WebServer WebServer(argv[1]);
+		Master master(argv[1]);
 	}
 	else
 	{
@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 // 	}
 // 	Config config(argv[1]);
 // 	return (0);
-// }
+// } 
 
 // #include "Request.hpp"
 // #include "RequestParser.hpp"
