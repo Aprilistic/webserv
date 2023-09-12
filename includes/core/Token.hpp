@@ -12,9 +12,11 @@ private:
   void removeComment(void);
   void addBlank(void);
   void tokenize(void);
+  void tokenError(const std::string &msg);
 
 public:
   std::vector<std::string> mTokens;
+  bool mIsGood;
 private:
   std::stringstream mConfBuffer;
 };

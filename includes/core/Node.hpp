@@ -9,18 +9,20 @@ public:
        std::vector<std::string>::iterator &token, Node *parent, int level);
   ~Node(void);
   void PrintTree(int level);
-
+	void checkSum(int level);
 private:
   int getTokenInfo(std::string token);
+  void nodeError(const std::string &msg);
   void addDirective(std::vector<std::string> &configTokens,
        std::vector<std::string>::iterator &token);
   void deleteTree(void);
 
 public:
-private:
   std::map<std::string, std::vector<std::string> > mDirectives;
-  Node *mParent;
   std::vector<Node *> mChildren;
+  bool mIsGood;
+private:
+  Node *mParent;
 };
 
 #endif

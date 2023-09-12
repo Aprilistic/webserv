@@ -1,6 +1,6 @@
 #include "Config.hpp"
 
-Token::Token(const std::string &path) {
+Token::Token(const std::string &path): mIsGood(true) {
   openConfFile(path);
   removeComment();
   addBlank();
@@ -10,13 +10,13 @@ Token::Token(const std::string &path) {
 void Token::openConfFile(const std::string &path) {
   std::ifstream confFile(path);
   if (confFile.is_open() == false) {
-    sendError("Error: Could not open confFile ");
+    tokenError("Error: Could not open confFile ");
   }
 
   mConfBuffer << confFile.rdbuf();
   confFile.close();
   if (mConfBuffer.good() == false) {
-    sendError("Error: confFile stream ");
+    tokenError("Error: confFile stream ");
   }
 }
 
@@ -61,4 +61,10 @@ void Token::tokenize(void) {
     mTokens.push_back(token);
     token.clear();
   }
+}
+
+void Token::tokenError(const std::string &msg)
+{
+  std::cerr << msg << std::endl;
+  mIsGood = false;
 }

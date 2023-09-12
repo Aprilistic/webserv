@@ -3,7 +3,10 @@
 
 Master::Master(const std::string &path) {
   Config config(path, mServersMap);
+  if (config.mIsGood == true)
+  {
 //   startMaster();
+  }
 }
 
 Master::~Master(void) { stopMaster(); }
