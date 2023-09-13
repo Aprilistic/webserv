@@ -5,11 +5,11 @@ bool Config::mIsGood = true;
 Config::Config(const std::string &path,
                std::map<int, std::vector<Server *> > mServersMap) {
   SetConfig(path);
-  // if (mIsGood)
-  // {
-  //   printTree();
-  // }
-  // checkSum();
+//   if (mIsGood)
+//   {
+//     printTree();
+//   }
+  checkSum();
 
   // tokenize
   // createTree
@@ -29,6 +29,7 @@ void Config::CreateServer(std::map<int, std::vector<Server *> > mServersMap) {
 
 Config::~Config(void) {
   deleteTree();
+  delete mConfigTree;
 }
 
 void Config::SetConfig(const std::string &path) {

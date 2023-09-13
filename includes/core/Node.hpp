@@ -25,6 +25,8 @@ private:
   void CheckListen(std::vector<std::string> &value);
   void CheckReturn(std::vector<std::string> &value);
   void CheckServerName(std::vector<std::string> &value);
+  void CheckAlias(std::vector<std::string> &value);
+  void CheckLimitExcept(std::vector<std::string> &value);
 
 public:
   std::map<std::string, std::vector<std::string> > mDirectives;

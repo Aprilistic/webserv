@@ -1,9 +1,9 @@
 #include "Master.hpp"
 
-// void ExitHandler(void)
-// {
-// 	system("leaks webserv");
-// }
+void ExitHandler(void)
+{
+	system("leaks webserv");
+}
 
 int main(int argc, char** argv)
 {

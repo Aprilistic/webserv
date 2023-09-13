@@ -19,10 +19,10 @@ void Node::checkSum(int level)
       CheckServerName(it->second);
     else if (it->first == "return")
       CheckReturn(it->second);
-    // else if (it->first == "alias")
-    //   CheckAlias();
-    // else if (it->first == "limit_except")
-    //   CheckLimitExcept();
+    else if (it->first == "alias")
+      CheckAlias(it->second);
+    else if (it->first == "limit_except")
+      CheckLimitExcept(it->second);
   }
   for (std::vector<Node *>::iterator it = mChildren.begin();
        it != mChildren.end(); ++it) {
@@ -34,7 +34,6 @@ void Node::CheckErrorPage(std::vector<std::string> &value) {
   if (value.size() < 2) {
     nodeError("Error: Incorrect number of arguments. At least two arguments are required.");
   }
-
   for (std::vector<std::string>::iterator it = value.begin();
        it != value.end() - 1; it++) {
     for (std::string::iterator strIt = it->begin(); strIt != it->end();
@@ -237,13 +236,29 @@ void Node::CheckReturn(std::vector<std::string> &value)
 	}
 }
 
-// void Node::CheckAlias(std::vector<std::string> &value)
-// {
-// 	if (value.size() != 1) {
-//     	nodeError("Error: No arguments provided. At least one argument is required.");
-//   }
-// }
+void Node::CheckAlias(std::vector<std::string> &value)
+{
+	if (value.size() != 1) {
+    	nodeError("Error: No arguments provided. At least one argument is required.");
+  }
+}
 
-// void Node::CheckLimitExcept(std::vector<std::string> &value)
-// {
-// }
+void Node::CheckLimitExcept(std::vector<std::string> &value)
+{
+	if (value.size() < 1)
+	{
+		nodeError("Error:");
+	}
+	std::vector<std::string> validMethods;
+    validMethods.push_back("GET");
+    validMethods.push_back("POST");
+    validMethods.push_back("DELETE");
+
+    for(int i = 0; i < value.size(); i++)
+    {
+        if(std::find(validMethods.begin(), validMethods.end(), value[i]) == validMethods.end())
+        {
+            nodeError("Invalid method");
+        }
+    }
+}
