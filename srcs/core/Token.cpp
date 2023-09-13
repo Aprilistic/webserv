@@ -1,6 +1,6 @@
 #include "Config.hpp"
 
-Token::Token(const std::string &path): mIsGood(true) {
+Token::Token(const std::string &path) {
   openConfFile(path);
   removeComment();
   addBlank();
@@ -66,5 +66,5 @@ void Token::tokenize(void) {
 void Token::tokenError(const std::string &msg)
 {
   std::cerr << msg << std::endl;
-  mIsGood = false;
+  Config::mIsGood = false;
 }

@@ -1,7 +1,13 @@
 #include "Master.hpp"
 
+// void ExitHandler(void)
+// {
+// 	system("leaks webserv");
+// }
+
 int main(int argc, char** argv)
 {
+	// atexit(ExitHandler);
 	if (argc == 1)
 	{
 		std::cout << "default config" << std::endl;

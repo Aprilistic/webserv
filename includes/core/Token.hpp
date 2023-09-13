@@ -16,7 +16,6 @@ private:
 
 public:
   std::vector<std::string> mTokens;
-  bool mIsGood;
 private:
   std::stringstream mConfBuffer;
 };

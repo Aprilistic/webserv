@@ -15,14 +15,14 @@ public:
 private:
   void printConfFile(void);
   void printTree(void);
-  void checkSum(int level);
+  void checkSum(void);
 
   void createTree(void);
   void deleteTree(void);
   void configError(const std::string &msg);
   /* variables */
 public:
-  bool mIsGood;
+  static bool mIsGood;
 private:
   Node *mConfigTree;
   std::vector<std::string> mTokens;
