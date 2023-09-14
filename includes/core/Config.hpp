@@ -22,7 +22,6 @@ private:
   void configError(const std::string &msg);
   /* variables */
 public:
-  static bool mIsGood;
 private:
   Node *mConfigTree;
   std::vector<std::string> mTokens;

@@ -66,5 +66,5 @@ void Token::tokenize(void) {
 void Token::tokenError(const std::string &msg)
 {
   std::cerr << msg << std::endl;
-  Config::mIsGood = false;
+  exit(1);
 }

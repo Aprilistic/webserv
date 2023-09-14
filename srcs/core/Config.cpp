@@ -1,7 +1,5 @@
 #include "Config.hpp"
 
-bool Config::mIsGood = true;
-
 Config::Config(const std::string &path,
                std::map<int, std::vector<Server *> > mServersMap) {
   SetConfig(path);
@@ -34,14 +32,8 @@ Config::~Config(void) {
 
 void Config::SetConfig(const std::string &path) {
   Token token(path);
-  if (mIsGood == false) {
-    configError("Error: Failed to tokenize.");
-  }
   mTokens = token.mTokens;
   createTree();
-  if (mIsGood == false){
-    configError("Error: Failed to make Node.");
-  }
   // printTree();
 }
 
@@ -56,11 +48,4 @@ void Config::printTree(void) { mConfigTree->PrintTree(0); }
 
 void Config::checkSum(void) { 
   mConfigTree->checkSum(0);
-  if (mIsGood == false) {
-    configError("Error: Failed to checkSum.");
-  }
-}
-
-void Config::configError(const std::string &msg) {
-  std::cerr << msg << std::endl;
 }
