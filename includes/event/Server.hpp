@@ -38,6 +38,8 @@ public:
 
 private:
   Server();
+  void readHandler();
+  void writeHandler();
 
 public:
 private:
