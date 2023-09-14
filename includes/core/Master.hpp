@@ -2,6 +2,7 @@
 #define MASTER_HPP
 
 #include "Config.hpp"
+#include "Core.hpp"
 
 /* Signal hadling SIGHUP, SIGQUIT or SIGTERM */
 
@@ -11,11 +12,14 @@ public:
   ~Master(void);
 
 private:
-  void startServer(void);
-  void stopServer(void);
+  void startMaster(void);
+  void stopMaster(void);
+
+  void masterError(const std::string &msg);
 
 public:
 private:
+  std::map<int, std::vector<Server *> > mServersMap;
 };
 
 #endif

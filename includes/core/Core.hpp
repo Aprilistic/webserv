@@ -35,6 +35,4 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-void sendError(const std::string &msg);
-
 #endif

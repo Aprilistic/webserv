@@ -1,5 +1,4 @@
 #include "Node.hpp"
-
 /* Level Bit Flags */
 #define NONE_LEVEL (1 << 0)
 #define HTTP_LEVEL (1 << 1)
@@ -41,7 +40,7 @@ Node::Node(std::vector<std::string> &configTokens,
     tokenInfo = getTokenInfo(*token);
 
     if ((tokenInfo & level) == 0 && tokenInfo != CLOSE_BRACKET) {
-      sendError("Error: Invalid token level");
+      nodeError("Error: Invalid token level");
     }
 
     if (tokenInfo & CREATE_NODE) {
@@ -55,7 +54,7 @@ Node::Node(std::vector<std::string> &configTokens,
 
       tokenInfo = getTokenInfo(*(++token));
       if ((tokenInfo & OPEN_BRACKET) == 0) {
-        sendError("Error: Bracket not opened");
+        nodeError("Error: Bracket not opened");
       }
 
       Node *newNode = new Node(configTokens, ++token, this,
@@ -65,10 +64,10 @@ Node::Node(std::vector<std::string> &configTokens,
       }
       mChildren.push_back(newNode);
     } else if (tokenInfo & OPEN_BRACKET) {
-      sendError("Error: Wrong bracket");
+      nodeError("Error: Wrong bracket");
     } else if (tokenInfo & CLOSE_BRACKET) {
       if (level == NONE_LEVEL && (token != configTokens.end())) {
-        sendError("Error: Wrong bracket");
+        nodeError("Error: Wrong bracket");
       }
       return;
     } else {
@@ -119,7 +118,7 @@ void Node::addDirective(std::vector<std::string> &configTokens,
   std::string key = *token;
 
   if (mDirectives.find(key) != mDirectives.end()) {
-    sendError("Error: Directive already exists");
+    nodeError("Error: Directive already exists");
   }
   std::vector<std::string> values;
   token++;
@@ -131,7 +130,7 @@ void Node::addDirective(std::vector<std::string> &configTokens,
     values.push_back(*token);
   }
   if (token == configTokens.end()) {
-    sendError("Error: Syntax Error");
+    nodeError("Error: Syntax Error");
   }
   mDirectives[key] = values;
 }
@@ -140,7 +139,6 @@ void Node::PrintTree(int level) {
   for (int i = 0; i < level; i++) {
     printf("  ");
   }
-  printf("Node: %d\n", level);
   for (std::map<std::string, std::vector<std::string> >::iterator it =
            mDirectives.begin();
        it != mDirectives.end(); ++it) {
@@ -171,4 +169,18 @@ void Node::deleteTree(void) {
     delete (*it);
   }
   mChildren.clear();
+}
+
+void Node::nodeError(const std::string &msg)
+{
+  std::cerr << "Node Error" << std::endl;
+  std::cerr << msg << std::endl;
+  // 왜 이게 없어도 정상 작동 되는건지 확인 필요
+  Node *currentNode = this;
+  while (currentNode->mParent != NULL){
+    currentNode = currentNode->mParent;
+  }
+  currentNode->deleteTree();
+  delete(currentNode);
+  exit(1);
 }
