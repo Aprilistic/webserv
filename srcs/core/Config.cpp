@@ -3,10 +3,7 @@
 Config::Config(const std::string &path,
                std::map<int, std::vector<Server *> > mServersMap) {
   SetConfig(path);
-//   if (mIsGood)
-//   {
 //     printTree();
-//   }
   checkSum();
 
   // tokenize

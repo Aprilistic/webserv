@@ -15,6 +15,8 @@ private:
   void startMaster(void);
   void stopMaster(void);
 
+  void masterError(const std::string &msg);
+
 public:
 private:
   std::map<int, std::vector<Server *> > mServersMap;

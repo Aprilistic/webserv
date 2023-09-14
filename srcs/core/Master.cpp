@@ -1,4 +1,3 @@
-
 #include "Master.hpp"
 
 Master::Master(const std::string &path) {
@@ -16,8 +15,7 @@ void Master::startMaster(void) {
 
   listenfd = socket(AF_INET, SOCK_STREAM, 0);
   if (listenfd < 0) {
-    std::cout << "socket() error" << std::endl;
-    exit(1);
+    masterError("socket() error");
   }
 
   memset(&serv_addr, 0, sizeof(serv_addr));
@@ -27,14 +25,12 @@ void Master::startMaster(void) {
 
   // Listening socket bind
   if (bind(listenfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
-    std::cout << "bind() error" << std::endl;
-    exit(1);
+    masterError("bind() error");
   }
 
   // Listening socket listen
   if (listen(listenfd, 5) < 0) {
-    std::cout << "listen() error" << std::endl;
-    exit(1);
+    masterError("listen() error");
   }
 
   // Listening socket register
@@ -44,14 +40,12 @@ void Master::startMaster(void) {
 
   kq = kqueue();
   if (kq == -1) {
-    std::cout << "kqueue() error" << std::endl;
-    exit(1);
+    masterError("kqueue() error");
   }
 
   EV_SET(&evSet, listenfd, EVFILT_READ, EV_ADD, 0, 5, NULL);
   if (kevent(kq, &evSet, 1, NULL, 0, NULL) == -1) {
-    std::cout << "kevent() error" << std::endl;
-    exit(1);
+    masterError("kevent() error");
   }
 
   
@@ -61,3 +55,9 @@ void Master::startMaster(void) {
 }
 
 void Master::stopMaster(void) {}
+
+void Master::masterError(const std::string &msg) {
+  std::cerr << "Master Error" << std::endl;
+  std::cerr << msg << std::endl;
+  exit(1);
+}
