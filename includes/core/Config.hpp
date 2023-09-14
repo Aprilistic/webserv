@@ -13,6 +13,7 @@ public:
   void SetConfig(const std::string &path);
   void CreateServer(std::map<int, std::vector<Server *> > mServersMap);
 private:
+  Config();
   void printConfFile(void);
   void printTree(void);
   void checkSum(void);

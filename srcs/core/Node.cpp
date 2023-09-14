@@ -175,7 +175,6 @@ void Node::nodeError(const std::string &msg)
 {
   std::cerr << "Node Error" << std::endl;
   std::cerr << msg << std::endl;
-  // 왜 이게 없어도 정상 작동 되는건지 확인 필요
   Node *currentNode = this;
   while (currentNode->mParent != NULL){
     currentNode = currentNode->mParent;

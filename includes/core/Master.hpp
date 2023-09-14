@@ -12,6 +12,7 @@ public:
   ~Master(void);
 
 private:
+  Master();
   void startMaster(void);
   void stopMaster(void);
 

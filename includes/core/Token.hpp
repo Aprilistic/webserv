@@ -8,6 +8,7 @@ public:
   Token(const std::string &path);
 
 private:
+  Token();
   void openConfFile(const std::string &path);
   void removeComment(void);
   void addBlank(void);

@@ -13,6 +13,7 @@ public:
 	void checkSum(int level);
   void deleteTree(void);
 private:
+  Node();
   int getTokenInfo(std::string token);
   void addDirective(std::vector<std::string> &configTokens,
        std::vector<std::string>::iterator &token);
