@@ -33,7 +33,7 @@
 
 Node::Node(std::vector<std::string> &configTokens,
            std::vector<std::string>::iterator &token, Node *parent, int level)
-    : mParent(parent) {
+    : mParent(parent), mLevel(level) {
   int tokenInfo;
 
   for (; token != configTokens.end(); token++) {
@@ -171,15 +171,14 @@ void Node::deleteTree(void) {
   mChildren.clear();
 }
 
-void Node::nodeError(const std::string &msg)
-{
+void Node::nodeError(const std::string &msg) {
   std::cerr << "Node Error" << std::endl;
   std::cerr << msg << std::endl;
   Node *currentNode = this;
-  while (currentNode->mParent != NULL){
+  while (currentNode->mParent != NULL) {
     currentNode = currentNode->mParent;
   }
   currentNode->deleteTree();
-  delete(currentNode);
+  delete (currentNode);
   exit(1);
 }

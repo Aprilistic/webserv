@@ -4,17 +4,23 @@
 #include "Config.hpp"
 #include "Core.hpp"
 
+
+class Server;
+
 class EventMonitor {
 public:
-  EventMonitor();
+  EventMonitor(Node *mConfigTree);
   ~EventMonitor();
 
-private:
-  int mKq;
-  int mQuit;
-  struct kevent evSet;
-  struct kevent evList[32];
+  void MonitorIO();
 
+private:
+  int mQuit;
+  struct kevent mEvList[32];
+  std::vector<Server *> mServerList;
+
+public:
+  int mKqueue;
 };
 
 #endif

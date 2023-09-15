@@ -3,6 +3,7 @@
 
 #include "Config.hpp"
 #include "Core.hpp"
+#include "EventMonitor.hpp"
 
 /* Signal hadling SIGHUP, SIGQUIT or SIGTERM */
 
@@ -13,14 +14,6 @@ public:
 
 private:
   Master();
-  void startMaster(void);
-  void stopMaster(void);
-
-  void masterError(const std::string &msg);
-
-public:
-private:
-  std::map<int, std::vector<Server *> > mServersMap;
 };
 
 #endif

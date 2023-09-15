@@ -1,7 +1,6 @@
 #include "Config.hpp"
 
-Config::Config(const std::string &path,
-               std::map<int, std::vector<Server *> > mServersMap) {
+Config::Config(const std::string &path) {
   SetConfig(path);
 //     printTree();
   checkSum();
@@ -14,13 +13,12 @@ Config::Config(const std::string &path,
   // CreatServer(mServersMap);
 }
 
-void Config::CreateServer(std::map<int, std::vector<Server *> > mServersMap) {
-  int serverCount = 4; // mConfigTree -> n
+// void Config::CreateServer(std::map<int, std::vector<Server *> > mServersMap) {
+//   int serverCount = 4; // mConfigTree -> n
 
-  for (int i = 0; i < serverCount; i++) {
-    mServersMap[i].push_back(new Server(mConfigTree));
-  }
-}
+//   for (int i = 0; i < serverCount; i++) {
+//   }
+// }
 
 Config::~Config(void) {
   deleteTree();
@@ -46,3 +44,4 @@ void Config::printTree(void) { mConfigTree->PrintTree(0); }
 void Config::checkSum(void) { 
   mConfigTree->checkSum(0);
 }
+Node* Config::GetConfigTree(void) const { return mConfigTree; }

@@ -2,9 +2,9 @@
 #define SERVER_HPP
 
 #include "Core.hpp"
-#include "IOcontrol.hpp"
-
+             
 class Node;
+class EventMonitor;
 // class Server
 // {
 // 	public:
@@ -33,21 +33,26 @@ class Node;
 
 class Server {
 public:
-  Server(IOcontrol *IO, Node *ServerNode);
+  Server(EventMonitor *Monitor, Node *ServerNode);
   ~Server();
 
+  // void ReadHandler();
+  // void WriteHandler();
 private:
   Server();
-  void readHandler();
-  void writeHandler();
+  void makeHashMap(Node *curNode);
+  void printHashMap(void);
+  void makeLocationHashMap(Node *curNode);
+  void deleteLocationHashMap(void);
 
 public:
+  int mSocket;
 private:
-  IOcontrol *mIO;
+  EventMonitor *mMonitor;
   Node *mServerNode;
+  std::map<std::string, Node *> mLocationHashMap;
   struct sockaddr_in mAddr;
   int mPort;
-  int mSocket;
 };
 
 #endif

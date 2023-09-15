@@ -3,15 +3,14 @@
 
 #include "Node.hpp"
 #include "Token.hpp"
-#include "Server.hpp"
 
+// class Node;
 class Config {
-  /* methods */
 public:
-  Config(const std::string &path, std::map<int, std::vector<Server *> > mServersMap);
+  Config(const std::string &path);
   ~Config(void);
   void SetConfig(const std::string &path);
-  void CreateServer(std::map<int, std::vector<Server *> > mServersMap);
+  Node *GetConfigTree(void) const;
 private:
   Config();
   void printConfFile(void);
@@ -21,7 +20,6 @@ private:
   void createTree(void);
   void deleteTree(void);
   void configError(const std::string &msg);
-  /* variables */
 public:
 private:
   Node *mConfigTree;

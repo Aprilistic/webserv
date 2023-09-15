@@ -2,7 +2,6 @@
 #define NODE_HPP
 
 #include "Core.hpp"
-#include "Config.hpp"
 
 class Node {
 public:
@@ -32,6 +31,8 @@ private:
 public:
   std::map<std::string, std::vector<std::string> > mDirectives;
   std::vector<Node *> mChildren;
+  int mLevel;
+
 private:
   Node *mParent;
 };
