@@ -37,7 +37,7 @@ public:
   Server(EventMonitor *Monitor, Node *ServerNode);
   ~Server();
 
-  void ReadHandler();
+  void ReadHandler(int ident);
   void WriteHandler();
   void TimerHandler();
   void SignalHandler();
@@ -54,7 +54,7 @@ private:
   EventMonitor *mMonitor;
   Node *mServerNode;
   std::map<std::string, Node *> mLocationHashMap;
-  std::map<int, Connection> mConnection;
+  std::map<int, Connection *> mConnection;
   struct sockaddr_in mAddr;
   int mPort;
 };

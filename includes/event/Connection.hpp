@@ -6,9 +6,10 @@
 class Connection
 {
 	public:
-		Connection();
+		Connection(int ClientSocket);
 		~Connection();
 	private:
+		int mClientSocket;
 		std::string mBuffer;
 };
 

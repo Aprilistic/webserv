@@ -11,6 +11,7 @@ class EventMonitor {
 public:
   EventMonitor(Node *mConfigTree);
   ~EventMonitor();
+  struct kevent GetEvList();
 
   void MonitorIO();
 

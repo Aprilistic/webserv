@@ -1,3 +1,7 @@
 #include "Connection.hpp"
 
-Connection::Connection() {}
+
+Connection::Connection(int ClientSocket)
+{
+	mClientSocket = ClientSocket;
+}

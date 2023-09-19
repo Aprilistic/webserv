@@ -26,19 +26,23 @@ void EventMonitor::MonitorIO() {
       Server *server = (Server *)mEvList[i].udata;
 
       if (mEvList[i].flags & EV_ERROR) {
-        // error
+        //error client으ㅣ 경경우  disconnect 필요
       }
 
       switch (mEvList[i].filter) {
       case EVFILT_READ:
         if (mEvList[i].ident == server->mSocket) {
           int clientSocket;
+          struct kevent events[2];
           if ((clientSocket = accept(server->mSocket, NULL, NULL)) == -1) {
             // error
           }
           fcntl(clientSocket, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
+          EV_SET(&events[0], clientSocket, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL); // option 확인 필요 client 생성할지 고민
+          EV_SET(&events[1], clientSocket, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, NULL); // option 확인 필요 client 생성할지 고민
+          kevent(mKqueue, events, 2, NULL, 0, NULL);
         }
-        server->ReadHandler();
+        server->ReadHandler(mEvList[i].ident);
         break;
       case EVFILT_WRITE:
         server->WriteHandler();
@@ -63,3 +67,5 @@ EventMonitor::~EventMonitor() {
   }
   close(mKqueue);
 }
+
+struct kevent EventMonitor::GetEvList() { return *mEvList; }

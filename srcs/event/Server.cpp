@@ -23,7 +23,7 @@ Server::Server(EventMonitor *Monitor, Node *ServerNode)
   mAddr.sin_port = htons(mPort);
   mAddr.sin_addr.s_addr = htonl(0);
 
-  if (bind(mSocket, (struct sockaddr *)&mAddr, sizeof(mAddr) < 0)) {
+  if (bind(mSocket, (struct sockaddr *)&mAddr, sizeof(mAddr)) < 0) {
     // error
   }
 
@@ -76,9 +76,19 @@ void Server::printHashMap() {
   }
 }
 
-void Server::ReadHandler()
+void Server::ReadHandler(int ident)
 {
-  
+  // if (ident == mSocket) {
+  //         int clientSocket;
+  //         if ((clientSocket = accept(mSocket, NULL, NULL)) == -1) {
+  //           // error
+  //         }
+  //         else {
+  //           std::pair<int, Connection *> SessionDict = std::make_pair(clientSocket, a);
+  //         }
+  //         fcntl(clientSocket, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
+          
+  //       }
 }
 
 void Server::WriteHandler()
