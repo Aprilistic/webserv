@@ -6,16 +6,13 @@ EventMonitor::EventMonitor(Node *mConfigTree) {
   mQuit = 0;
 
   Node *httpNode = mConfigTree->mChildren[0];
-  std::cout<<"Node lv: " << httpNode->mLevel<<std::endl;
   for (std::vector<Node *>::iterator serverNode = httpNode->mChildren.begin();
        serverNode != httpNode->mChildren.end(); ++serverNode) {
-          std::cout<<"ServerNode lv: " << (*serverNode)->mLevel<<std::endl;
     mServerList.push_back(new Server(this, *serverNode));
   }
-
 }
 
-//signal, timer registeration to kqueue
+// signal, timer registeration to kqueue
 
 void EventMonitor::MonitorIO() {
   while (mQuit == 0) {
@@ -28,24 +25,33 @@ void EventMonitor::MonitorIO() {
     for (int i = 0; i < nev; i++) {
       Server *server = (Server *)mEvList[i].udata;
 
-      // if (mEvList[i].flags & EV_ERROR)
-      // {
-      //   // error
-      // }
-      // else if (mEvList[i].filter == EVFILT_READ) {
-      //   if (mEvList[i].ident == server->mSocket)
-      //   {
-      //       int clientSocket;
-      //       if ((clientSocket = accept(server->mSocket, NULL, NULL)) == -1)
-      //       {
-      //         // error
-      //       }
-      //       fcntl(clientSocket, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
-      //   }
-      //   server->ReadHandler();
-      // } else if (mEvList[i].filter == EVFILT_WRITE) {
-      //   server->WriteHandler();
-      // }
+      if (mEvList[i].flags & EV_ERROR) {
+        // error
+      }
+
+      switch (mEvList[i].filter) {
+      case EVFILT_READ:
+        if (mEvList[i].ident == server->mSocket) {
+          int clientSocket;
+          if ((clientSocket = accept(server->mSocket, NULL, NULL)) == -1) {
+            // error
+          }
+          fcntl(clientSocket, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
+        }
+        server->ReadHandler();
+        break;
+      case EVFILT_WRITE:
+        server->WriteHandler();
+        break;
+      case EVFILT_TIMER:
+        server->TimerHandler();
+        break;
+      case EVFILT_SIGNAL:
+        server->SignalHandler();
+        break;
+      default:
+        break;
+      }
     }
   }
 }
