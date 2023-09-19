@@ -75,3 +75,20 @@ void Server::printHashMap() {
               << std::endl;
   }
 }
+
+void Server::ReadHandler()
+{
+  
+}
+
+void Server::WriteHandler()
+{
+}
+
+void Server::TimerHandler()
+{
+}
+
+void Server::SignalHandler()
+{
+}

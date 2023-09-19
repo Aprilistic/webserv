@@ -5,6 +5,7 @@
              
 class Node;
 class EventMonitor;
+class Connection;
 // class Server
 // {
 // 	public:
@@ -36,8 +37,10 @@ public:
   Server(EventMonitor *Monitor, Node *ServerNode);
   ~Server();
 
-  // void ReadHandler();
-  // void WriteHandler();
+  void ReadHandler();
+  void WriteHandler();
+  void TimerHandler();
+  void SignalHandler();
 private:
   Server();
   void makeHashMap(Node *curNode);
@@ -51,6 +54,7 @@ private:
   EventMonitor *mMonitor;
   Node *mServerNode;
   std::map<std::string, Node *> mLocationHashMap;
+  std::map<int, Connection> mConnection;
   struct sockaddr_in mAddr;
   int mPort;
 };
