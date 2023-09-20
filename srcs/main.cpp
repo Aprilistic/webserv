@@ -7,8 +7,7 @@ int main(int argc, char **argv) {
   if (argc == 1) {
     std::cout << "default config" << std::endl;
   } else if (argc == 2) {
-	Config config(argv[1]);
-    Master master(config.GetConfigTree());
+    Master master(argv[1]);
 	while (true)
 	{
 		master.EventMonitoring();

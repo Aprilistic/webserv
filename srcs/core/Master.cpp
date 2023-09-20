@@ -1,12 +1,12 @@
 #include "Master.hpp"
 #include "Server.hpp"
 
-Master::Master(const std::string &path) {
-  Config config(path);
-  EventMonitor eventMonitor(config.GetConfigTree());
-}
+// Master::Master(const std::string &path) {
+//   Config config(path);
+//   EventMonitor eventMonitor(config.GetConfigTree());
+// }
 
-Master::Master(Node* mConfigTree)
+Master::Master(const std::string &path)
 {
 	mKqueue = kqueue();
 
@@ -15,7 +15,8 @@ Master::Master(Node* mConfigTree)
 		// error
 	}
 
-	Node* httpNode = mConfigTree->mChildren[0];
+	Config config(path);
+	Node* httpNode = config.GetConfigTree()->mChildren[0];
 	for (std::vector<Node *>::iterator serverNode = httpNode->mChildren.begin();
 		serverNode != httpNode->mChildren.end(); ++serverNode)
 		{
