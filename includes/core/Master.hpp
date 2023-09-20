@@ -10,10 +10,16 @@
 class Master {
 public:
   Master(const std::string &path);
+  Master(Node* mConfigTree);
   ~Master(void);
+  void EventMonitoring(void);
+  void EventHandler(struct kevent& currentEvent);
 
 private:
   Master();
+  int mKqueue;
+  std::vector<Server *> mServerList;
+  std::vector<struct kevent> mEventList;
 };
 
 #endif

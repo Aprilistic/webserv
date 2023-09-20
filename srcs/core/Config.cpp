@@ -29,7 +29,7 @@ void Config::SetConfig(const std::string &path) {
   Token token(path);
   mTokens = token.mTokens;
   createTree();
-  // printTree();
+  // printTree(); 
 }
 
 void Config::createTree(void) {

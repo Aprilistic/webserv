@@ -35,6 +35,8 @@ class Connection;
 class Server {
 public:
   Server(EventMonitor *Monitor, Node *ServerNode);
+  Server(Master *Master, Node *ServerNode);
+
   ~Server();
 
   void ReadHandler(int ident);

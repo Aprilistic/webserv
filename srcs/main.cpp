@@ -7,7 +7,12 @@ int main(int argc, char **argv) {
   if (argc == 1) {
     std::cout << "default config" << std::endl;
   } else if (argc == 2) {
-    Master master(argv[1]);
+	Config config(argv[1]);
+    Master master(config.GetConfigTree());
+	while (true)
+	{
+		master.EventMonitoring();
+	}
   } else {
     std::cout << "Usage: ./webserv [config_file]" << std::endl;
   }
