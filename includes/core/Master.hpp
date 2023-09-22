@@ -3,7 +3,6 @@
 
 #include "Config.hpp"
 #include "Core.hpp"
-#include "EventMonitor.hpp"
 
 /* Signal hadling SIGHUP, SIGQUIT or SIGTERM */
 
@@ -19,6 +18,9 @@ private:
   int mKqueue;
   std::vector<Server *> mServerList;
   std::vector<struct kevent> mEventList;
+
+public:
+  int GetKqueue(void) const;
 };
 
 #endif

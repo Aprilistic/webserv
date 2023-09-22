@@ -44,7 +44,7 @@ void Master::EventHandler(struct kevent& currentEvent)
 {
 	Server *server = static_cast<Server *>(currentEvent.udata);
 
-	if (currentEvent.fflags & EV_ERROR)
+	if (currentEvent.flags & EV_ERROR)
 	{
 		// error
 	}
@@ -65,18 +65,22 @@ void Master::EventHandler(struct kevent& currentEvent)
         }
         server->ReadHandler(currentEvent.ident);
         break;
-      case EVFILT_WRITE:
-        server->WriteHandler();
-        break;
-      case EVFILT_TIMER:
-        server->TimerHandler();
-        break;
-      case EVFILT_SIGNAL:
-        server->SignalHandler();
-        break;
-      default:
-        break;
+		case EVFILT_WRITE:
+			server->WriteHandler();
+			break;
+		case EVFILT_TIMER:
+			server->TimerHandler();
+			break;
+		case EVFILT_SIGNAL:
+			server->SignalHandler();
+			break;
+		default:
+			break;
 	}
+}
+
+int Master::GetKqueue(void) const {
+	return mKqueue;
 }
 
 
