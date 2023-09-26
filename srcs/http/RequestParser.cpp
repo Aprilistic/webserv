@@ -189,11 +189,11 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
         if (req.mMethod == "POST" || req.mMethod == "PUT") {
           Request::HeaderItem &h = req.mHeaders.back();
 
-          if (strcasecmp(h.name.c_str(), "mContent-Length") == 0) {
+          if (strcasecmp(h.name.c_str(), "Content-Length") == 0) {
             mContentsize = atoi(h.value.c_str());
             req.mContent.reserve(mContentsize);
           } else if (strcasecmp(h.name.c_str(), "Transfer-Encoding") == 0) {
-            if (strcasecmp(h.value.c_str(), "mChunked") == 0)
+            if (strcasecmp(h.value.c_str(), "Chunked") == 0)
               mChunked = true;
           }
         }

@@ -4,7 +4,7 @@ RequestSyntax::RequestSyntax() {}
 
 RequestSyntax::~RequestSyntax() {}
 
-eStatustCode RequestSyntax::syntax(Request &request) {
+eStatustCode RequestSyntax::checksyntax(Request &request) {
     typedef eStatustCode (RequestSyntax::*CheckFunction)(Request&);
     CheckFunction checks[] = {
         &RequestSyntax::method,

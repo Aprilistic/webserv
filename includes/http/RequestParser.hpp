@@ -79,8 +79,8 @@ private:
   inline bool isDigit(int c);
 
 public:
-private:
   size_t mContentsize;
+private:
   std::string mChunkSizeStr;
   size_t mChunkSize;
   bool mChunked;

@@ -59,7 +59,7 @@ class RequestSyntax {
 		RequestSyntax();
 		~RequestSyntax();
 
-		eStatustCode syntax(Request &request);
+		eStatustCode checksyntax(Request &request);
 		eStatustCode method(Request& request); //mMethod
 		eStatustCode requestTarget(Request& request);// mUri
 		eStatustCode httpVersion(Request& request); // mVersionMajor, mVersionMinor
