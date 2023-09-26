@@ -15,13 +15,13 @@ std::vector<std::string> Tokenizer::makeTokens(const std::string& path)
 void Tokenizer::openConfFile(const std::string &path, std::stringstream& outConfBuffer) {
   std::ifstream confFile(path);
   if (confFile.is_open() == false) {
-    tokenError("Error: Could not open confFile ");
+    throw std::runtime_error("Error: Could not open confFile.");
   }
 
   outConfBuffer << confFile.rdbuf();
   confFile.close();
   if (outConfBuffer.good() == false) {
-    tokenError("Error: confFile stream ");
+    throw std::runtime_error("Error: confFile stream operation error.");
   }
 }
 
@@ -66,11 +66,4 @@ void Tokenizer::tokenize(std::stringstream& outConfBuffer, std::vector<std::stri
     outTokens.push_back(token);
     token.clear();
   }
-}
-
-void Tokenizer::tokenError(const std::string &msg)
-{
-  std::cerr << "Token Error" << std::endl;
-  std::cerr << msg << std::endl;
-  exit(1);
 }

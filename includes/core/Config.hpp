@@ -14,7 +14,7 @@ public:
 
 private:
   Config();
-  static void checkSum(Node *ConfigTree);
+  static void checkSum(Node *configTree);
 
 };
 

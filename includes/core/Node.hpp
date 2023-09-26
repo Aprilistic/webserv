@@ -6,7 +6,7 @@
 class Node {
 public:
   Node(std::vector<std::string> &configTokens,
-       std::vector<std::string>::iterator &token, Node *parent, int level);
+       std::vector<std::string>::iterator &tokenLocation, Node *parent, int level);
   ~Node(void);
   void PrintTree(int level);
 	void checkSum(int level);
@@ -14,7 +14,7 @@ private:
   Node();
   int getTokenInfo(std::string token);
   void addDirective(std::vector<std::string> &configTokens,
-       std::vector<std::string>::iterator &token);
+       std::vector<std::string>::iterator &tokenLocation);
   void nodeError(const std::string &msg);
 
   void CheckErrorPage(std::vector<std::string> &value);

@@ -32,12 +32,12 @@
 /* { } ; */
 
 Node::Node(std::vector<std::string> &configTokens,
-           std::vector<std::string>::iterator &token, Node *parent, int level)
+           std::vector<std::string>::iterator &tokenLocation, Node *parent, int level)
     : mParent(parent), mLevel(level) {
   int tokenInfo;
 
-  for (; token != configTokens.end(); token++) {
-    tokenInfo = getTokenInfo(*token);
+  for (; tokenLocation != configTokens.end(); tokenLocation++) {
+    tokenInfo = getTokenInfo(*tokenLocation);
 
     if ((tokenInfo & level) == 0 && tokenInfo != CLOSE_BRACKET) {
       nodeError("Error: Invalid token level");
@@ -47,17 +47,17 @@ Node::Node(std::vector<std::string> &configTokens,
       bool bLocationFlag = false;
       std::string location;
       if (tokenInfo == LOCATION) { /* location */
-        tokenInfo = getTokenInfo(*(++token));
+        tokenInfo = getTokenInfo(*(++tokenLocation));
         bLocationFlag = true;
-        location = *token;
+        location = *tokenLocation;
       }
 
-      tokenInfo = getTokenInfo(*(++token));
+      tokenInfo = getTokenInfo(*(++tokenLocation));
       if ((tokenInfo & OPEN_BRACKET) == 0) {
         nodeError("Error: Bracket not opened");
       }
 
-      Node *newNode = new Node(configTokens, ++token, this,
+      Node *newNode = new Node(configTokens, ++tokenLocation, this,
                                (level & LOCATION_LEVEL) ? level : level << 1);
       if (bLocationFlag) {
         newNode->mDirectives["location"].push_back(location);
@@ -66,12 +66,12 @@ Node::Node(std::vector<std::string> &configTokens,
     } else if (tokenInfo & OPEN_BRACKET) {
       nodeError("Error: Wrong bracket");
     } else if (tokenInfo & CLOSE_BRACKET) {
-      if (level == NONE_LEVEL && (token != configTokens.end())) {
+      if (level == NONE_LEVEL && (tokenLocation != configTokens.end())) {
         nodeError("Error: Wrong bracket");
       }
       return;
     } else {
-      addDirective(configTokens, token);
+      addDirective(configTokens, tokenLocation);
     }
   }
 }
@@ -114,22 +114,22 @@ int Node::getTokenInfo(std::string token) {
 }
 
 void Node::addDirective(std::vector<std::string> &configTokens,
-                        std::vector<std::string>::iterator &token) {
-  std::string key = *token;
+                        std::vector<std::string>::iterator &tokenLocation) {
+  std::string key = *tokenLocation;
 
   if (mDirectives.find(key) != mDirectives.end()) {
     nodeError("Error: Directive already exists");
   }
   std::vector<std::string> values;
-  token++;
-  for (; token != configTokens.end(); token++) {
-    int tokenInfo = getTokenInfo(*token);
+  tokenLocation++;
+  for (; tokenLocation != configTokens.end(); tokenLocation++) {
+    int tokenInfo = getTokenInfo(*tokenLocation);
     if (tokenInfo & SEMICOLON) {
       break;
     }
-    values.push_back(*token);
+    values.push_back(*tokenLocation);
   }
-  if (token == configTokens.end()) {
+  if (tokenLocation == configTokens.end()) {
     nodeError("Error: Syntax Error");
   }
   mDirectives[key] = values;
@@ -172,7 +172,6 @@ void Node::deleteTree(void) {
 }
 
 void Node::nodeError(const std::string &msg) {
-  std::cerr << "Node Error" << std::endl;
   std::cerr << msg << std::endl;
   Node *currentNode = this;
   while (currentNode->mParent != NULL) {
@@ -180,5 +179,5 @@ void Node::nodeError(const std::string &msg) {
   }
   currentNode->deleteTree();
   delete (currentNode);
-  exit(1);
+  throw std::runtime_error("Error: Failed to create node.");
 }

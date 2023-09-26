@@ -39,7 +39,9 @@ WebServer::~WebServer(void) {
   if (!mServerConfigList.empty()) {
     for (std::vector<ServerConfig *>::iterator it = mServerConfigList.begin();
          it != mServerConfigList.end(); ++it) {
-      delete *it;
+			if (*it) {
+      	delete *it;
+			}
     }
   } else {
     safeExit = 0;
