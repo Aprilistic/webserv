@@ -1,7 +1,7 @@
 #include "Node.hpp"
 
 void Node::checkSum(int level) {
-  for (std::map<std::string, std::vector<std::string>>::iterator it =
+  for (std::map<std::string, std::vector<std::string> >::iterator it =
            mDirectives.begin();
        it != mDirectives.end(); ++it) {
     if (it->first == "error_page")
