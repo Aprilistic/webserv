@@ -11,12 +11,17 @@ class WebServer {
 public:
 	WebServer(const std::string &path);
 	~WebServer(void);
-	void EventMonitoring(void);
-	void EventHandler(struct kevent& currentEvent);
+	void Run(void);
 	int GetKqueue(void) const;
+	bool IsGood(void) const;
 
 private:
 	WebServer();
+	void eventMonitoring(void);
+	void eventHandler(struct kevent& currentEvent);
+
+private:
+	bool mGood;
 	int mKqueue;
 	Node *mConfigTree;
 	std::vector<ServerConfig *> mServerConfigList;

@@ -4,16 +4,18 @@
 #include "ServerConfig.hpp"
 #include "WebServer.hpp"
 
-ServerConfig::ServerConfig(WebServer *webServer, Node *ServerConfigNode)
-    : mWebServer(webServer), mServerConfigNode(ServerConfigNode) {
+ServerConfig::ServerConfig(WebServer *webServer, Node *serverConfigNode)
+    : mWebServer(webServer)
+    , mServerConfigNode(serverConfigNode) {
 
-  makeLocationConfigHashMap(ServerConfigNode);
+  makeLocationConfigHashMap(serverConfigNode);
 
   // printHashMap();
 
   mSocket = socket(AF_INET, SOCK_STREAM, 0);
   if (mSocket < 0) {
-    throw std::runtime_error("socket() failed");
+    //FD limit exceeded
+    throw std::runtime_error("Error: socket() creation failed: " + std::string(strerror(errno)));
   }
 
   fcntl(mSocket, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
@@ -24,11 +26,11 @@ ServerConfig::ServerConfig(WebServer *webServer, Node *ServerConfigNode)
   mAddr.sin_addr.s_addr = htonl(0);
 
   if (bind(mSocket, (struct sockaddr *)&mAddr, sizeof(mAddr) < 0)) {
-    // error
+    throw std::runtime_error("Error: Failed to bind the socket: " + std::string(strerror(errno)));
   }
 
   if (listen(mSocket, SOMAXCONN /* backlog size*/) < 0) {
-    // error
+    throw std::runtime_error("Error: Failed to listen on the socket: " + std::string(strerror(errno)));
   }
 
   struct kevent events[2];
