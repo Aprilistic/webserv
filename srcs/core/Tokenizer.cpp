@@ -1,6 +1,6 @@
-#include "Config.hpp"
+#include "Tokenizer.hpp"
 
-std::vector<std::string> Token::makeTokens(const std::string& path)
+std::vector<std::string> Tokenizer::makeTokens(const std::string& path)
 {
 	std::stringstream confBuffer;
 	std::vector<std::string> Tokens;
@@ -12,20 +12,20 @@ std::vector<std::string> Token::makeTokens(const std::string& path)
   return (Tokens);
 }
 
-void Token::openConfFile(const std::string &path, std::stringstream& outConfBuffer) {
+void Tokenizer::openConfFile(const std::string &path, std::stringstream& outConfBuffer) {
   std::ifstream confFile(path);
   if (confFile.is_open() == false) {
-    tokenError("Error: Could not open confFile ");
+    throw std::runtime_error("Error: Could not open confFile.");
   }
 
   outConfBuffer << confFile.rdbuf();
   confFile.close();
   if (outConfBuffer.good() == false) {
-    tokenError("Error: confFile stream ");
+    throw std::runtime_error("Error: confFile stream operation error.");
   }
 }
 
-void Token::removeComment(std::stringstream& outConfBuffer) {
+void Tokenizer::removeComment(std::stringstream& outConfBuffer) {
   std::stringstream cleanBuffer;
   std::string line;
   int commentPos;
@@ -40,7 +40,7 @@ void Token::removeComment(std::stringstream& outConfBuffer) {
   outConfBuffer.clear();
 }
 
-void Token::addBlank(std::stringstream& outConfBuffer) {
+void Tokenizer::addBlank(std::stringstream& outConfBuffer) {
   std::string content;
   content = outConfBuffer.str();
   for (int index = 0; index < content.size(); index++) {
@@ -55,7 +55,7 @@ void Token::addBlank(std::stringstream& outConfBuffer) {
   outConfBuffer << content;
 }
 
-void Token::tokenize(std::stringstream& outConfBuffer, std::vector<std::string>& outTokens) {
+void Tokenizer::tokenize(std::stringstream& outConfBuffer, std::vector<std::string>& outTokens) {
   std::string token;
 
   while (true) {
@@ -66,11 +66,4 @@ void Token::tokenize(std::stringstream& outConfBuffer, std::vector<std::string>&
     outTokens.push_back(token);
     token.clear();
   }
-}
-
-void Token::tokenError(const std::string &msg)
-{
-  std::cerr << "Token Error" << std::endl;
-  std::cerr << msg << std::endl;
-  exit(1);
 }
