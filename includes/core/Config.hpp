@@ -1,7 +1,7 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include "Token.hpp"
+#include "Tokenizer.hpp"
 #include "ServerConfig.hpp"
 #include "Node.hpp"
 
@@ -15,9 +15,6 @@ public:
 private:
   Config();
   static void checkSum(Node *ConfigTree);
-
-public:
-private:
 
 };
 

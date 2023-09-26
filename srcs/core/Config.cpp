@@ -2,7 +2,7 @@
 
 Node* Config::makeConfigTree(const std::string &path)
 {
-	std::vector<std::string> Tokens = Token::makeTokens(path);
+	std::vector<std::string> Tokens = Tokenizer::makeTokens(path);
 	Node *ConfigTree;
 
 	std::vector<std::string>::iterator token = Tokens.begin();
