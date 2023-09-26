@@ -9,7 +9,7 @@ public:
        std::vector<std::string>::iterator &tokenLocation, Node *parent, int level);
   ~Node(void);
   void PrintTree(int level);
-	void checkSum(int level);
+	void CheckSum(int level);
 private:
   Node();
   int getTokenInfo(std::string token);
@@ -17,15 +17,15 @@ private:
        std::vector<std::string>::iterator &tokenLocation);
   void nodeError(const std::string &msg);
 
-  void CheckErrorPage(std::vector<std::string> &value);
-  void CheckClientMaxBodySize(std::vector<std::string> &value);
-  void CheckIndex(std::vector<std::string> &value);
-  void CheckAutoIndex(std::vector<std::string> &value);
-  void CheckListen(std::vector<std::string> &value);
-  void CheckReturn(std::vector<std::string> &value);
-  void CheckServerName(std::vector<std::string> &value);
-  void CheckAlias(std::vector<std::string> &value);
-  void CheckLimitExcept(std::vector<std::string> &value);
+  void checkErrorPage(std::vector<std::string> &value);
+  void checkClientMaxBodySize(std::vector<std::string> &value);
+  void checkIndex(std::vector<std::string> &value);
+  void checkAutoIndex(std::vector<std::string> &value);
+  void checkListen(std::vector<std::string> &value);
+  void checkReturn(std::vector<std::string> &value);
+  void checkServerName(std::vector<std::string> &value);
+  void checkAlias(std::vector<std::string> &value);
+  void checkLimitExcept(std::vector<std::string> &value);
   void deleteTree(void);
 
 public:

@@ -23,9 +23,11 @@ WebServer::WebServer(const std::string &path)
   }
 }
 
-bool IsGood(void) const{
+bool WebServer::IsGood(void) const{
 		return (mGood);
 }
+
+int WebServer::GetKqueue(void) const { return (mKqueue); }
 
 WebServer::~WebServer(void) {
   int safeExit = 1;
@@ -39,9 +41,7 @@ WebServer::~WebServer(void) {
   if (!mServerConfigList.empty()) {
     for (std::vector<ServerConfig *>::iterator it = mServerConfigList.begin();
          it != mServerConfigList.end(); ++it) {
-			if (*it) {
       	delete *it;
-			}
     }
   } else {
     safeExit = 0;
@@ -58,33 +58,33 @@ WebServer::~WebServer(void) {
   }
 }
 
-void WebServer::Run(void)
-{
-	if (!isGood())
-	{
-		return;
-	}
-	EventMonitoring();
-}
+// void WebServer::Run(void)
+// {
+// 	if (!isGood())
+// 	{
+// 		return;
+// 	}
+// 	EventMonitoring();
+// }
 
-void WebServer::eventMonitoring(void)
-{
-	while 
-	{
-		int newEvent = kevent(mKqueue, NULL, 0, &mEventList[0], mEventList.size(), NULL);
+// void WebServer::eventMonitoring(void)
+// {
+// 	while 
+// 	{
+// 		int newEvent = kevent(mKqueue, NULL, 0, &mEventList[0], mEventList.size(), NULL);
 
-		if (newEvent < 0 && errno == EINTR)
-		{
-			return ;
-		}
+// 		if (newEvent < 0 && errno == EINTR)
+// 		{
+// 			return ;
+// 		}
 
-		for (int index = 0; index < newEvent; index++)
-		{
-			struct kevent currentEvent = mEventList[index];
-			EventHandler(currentEvent);
-		}
-	}
-}
+// 		for (int index = 0; index < newEvent; index++)
+// 		{
+// 			struct kevent currentEvent = mEventList[index];
+// 			EventHandler(currentEvent);
+// 		}
+// 	}
+// }
 
 // void WebServer::EventHandler(struct kevent& currentEvent)
 // {
