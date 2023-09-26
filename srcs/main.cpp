@@ -7,7 +7,11 @@ int main(int argc, char **argv) {
   if (argc == 1) {
     std::cout << "default config" << std::endl;
   } else if (argc == 2) {
-    WebServer WebServer(argv[1]);
+
+  WebServer WebServer(argv[1]);
+  
+  WebServer.EventMorintoring();
+
 	// while (true)
 	// {
 	// 	WebServer.EventMonitoring();
@@ -15,6 +19,7 @@ int main(int argc, char **argv) {
   } else {
     std::cout << "Usage: ./webserv [config_file]" << std::endl;
   }
+  return (0);
 }
 
 // 1. config 파일 확인

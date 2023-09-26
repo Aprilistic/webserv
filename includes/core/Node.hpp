@@ -10,7 +10,6 @@ public:
   ~Node(void);
   void PrintTree(int level);
 	void checkSum(int level);
-  void deleteTree(void);
 private:
   Node();
   int getTokenInfo(std::string token);
@@ -27,6 +26,7 @@ private:
   void CheckServerName(std::vector<std::string> &value);
   void CheckAlias(std::vector<std::string> &value);
   void CheckLimitExcept(std::vector<std::string> &value);
+  void deleteTree(void);
 
 public:
   std::map<std::string, std::vector<std::string> > mDirectives;

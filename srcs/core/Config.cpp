@@ -9,7 +9,7 @@ Node* Config::makeConfigTree(const std::string &path)
 	ConfigTree = new Node(Tokens, token, NULL, 1);
 
 	checkSum(ConfigTree);
-	
+
 	return (ConfigTree);
 }
 
@@ -17,7 +17,6 @@ void Config::checkSum(Node *ConfigTree)
 {
   ConfigTree->checkSum(0);
 }
-
 
 std::vector<ServerConfig *> Config::makeServerConfigList(WebServer *webServer, Node *configTree)
 {
