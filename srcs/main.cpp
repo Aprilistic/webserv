@@ -9,8 +9,7 @@ int main(int argc, char **argv) {
   } else if (argc == 2) {
 
   WebServer WebServer(argv[1]);
-  
-  WebServer.EventMorintoring();
+  // WebServer.EventMorintoring();
 
 	// while (true)
 	// {
