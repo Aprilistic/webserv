@@ -1,30 +1,25 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include "Node.hpp"
 #include "Token.hpp"
-#include "Server.hpp"
+#include "ServerConfig.hpp"
+#include "Node.hpp"
 
+// class Node;
 class Config {
-  /* methods */
 public:
-  Config(const std::string &path, std::map<int, std::vector<Server *> > mServersMap);
-  ~Config(void);
-  void SetConfig(const std::string &path);
-  void CreateServer(std::map<int, std::vector<Server *> > mServersMap);
-private:
-  void printConfFile(void);
-  void printTree(void);
-  void checkSum(void);
+  static Node* makeConfigTree(const std::string &path);
+  static std::vector<ServerConfig *> makeServerConfigList(WebServer *webServer, Node *configTree);
+  static void printTree(void);
 
-  void createTree(void);
-  void deleteTree(void);
-  void configError(const std::string &msg);
-  /* variables */
+private:
+  Config();
+  static void checkSum(Node *ConfigTree);
+
 public:
 private:
-  Node *mConfigTree;
-  std::vector<std::string> mTokens;
+
 };
 
 #endif
+

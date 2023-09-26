@@ -5,19 +5,18 @@
 
 class Token {
 public:
-  Token(const std::string &path);
+  static std::vector<std::string> makeTokens(const std::string& path);
 
 private:
-  void openConfFile(const std::string &path);
-  void removeComment(void);
-  void addBlank(void);
-  void tokenize(void);
-  void tokenError(const std::string &msg);
+  Token();
+  static void openConfFile(const std::string &path, std::stringstream& outConfBuffer);
+  static void removeComment(std::stringstream& outConfBuffer);
+  static void addBlank(std::stringstream& outConfBuffer);
+  static void tokenize(std::stringstream& outConfBuffer, std::vector<std::string>& outTokens);
+  static void tokenError(const std::string &msg);
 
 public:
-  std::vector<std::string> mTokens;
 private:
-  std::stringstream mConfBuffer;
 };
 
 #endif

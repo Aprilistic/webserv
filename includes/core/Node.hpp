@@ -2,7 +2,6 @@
 #define NODE_HPP
 
 #include "Core.hpp"
-#include "Config.hpp"
 
 class Node {
 public:
@@ -13,6 +12,7 @@ public:
 	void checkSum(int level);
   void deleteTree(void);
 private:
+  Node();
   int getTokenInfo(std::string token);
   void addDirective(std::vector<std::string> &configTokens,
        std::vector<std::string>::iterator &token);
@@ -31,6 +31,8 @@ private:
 public:
   std::map<std::string, std::vector<std::string> > mDirectives;
   std::vector<Node *> mChildren;
+  int mLevel;
+
 private:
   Node *mParent;
 };

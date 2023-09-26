@@ -1,48 +1,35 @@
 #include "Config.hpp"
 
-Config::Config(const std::string &path,
-               std::map<int, std::vector<Server *> > mServersMap) {
-  SetConfig(path);
-//     printTree();
-  checkSum();
+Node* Config::makeConfigTree(const std::string &path)
+{
+	std::vector<std::string> Tokens = Token::makeTokens(path);
+	Node *ConfigTree;
 
-  // tokenize
-  // createTree
+	std::vector<std::string>::iterator token = Tokens.begin();
+	ConfigTree = new Node(Tokens, token, NULL, 1);
 
-  // validate or checksum or ...
-
-  // CreatServer(mServersMap);
+	checkSum(ConfigTree);
+	
+	return (ConfigTree);
 }
 
-void Config::CreateServer(std::map<int, std::vector<Server *> > mServersMap) {
-  int serverCount = 4; // mConfigTree -> n
-
-  for (int i = 0; i < serverCount; i++) {
-    mServersMap[i].push_back(new Server(mConfigTree));
-  }
+void Config::checkSum(Node *ConfigTree)
+{
+  ConfigTree->checkSum(0);
 }
 
-Config::~Config(void) {
-  deleteTree();
-  delete mConfigTree;
-}
 
-void Config::SetConfig(const std::string &path) {
-  Token token(path);
-  mTokens = token.mTokens;
-  createTree();
-  // printTree();
-}
+std::vector<ServerConfig *> Config::makeServerConfigList(WebServer *webServer, Node *configTree)
+{
+	std::vector<ServerConfig *> serverConfigList;
 
-void Config::createTree(void) {
-  std::vector<std::string>::iterator token = mTokens.begin();
-  mConfigTree = new Node(mTokens, token, NULL, 1);
-}
+	Node* httpNode = configTree->mChildren[0];
 
-void Config::deleteTree(void) { mConfigTree->deleteTree(); }
+	for (std::vector<Node *>::iterator serverNode = httpNode->mChildren.begin();
+		serverNode != httpNode->mChildren.end(); ++serverNode)
+		{
+			serverConfigList.push_back(new ServerConfig(webServer, *serverNode));
+		}
 
-void Config::printTree(void) { mConfigTree->PrintTree(0); }
-
-void Config::checkSum(void) { 
-  mConfigTree->checkSum(0);
+	return (serverConfigList);
 }

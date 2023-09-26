@@ -1,43 +1,48 @@
 #include "Config.hpp"
 
-Token::Token(const std::string &path) {
-  openConfFile(path);
-  removeComment();
-  addBlank();
-  tokenize();
+std::vector<std::string> Token::makeTokens(const std::string& path)
+{
+	std::stringstream confBuffer;
+	std::vector<std::string> Tokens;
+
+  openConfFile(path, confBuffer);
+  removeComment(confBuffer);
+  addBlank(confBuffer);
+  tokenize(confBuffer, Tokens);
+  return (Tokens);
 }
 
-void Token::openConfFile(const std::string &path) {
+void Token::openConfFile(const std::string &path, std::stringstream& outConfBuffer) {
   std::ifstream confFile(path);
   if (confFile.is_open() == false) {
     tokenError("Error: Could not open confFile ");
   }
 
-  mConfBuffer << confFile.rdbuf();
+  outConfBuffer << confFile.rdbuf();
   confFile.close();
-  if (mConfBuffer.good() == false) {
+  if (outConfBuffer.good() == false) {
     tokenError("Error: confFile stream ");
   }
 }
 
-void Token::removeComment(void) {
+void Token::removeComment(std::stringstream& outConfBuffer) {
   std::stringstream cleanBuffer;
   std::string line;
   int commentPos;
 
-  while (std::getline(mConfBuffer, line)) {
+  while (std::getline(outConfBuffer, line)) {
     commentPos = line.find('#');
     if (commentPos != std::string::npos)
       line.erase(commentPos);
     cleanBuffer << line << std::endl;
   }
-  mConfBuffer.str(cleanBuffer.str());
-  mConfBuffer.clear();
+  outConfBuffer.str(cleanBuffer.str());
+  outConfBuffer.clear();
 }
 
-void Token::addBlank(void) {
+void Token::addBlank(std::stringstream& outConfBuffer) {
   std::string content;
-  content = mConfBuffer.str();
+  content = outConfBuffer.str();
   for (int index = 0; index < content.size(); index++) {
     if (content[index] == '{' || content[index] == '}' ||
         content[index] == ';') {
@@ -46,19 +51,19 @@ void Token::addBlank(void) {
       content.insert(index, " ");
     }
   }
-  mConfBuffer.str("");
-  mConfBuffer << content;
+  outConfBuffer.str("");
+  outConfBuffer << content;
 }
 
-void Token::tokenize(void) {
+void Token::tokenize(std::stringstream& outConfBuffer, std::vector<std::string>& outTokens) {
   std::string token;
 
   while (true) {
-    mConfBuffer >> token;
-    if (mConfBuffer.eof() == true) {
+    outConfBuffer >> token;
+    if (outConfBuffer.eof() == true) {
       break;
     }
-    mTokens.push_back(token);
+    outTokens.push_back(token);
     token.clear();
   }
 }
