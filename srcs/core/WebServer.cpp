@@ -2,23 +2,29 @@
 #include "ServerConfig.hpp"
 
 WebServer::WebServer(const std::string &path)
-// : mKqueue(kqueue())
-// , mConfigTree(Config::makeConfigTree(path))
-// , mServerConfigList(Config::makeServerConfigList(this, mConfigTree))
+		: mGood(true)
 {
   mConfigTree = Config::makeConfigTree(path);
   if (mConfigTree == NULL) {
+		mGood = false;
     return;
   }
+	
   mServerConfigList = Config::makeServerConfigList(this, mConfigTree);
   if (mServerConfigList.empty()) {
+		mGood = false;
     return;
   }
+
   int mKqueue = kqueue();
   if (mKqueue == -1) {
-    // error
+		mGood = false;
     return;
   }
+}
+
+bool IsGood(void) const{
+		return (mGood);
 }
 
 WebServer::~WebServer(void) {
@@ -50,22 +56,33 @@ WebServer::~WebServer(void) {
   }
 }
 
-// void WebServer::EventMonitoring(void)
-// {
-// 	int newEvent = kevent(mKqueue, NULL, 0, &mEventList[0],
-// mEventList.size(), NULL);
+void WebServer::Run(void)
+{
+	if (!isGood())
+	{
+		return;
+	}
+	EventMonitoring();
+}
 
-// 	if (newEvent < 0 && errno == EINTR)
-// 	{
-// 		return ;
-// 	}
+void WebServer::eventMonitoring(void)
+{
+	while 
+	{
+		int newEvent = kevent(mKqueue, NULL, 0, &mEventList[0], mEventList.size(), NULL);
 
-// 	for (int index = 0; index < newEvent; index++)
-// 	{
-// 		struct kevent currentEvent = mEventList[index];
-// 		EventHandler(currentEvent);
-// 	}
-// }
+		if (newEvent < 0 && errno == EINTR)
+		{
+			return ;
+		}
+
+		for (int index = 0; index < newEvent; index++)
+		{
+			struct kevent currentEvent = mEventList[index];
+			EventHandler(currentEvent);
+		}
+	}
+}
 
 // void WebServer::EventHandler(struct kevent& currentEvent)
 // {
