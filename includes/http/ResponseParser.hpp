@@ -1,25 +1,15 @@
-#ifndef REQUESTPARSER_HPP
-#define REQUESTPARSER_HPP
+#ifndef RESPONSEPARSER_HPP
+#define RESPONSEPARSER_HPP
 
-#include "Request.hpp"
+#include "Response.hpp"
 
-enum eRequestParseResult { ParsingCompleted, ParsingIncompleted, ParsingError };
-// The current mState of the parser.
-enum eRequestState {
-  RequestMethodStart,
-  RequestMethod,
-  RequestUriStart,
-  RequestUri,
-  RequestHttpVersion_h,
-  RequestHttpVersion_ht,
-  RequestHttpVersion_htt,
-  RequestHttpVersion_http,
-  RequestHttpVersion_slash,
-  RequestHttpVersion_majorStart,
-  RequestHttpVersion_major,
-  RequestHttpVersion_minorStart,
-  RequestHttpVersion_minor,
+enum eResponseParseResult {
+  ParsingCompleted,
+  ParsingIncompleted,
+  ParsingError
+};
 
+enum eResponseState {
   ResponseStatusStart,
   ResponseHttpVersion_ht,
   ResponseHttpVersion_htt,
@@ -29,10 +19,10 @@ enum eRequestState {
   ResponseHttpVersion_major,
   ResponseHttpVersion_minorStart,
   ResponseHttpVersion_minor,
-  ResponseHttpVersion_spaceAfterVersion,
   ResponseHttpVersion_statusCodeStart,
-  ResponseHttpVersion_spaceAfterStatusCode,
+  ResponseHttpVersion_statusCode,
   ResponseHttpVersion_statusTextStart,
+  ResponseHttpVersion_statusText,
   ResponseHttpVersion_newLine,
 
   HeaderLineStart,
@@ -58,16 +48,18 @@ enum eRequestState {
   ChunkData,
 };
 
-class RequestParser {
+class ResponseParser {
 public:
-  RequestParser();
-  ~RequestParser();
+  ResponseParser();
+  ~ResponseParser();
 
-  eRequestParseResult parse(Request &req, const char *begin, const char *end);
+  eResponseParseResult parse(Response &resp, const char *begin,
+                             const char *end);
 
 private:
-  static bool checkIfConnection(const Request::HeaderItem &item);
-  eRequestParseResult consume(Request &req, const char *begin, const char *end);
+  static bool checkIfConnection(const Response::HeaderItem &item);
+  eResponseParseResult consume(Response &resp, const char *begin,
+                               const char *end);
   // Check if a byte is an HTTP character.
   inline bool isChar(int c);
   // Check if a byte is an HTTP control character.
@@ -78,9 +70,7 @@ private:
   inline bool isDigit(int c);
 
 public:
-  size_t mContentsize;
-
-private:
+  size_t mContentSize;
   std::string mChunkSizeStr;
   size_t mChunkSize;
   bool mChunked;

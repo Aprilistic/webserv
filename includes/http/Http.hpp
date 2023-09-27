@@ -7,16 +7,17 @@
 #include "RequestSyntax.hpp"
 
 class Http {
-	public:
-		Http();
-		~Http();
-		void waitRequest(std::string &buf);
-		void makeOneRequest(std::string &buf);
-		int	getStatus() const;
-	private:
-		Request mReq; 
-		eParseResult mRes;
-		eStatustCode mStatus;
+public:
+  Http();
+  ~Http();
+  void waitRequest(std::string &buf);
+  void makeOneRequest(std::string &buf);
+  int getStatus() const;
+
+private:
+  Request mReq;
+  eRequestParseResult mRes;
+  eStatustCode mStatus;
 };
 
 #endif
