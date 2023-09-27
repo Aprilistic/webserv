@@ -4,6 +4,8 @@ ResponseParser::ResponseParser()
     : mState(ResponseStatusStart), mContentSize(0), mChunkSize(0),
       mChunked(false) {}
 
+ResponseParser::~ResponseParser() {}
+
 eParseResult ResponseParser::parse(Response &resp, const char *begin,
                                            const char *end) {
   return consume(resp, begin, end);

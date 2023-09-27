@@ -2,47 +2,7 @@
 #define RESPONSEPARSER_HPP
 
 #include "Response.hpp"
-
-enum eParseResult { ParsingCompleted, ParsingIncompleted, ParsingError };
-
-enum eState {
-  ResponseStatusStart,
-  ResponseHttpVersion_ht,
-  ResponseHttpVersion_htt,
-  ResponseHttpVersion_http,
-  ResponseHttpVersion_slash,
-  ResponseHttpVersion_majorStart,
-  ResponseHttpVersion_major,
-  ResponseHttpVersion_minorStart,
-  ResponseHttpVersion_minor,
-  ResponseHttpVersion_statusCodeStart,
-  ResponseHttpVersion_statusCode,
-  ResponseHttpVersion_statusTextStart,
-  ResponseHttpVersion_statusText,
-  ResponseHttpVersion_newLine,
-
-  HeaderLineStart,
-  HeaderLws,
-  HeaderName,
-  SpaceBeforeHeaderValue,
-  HeaderValue,
-  ExpectingNewline_2,
-  ExpectingNewline_3,
-
-  Post,
-  ChunkSize,
-  ChunkExtensionName,
-  ChunkExtensionValue,
-  ChunkSizeNewLine,
-  ChunkSizeNewLine_2,
-  ChunkSizeNewLine_3,
-  ChunkTrailerName,
-  ChunkTrailerValue,
-
-  ChunkDataNewLine_1,
-  ChunkDataNewLine_2,
-  ChunkData,
-};
+#include "Enum.hpp"
 
 class ResponseParser {
 public:
