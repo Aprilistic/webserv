@@ -22,8 +22,8 @@ private:
 	void eventHandler(struct kevent& currentEvent);
 	void handleReadEvent(struct kevent& currentEvent);
 	void handleWriteEvent(struct kevent& currentEvent);
-	void handleTimerEvent(struct kevent& currentEvent);
-	void handleSignalEvent(struct kevent& currentEvent);
+	// void handleTimerEvent(struct kevent& currentEvent);
+	// void handleSignalEvent(struct kevent& currentEvent);
 
 	void onServerRead(int ident);
 	void onClientRead(int ident);

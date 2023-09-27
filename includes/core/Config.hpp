@@ -10,7 +10,7 @@ class Config {
 public:
   static Node* makeConfigTree(const std::string &path);
 //   static std::vector<ServerConfig *> makeServerConfigList(WebServer *webServer, Node *configTree);
-  static std::map<int, ServerConfig *> Config::makeServerConfigList(WebServer *webServer,
+  static std::map<int, ServerConfig *> makeServerConfigList(WebServer *webServer,
                                                          Node *configTree);
   static void printTree(void);
 

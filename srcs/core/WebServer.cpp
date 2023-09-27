@@ -113,10 +113,10 @@ void WebServer::eventHandler(struct kevent& currentEvent)
 			handleWriteEvent(currentEvent);
 			break;
 		case EVFILT_TIMER:
-			handleTimerEvent(currentEvent);
+			// handleTimerEvent(currentEvent);
 			break;
 		case EVFILT_SIGNAL:
-			handleSignalEvent(currentEvent);
+			// handleSignalEvent(currentEvent);
 			break;
 		default:
 			break;
