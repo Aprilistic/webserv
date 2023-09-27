@@ -16,7 +16,7 @@ public:
 
 private:
   Request mReq;
-  eRequestParseResult mRes;
+  eParseResult mRes;
   eStatustCode mStatus;
 };
 

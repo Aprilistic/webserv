@@ -4,7 +4,7 @@ ResponseParser::ResponseParser()
     : mState(ResponseStatusStart), mContentSize(0), mChunkSize(0),
       mChunked(false) {}
 
-eResponseParseResult ResponseParser::parse(Response &resp, const char *begin,
+eParseResult ResponseParser::parse(Response &resp, const char *begin,
                                            const char *end) {
   return consume(resp, begin, end);
 }
@@ -13,7 +13,7 @@ bool ResponseParser::checkIfConnection(const Response::HeaderItem &item) {
   return strcasecmp(item.name.c_str(), "Connection") == 0;
 }
 
-eResponseParseResult ResponseParser::consume(Response &resp, const char *begin,
+eParseResult ResponseParser::consume(Response &resp, const char *begin,
                                              const char *end) {
   while (begin != end) {
     char input = *begin++;

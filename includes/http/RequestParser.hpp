@@ -3,9 +3,9 @@
 
 #include "Request.hpp"
 
-enum eRequestParseResult { ParsingCompleted, ParsingIncompleted, ParsingError };
+enum eParseResult { ParsingCompleted, ParsingIncompleted, ParsingError };
 // The current mState of the parser.
-enum eRequestState {
+enum eState {
   RequestMethodStart,
   RequestMethod,
   RequestUriStart,
@@ -63,11 +63,11 @@ public:
   RequestParser();
   ~RequestParser();
 
-  eRequestParseResult parse(Request &req, const char *begin, const char *end);
+  eParseResult parse(Request &req, const char *begin, const char *end);
 
 private:
   static bool checkIfConnection(const Request::HeaderItem &item);
-  eRequestParseResult consume(Request &req, const char *begin, const char *end);
+  eParseResult consume(Request &req, const char *begin, const char *end);
   // Check if a byte is an HTTP character.
   inline bool isChar(int c);
   // Check if a byte is an HTTP control character.

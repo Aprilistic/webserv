@@ -3,13 +3,9 @@
 
 #include "Response.hpp"
 
-enum eResponseParseResult {
-  ParsingCompleted,
-  ParsingIncompleted,
-  ParsingError
-};
+enum eParseResult { ParsingCompleted, ParsingIncompleted, ParsingError };
 
-enum eResponseState {
+enum eState {
   ResponseStatusStart,
   ResponseHttpVersion_ht,
   ResponseHttpVersion_htt,
@@ -53,13 +49,11 @@ public:
   ResponseParser();
   ~ResponseParser();
 
-  eResponseParseResult parse(Response &resp, const char *begin,
-                             const char *end);
+  eParseResult parse(Response &resp, const char *begin, const char *end);
 
 private:
   static bool checkIfConnection(const Response::HeaderItem &item);
-  eResponseParseResult consume(Response &resp, const char *begin,
-                               const char *end);
+  eParseResult consume(Response &resp, const char *begin, const char *end);
   // Check if a byte is an HTTP character.
   inline bool isChar(int c);
   // Check if a byte is an HTTP control character.

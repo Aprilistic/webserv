@@ -6,7 +6,7 @@ RequestParser::RequestParser()
 
 RequestParser::~RequestParser() {}
 
-eRequestParseResult RequestParser::parse(Request &req, const char *begin,
+eParseResult RequestParser::parse(Request &req, const char *begin,
                                          const char *end) {
   return consume(req, begin, end);
 }
@@ -15,7 +15,7 @@ bool RequestParser::checkIfConnection(const Request::HeaderItem &item) {
   return strcasecmp(item.name.c_str(), "Connection") == 0;
 }
 
-eRequestParseResult RequestParser::consume(Request &req, const char *begin,
+eParseResult RequestParser::consume(Request &req, const char *begin,
                                            const char *end) {
   while (begin != end) {
     char input = *begin++;

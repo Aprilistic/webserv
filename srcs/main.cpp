@@ -27,7 +27,7 @@ int main(void) {
   Response response;
   ResponseParser parser;
 
-  eResponseParseResult res = parser.parse(response, text, text + sizeof(text));
+  eParseResult res = parser.parse(response, text, text + sizeof(text));
 
   if (res == ParsingCompleted) {
     std::cout << response.inspect() << std::endl;
