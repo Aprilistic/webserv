@@ -13,10 +13,6 @@ public:
 
   ~ServerConfig();
 
-//   void ReadHandler(int ident);
-//   void WriteHandler();
-//   void TimerHandler();
-//   void SignalHandler();
 private:
   ServerConfig();
 //   void makeHashMap(Node *curNode);

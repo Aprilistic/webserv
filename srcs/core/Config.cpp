@@ -21,9 +21,9 @@ Node *Config::makeConfigTree(const std::string &path) {
 
 void Config::checkSum(Node *configTree) { configTree->CheckSum(0); }
 
-std::vector<ServerConfig *> Config::makeServerConfigList(WebServer *webServer,
+std::map<int, ServerConfig *> Config::makeServerConfigList(WebServer *webServer,
                                                          Node *configTree) {
-  std::vector<ServerConfig *> serverConfigList;
+  std::map<int, ServerConfig *> serverConfigList;
   try {
     if (!configTree->mChildren.empty()) {
       Node *httpNode = configTree->mChildren[0];
@@ -31,15 +31,16 @@ std::vector<ServerConfig *> Config::makeServerConfigList(WebServer *webServer,
       for (std::vector<Node *>::iterator serverNode =
                httpNode->mChildren.begin();
            serverNode != httpNode->mChildren.end(); ++serverNode) {
-        serverConfigList.push_back(new ServerConfig(webServer, *serverNode));
+		ServerConfig* newConfig = new ServerConfig(webServer, *serverNode);
+        serverConfigList[newConfig->mSocket] = newConfig;
       }
     }
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
-    for (std::vector<ServerConfig *>::iterator it = serverConfigList.begin();
-         it != serverConfigList.end(); ++it) {
-      delete *it;
-    }
+	for (std::map<int, ServerConfig*>::iterator it = serverConfigList.begin();
+			it != serverConfigList.end(); ++it) {
+		delete it->second;
+	}
     serverConfigList.clear();
   }
 
