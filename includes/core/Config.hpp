@@ -1,7 +1,6 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include "Tokenizer.hpp"
 #include "ServerConfig.hpp"
 #include "Node.hpp"
 #include "Common.hpp"

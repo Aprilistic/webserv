@@ -1,4 +1,5 @@
 #include "Config.hpp"
+#include "Tokenizer.hpp"
 
 void Config::makeConfigTree(const std::string &path) {
 
