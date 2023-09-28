@@ -1,26 +1,23 @@
 #include "WebServer.hpp"
-#include "ServerConfig.hpp"
-
-#include "Client.hpp"
-
+#include "Config.hpp"
 
 WebServer::WebServer(const std::string &path)
 		: mGood(true)
 {
-  mConfigTree = Config::makeConfigTree(path);
-  if (mConfigTree == NULL) {
+  Config::makeConfigTree(path);
+  if (Common::mConfigTree == NULL) {
 		mGood = false;
     return;
   }
-	
-  mServerConfigList = Config::makeServerConfigList(this, mConfigTree);
+
+  mServerConfigList = Config::makeServerConfigList(this, Common::mConfigTree);
   if (mServerConfigList.empty()) {
 		mGood = false;
     return;
   }
 
-  int mKqueue = kqueue();
-  if (mKqueue == -1) {
+	Common::mKqueue = kqueue();
+  if (Common::mKqueue == -1) {
 		mGood = false;
     return;
   }
@@ -30,13 +27,11 @@ bool WebServer::IsGood(void) const{
 		return (mGood);
 }
 
-int WebServer::GetKqueue(void) const { return (mKqueue); }
-
 WebServer::~WebServer(void) {
   int safeExit = 1;
 
-  if (mKqueue != -1) {
-    close(mKqueue);
+  if (Common::mKqueue != -1) {
+    close(Common::mKqueue);
   } else {
     safeExit = 0;
   }
@@ -59,8 +54,8 @@ WebServer::~WebServer(void) {
         safeExit = 0;
     }
 
-  if (mConfigTree) {
-    delete (mConfigTree);
+  if (Common::mConfigTree) {
+    delete (Common::mConfigTree);
   } else {
     safeExit = 0;
   }
@@ -83,7 +78,7 @@ void WebServer::eventMonitoring(void)
 {
 	while (true)
 	{
-		int newEvent = kevent(mKqueue, NULL, 0, &mEventList[0], mEventList.size(), NULL);
+		int newEvent = kevent(Common::mKqueue, NULL, 0, &mEventList[0], mEventList.size(), NULL);
 
 		if (newEvent < 0 && errno == EINTR)
 		{
@@ -148,7 +143,7 @@ void WebServer::onServerRead(int ident)
 	fcntl(client->mSocket, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
 	EV_SET(&events[0], client->mSocket, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, client);
 	EV_SET(&events[1], client->mSocket, EVFILT_WRITE, EV_ADD | EV_ENABLE,0, 0, client);
-	kevent(mKqueue, events, 2, NULL, 0, NULL);
+	kevent(Common::mKqueue, events, 2, NULL, 0, NULL);
 	mClientList[client->mSocket] = client;
 }
 
