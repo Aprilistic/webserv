@@ -1,5 +1,5 @@
 #define SERVERCONFIG_LEVEL (1 << 2)
-#define LOCATION_LEVEL (1 << 3)
+#define LOCATIONCONFIG_LEVEL (1 << 3)
 
 #include "ServerConfig.hpp"
 #include "WebServer.hpp"
@@ -57,7 +57,7 @@ ServerConfig::~ServerConfig() {
 void ServerConfig::makeLocationConfigHashMap(Node *curNode) {
   if (curNode->mLevel & SERVERCONFIG_LEVEL) {
     assert(curNode->mChildren.size());
-  } else if (curNode->mLevel & LOCATION_LEVEL) {
+  } else if (curNode->mLevel & LOCATIONCONFIG_LEVEL) {
     std::pair<std::string, Node *> LocDict =
         std::make_pair(curNode->mDirectives["location"][0], curNode);
     mLocationConfigHashMap.insert(LocDict);
