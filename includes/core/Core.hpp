@@ -35,4 +35,11 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+class Node;
+class Core {
+public:
+	static int mKqueue;
+	static Node *mConfigTree;
+};
+
 #endif
