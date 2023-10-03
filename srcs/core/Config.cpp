@@ -22,7 +22,7 @@ void Config::checkSum(Node *configTree) {
     if (it->first == "error_page")
       checkErrorPage(it->second);
     else if (it->first == "client_max_body_size")
-      checkClientMaxBodySize(it->second);
+      checkConnectionMaxBodySize(it->second);
     else if (it->first == "index")
       checkIndex(it->second);
     else if (it->first == "autoindex")
@@ -44,9 +44,8 @@ void Config::checkSum(Node *configTree) {
   }
 }
 
-std::map<int, ServerConfig *> Config::makeServerConfigList(WebServer *webServer,
-                                                           Node *configTree) {
-  std::map<int, ServerConfig *> serverConfigList;
+std::map<int, Server *> Config::makeServerList(Node *configTree) {
+  std::map<int, Server *> ServerList;
   try {
     if (!configTree->mChildren.empty()) {
       Node *httpNode = configTree->mChildren[0];
@@ -54,20 +53,20 @@ std::map<int, ServerConfig *> Config::makeServerConfigList(WebServer *webServer,
       for (std::vector<Node *>::iterator serverNode =
                httpNode->mChildren.begin();
            serverNode != httpNode->mChildren.end(); ++serverNode) {
-        ServerConfig *newConfig = new ServerConfig(webServer, *serverNode);
-        serverConfigList[newConfig->mSocket] = newConfig;
+        Server *newConfig = new Server(*serverNode);
+        ServerList[newConfig->mSocket] = newConfig;
       }
     }
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
-    for (std::map<int, ServerConfig *>::iterator it = serverConfigList.begin();
-         it != serverConfigList.end(); ++it) {
+    for (std::map<int, Server *>::iterator it = ServerList.begin();
+         it != ServerList.end(); ++it) {
       delete it->second;
     }
-    serverConfigList.clear();
+    ServerList.clear();
   }
 
-  return (serverConfigList);
+  return (ServerList);
 }
 
 void Config::checkErrorPage(std::vector<std::string> &value) {
@@ -91,7 +90,7 @@ void Config::checkErrorPage(std::vector<std::string> &value) {
   // 마지막값은 유효성 검사하지 않아도 됨
 }
 
-void Config::checkClientMaxBodySize(std::vector<std::string> &value) {
+void Config::checkConnectionMaxBodySize(std::vector<std::string> &value) {
   if (value.size() != 1) {
     configError("Error: Incorrect number of arguments. Exactly one argument is "
               "required.");
@@ -134,7 +133,7 @@ void Config::checkClientMaxBodySize(std::vector<std::string> &value) {
   if (num < 0) {
     configError("Error: Only positive numbers are possible.");
   }
-  // mClientMaxBodySize = (num * multiplier);
+  // mConnectionMaxBodySize = (num * multiplier);
 }
 
 void Config::checkIndex(std::vector<std::string> &value) {

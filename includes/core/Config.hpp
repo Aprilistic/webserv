@@ -1,25 +1,22 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include "ServerConfig.hpp"
+#include "Server.hpp"
 #include "Node.hpp"
 #include "Common.hpp"
-
 
 // class Node;
 class Config {
 public:
   static void makeConfigTree(const std::string &path);
-//   static std::vector<ServerConfig *> makeServerConfigList(WebServer *webServer, Node *configTree);
-  static std::map<int, ServerConfig *> makeServerConfigList(WebServer *webServer,
-                                                         Node *configTree);
+  static std::map<int, Server *> makeServerList(Node *configTree);
 
 private:
   Config();
   static void checkSum(Node *configTree);
 
   static void checkErrorPage(std::vector<std::string> &value);
-  static void checkClientMaxBodySize(std::vector<std::string> &value);
+  static void checkConnectionMaxBodySize(std::vector<std::string> &value);
   static void checkIndex(std::vector<std::string> &value);
   static void checkAutoIndex(std::vector<std::string> &value);
   static void checkListen(std::vector<std::string> &value);

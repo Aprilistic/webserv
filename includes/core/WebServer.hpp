@@ -1,10 +1,10 @@
 #ifndef WEBSERVER_HPP
 #define WEBSERVER_HPP
 
+#include "Config.hpp"
 #include "Core.hpp"
-#include "ServerConfig.hpp"
-#include "Client.hpp"
-#include "Common.hpp"
+#include "Server.hpp"
+#include "Connection.hpp"
 
 /* Signal hadling SIGHUP, SIGQUIT or SIGTERM */
 
@@ -16,26 +16,12 @@ public:
 	bool IsGood(void) const;
 
 private:
-	WebServer();
 	void eventMonitoring(void);
 	void eventHandler(struct kevent& currentEvent);
-	void handleReadEvent(struct kevent& currentEvent);
-	void handleWriteEvent(struct kevent& currentEvent);
-	// void handleTimerEvent(struct kevent& currentEvent);
-	// void handleSignalEvent(struct kevent& currentEvent);
-
-	void onServerRead(int ident);
-	void onClientRead(int ident);
-	void onServerWrite(int ident);
-	void onClientWrite(int ident);
-public:
-
+	
 private:
 	bool mGood;
-	// std::vector<ServerConfig *> mServerConfigList;
-	std::map<int, ServerConfig *> mServerConfigList;
-	// std::vector<Client *> mClientList;
-	std::map<int, Client *> mClientList;
+	std::map<int, Server *> mServerList;
 	std::vector<struct kevent> mEventList;
 };
 
