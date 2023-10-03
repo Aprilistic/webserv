@@ -60,7 +60,7 @@ void Server::makeLocationHashMap(Node *curNode) {
   } else if (curNode->mLevel & LOCATION_LEVEL) {
     std::pair<std::string, Node *> LocDict =
         std::make_pair(curNode->mDirectives["location"][0], curNode);
-    mLocationConfigHashMap.insert(LocDict);
+    mLocationHashMap.insert(LocDict);
   }
 
   for (std::vector<Node *>::iterator it = curNode->mChildren.begin();
@@ -72,7 +72,7 @@ void Server::makeLocationHashMap(Node *curNode) {
 // void Server::printHashMap() {
 //   std::cout << "Location HashMap" << std::endl;
 //   std::map<std::string, Node *>::iterator it;
-//   for (it = mLocationConfigHashMap.begin(); it != mLocationConfigHashMap.end(); ++it) {
+//   for (it = mLocationHashMap.begin(); it != mLocationHashMap.end(); ++it) {
 //     std::cout << "Key: " << it->first << ", Node Address: " << it->second
 //               << std::endl;
 //   }

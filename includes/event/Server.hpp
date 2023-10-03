@@ -24,8 +24,8 @@ public:
   int mSocket;
 private:
   WebServer *mWebServer;
-  Node *mServerNode;
-  std::map<std::string, Node *> mLocationConfigHashMap;
+  Node *mServerNode;  //May not need this
+  std::map<std::string, Node *> mLocationHashMap;
   std::map<int, Connection *> mConnection;
   struct sockaddr_in mAddr;
   int mPort;
