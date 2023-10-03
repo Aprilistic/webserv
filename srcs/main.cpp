@@ -6,52 +6,16 @@
 void ExitHandler(void) { system("leaks webserv"); }
 
 int main(void) {
-  // Http http;
-  // std::string str = "POST /login HTTP/1.1\r\n"
-  //                   "Host: www.example.com\r\n"
-  //                   "Content-Type: application/x-www-form-urlencoded\r\n"
-  //                   // "Content-Length: 29\r\n"
-  //                   "\r\n"
-  //                   "username=test&password=1234";
+  Http http;
+  std::string str = "POST /login HTTP/1.1\r\n"
+                    "Host: www.example.com\r\n"
+                    "Content-Type: application/x-www-form-urlencoded\r\n"
+                    "Content-Length: 26\r\n"
+                    "\r\n"
+                    "username=test&password=1234";
 
-  // http.waitRequest(str);
-  // std::cout << "mStatus: " << http.getStatus() << std::endl;
-  const char text[] = "HTTP/1.1 200 OK\r\n"
-                      "Server: nginx/1.2.1\r\n"
-                      "Content-Type: text/html\r\n"
-                      "Content-Length: 8\r\n"
-                      "Connection: keep-alive\r\n"
-                      "\r\n"
-                      "<html />";
-
-  Response response;
-  ResponseParser parser;
-
-  eParseResult res = parser.parse(response, text, text + sizeof(text));
-
-  if (res == ParsingCompleted) {
-    std::cout << response.inspect() << std::endl;
-    return EXIT_SUCCESS;
-  } else {
-    std::cerr << "Parsing failed" << std::endl;
-    return EXIT_FAILURE;
-  }
+  std::cout << "mStatus: " << http.getStatus() << std::endl;
 }
-
-// int main(int argc, char **argv) {
-//   // atexit(ExitHandler);
-//   if (argc == 1) {
-//     std::cout << "default config" << std::endl;
-//   } else if (argc == 2) {
-//     WebServer WebServer(argv[1]);
-// 	// while (true)
-// 	// {
-// 	// 	WebServer.EventMonitoring();
-// 	// }
-//   } else {
-//     std::cout << "Usage: ./webserv [config_file]" << std::endl;
-//   }
-// }
 
 // 1. config 파일 확인
 // 2. config 트리 생성

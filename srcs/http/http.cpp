@@ -8,28 +8,25 @@ Http::~Http() {}
 
 int Http::getStatus() const { return mStatus; }
 
-void Http::waitRequest(std::string &buf) {
-  if (mRes == ParsingIncompleted) {
-    makeOneRequest(buf);
-
-    // event 추가
-  }
-}
-
-void Http::makeOneRequest(std::string &buf) {
+void Http::receiveRequest(std::string &buf) {
   RequestParser parser;
   RequestSyntax syntax;
 
   mRes = parser.parse(mReq, buf.c_str(), buf.c_str() + buf.size());
+  // event
 
-  std::cout << "Request Content : " << mReq.mContent.size() << std::endl;
-  for (std::vector<char>::iterator it = mReq.mContent.begin();
-       it != mReq.mContent.end(); ++it) {
-    std::cout << *it;
+  if (mRes == ParsingCompleted) {
+    std::cout << "ParsingCompleted" << std::endl;
+    std::cout << parser.getRemainingBuffer() << std::endl;
+    mStatus = syntax.checksyntax(mReq);
+    // mRemainingBuffer =
   }
-  std::cout << std::endl;
+}
 
-  // if (mRes == ParsingCompleted) {
-  //   mStatus = syntax.checksyntax(mReq);
-  // }
+void Http::httpProcess() {
+  // Request
+  // RequestParser
+  // RequestSyntax
+  // for ()
+  // Response
 }

@@ -1,14 +1,15 @@
 #ifndef REQUESTPARSER_HPP
 #define REQUESTPARSER_HPP
 
-#include "Request.hpp"
 #include "Enum.hpp"
+#include "Request.hpp"
 class RequestParser {
 public:
   RequestParser();
   ~RequestParser();
 
   eParseResult parse(Request &req, const char *begin, const char *end);
+  std::string getRemainingBuffer(void);
 
 private:
   static bool checkIfConnection(const Request::HeaderItem &item);
@@ -26,6 +27,7 @@ public:
   size_t mContentsize;
 
 private:
+  std::string mRemainingBuffer;
   std::string mChunkSizeStr;
   size_t mChunkSize;
   bool mChunked;

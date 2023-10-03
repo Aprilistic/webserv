@@ -7,7 +7,7 @@ RequestParser::RequestParser()
 RequestParser::~RequestParser() {}
 
 eParseResult RequestParser::parse(Request &req, const char *begin,
-                                         const char *end) {
+                                  const char *end) {
   return consume(req, begin, end);
 }
 
@@ -16,7 +16,7 @@ bool RequestParser::checkIfConnection(const Request::HeaderItem &item) {
 }
 
 eParseResult RequestParser::consume(Request &req, const char *begin,
-                                           const char *end) {
+                                    const char *end) {
   while (begin != end) {
     char input = *begin++;
 
@@ -245,6 +245,7 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
       req.mContent.push_back(input);
 
       if (mContentsize == 0) {
+        mRemainingBuffer.assign(begin, end);
         return ParsingCompleted;
       }
       break;
@@ -393,3 +394,5 @@ inline bool RequestParser::isSpecial(int c) {
 
 // Check if a byte is a digit.
 inline bool RequestParser::isDigit(int c) { return c >= '0' && c <= '9'; }
+
+std::string RequestParser::getRemainingBuffer() { return mRemainingBuffer; }

@@ -10,14 +10,15 @@ class Http {
 public:
   Http();
   ~Http();
-  void waitRequest(std::string &buf);
-  void makeOneRequest(std::string &buf);
   int getStatus() const;
+  void receiveRequest(std::string &buf);
+  void httpProcess();
 
 private:
   Request mReq;
   eParseResult mRes;
   eStatustCode mStatus;
+  // std::string mRemainingBuffer;
 };
 
 #endif
