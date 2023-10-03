@@ -10,8 +10,8 @@ WebServer::WebServer(const std::string &path)
     return;
   }
 
-  mServerConfigList = Config::makeServerConfigList(this, Common::mConfigTree);
-  if (mServerConfigList.empty()) {
+  mServerList = Config::makeServerList(this, Common::mConfigTree);
+  if (mServerList.empty()) {
 		mGood = false;
     return;
   }
@@ -36,20 +36,12 @@ WebServer::~WebServer(void) {
     safeExit = 0;
   }
 
-//   if (!mServerConfigList.empty()) {
-//     for (std::vector<ServerConfig *>::iterator it = mServerConfigList.begin();
-//          it != mServerConfigList.end(); ++it) {
-//       	delete *it;
-//     }
-//   } else {
-//     safeExit = 0;
-//   }
-   if (!mServerConfigList.empty()) {
-        for (std::map<int, ServerConfig*>::iterator it = mServerConfigList.begin();
-             it != mServerConfigList.end(); ++it) {
+   if (!mServerList.empty()) {
+        for (std::map<int, Server*>::iterator it = mServerList.begin();
+             it != mServerList.end(); ++it) {
             delete it->second;
         }
-        mServerConfigList.clear();
+        mServerList.clear();
     } else {
         safeExit = 0;
     }
@@ -120,7 +112,7 @@ void WebServer::eventHandler(struct kevent& currentEvent)
 
 void WebServer::handleReadEvent(struct kevent& currentEvent)
 {
-	if (mServerConfigList.count(currentEvent.ident) == true)
+	if (mServerList.count(currentEvent.ident) == true)
 	{
 		onServerRead(currentEvent.ident);
 	}
@@ -135,7 +127,7 @@ void WebServer::onServerRead(int ident)
 	Client * client = new Client;
 	struct kevent events[2];
 
-	if ((client->mSocket = accept(mServerConfigList[ident]->mSocket, NULL, NULL)) == -1)
+	if ((client->mSocket = accept(mServerList[ident]->mSocket, NULL, NULL)) == -1)
 	{
 		delete client;
 		// error
@@ -218,7 +210,7 @@ void WebServer::onClientWrite(int ident)
 // {
 // 	int clientSocket;
 // 	struct kevent events[2];
-// 	if ((clientSocket = accept(serverConfig->mSocket, NULL, NULL)) ==
+// 	if ((clientSocket = accept(Server->mSocket, NULL, NULL)) ==
 // 	-1) {
 // 	// error
 // 	}
@@ -232,7 +224,7 @@ void WebServer::onClientWrite(int ident)
 
 // void WebServer::EventHandler(struct kevent& currentEvent)
 // {
-// 	ServerConfig *serverConfig = static_cast<ServerConfig
+// 	Server *Server = static_cast<Server
 // *>(currentEvent.udata);
 
 // 	if (currentEvent.flags & EV_ERROR)
@@ -243,10 +235,10 @@ void WebServer::onClientWrite(int ident)
 // 	switch (currentEvent.filter)
 // 	{
 // 		case EVFILT_READ:
-//         if (currentEvent.ident == serverConfig->mSocket) {
+//         if (currentEvent.ident == Server->mSocket) {
 //           int clientSocket;
 //           struct kevent events[2];
-//           if ((clientSocket = accept(serverConfig->mSocket, NULL, NULL)) ==
+//           if ((clientSocket = accept(Server->mSocket, NULL, NULL)) ==
 //           -1) {
 //             // error
 //           }
@@ -257,16 +249,16 @@ void WebServer::onClientWrite(int ident)
 //           0, 0, NULL); // option 확인 필요 client 생성할지 고민
 //           kevent(mKqueue, events, 2, NULL, 0, NULL);
 //         }
-//         serverConfig->ReadHandler(currentEvent.ident);
+//         Server->ReadHandler(currentEvent.ident);
 //         break;
 // 		case EVFILT_WRITE:
-// 			serverConfig->WriteHandler();
+// 			Server->WriteHandler();
 // 			break;
 // 		case EVFILT_TIMER:
-// 			serverConfig->TimerHandler();
+// 			Server->TimerHandler();
 // 			break;
 // 		case EVFILT_SIGNAL:
-// 			serverConfig->SignalHandler();
+// 			Server->SignalHandler();
 // 			break;
 // 		default:
 // 			break;

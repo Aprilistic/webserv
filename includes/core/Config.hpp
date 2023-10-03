@@ -1,7 +1,7 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include "ServerConfig.hpp"
+#include "Server.hpp"
 #include "Node.hpp"
 #include "Common.hpp"
 
@@ -10,8 +10,8 @@
 class Config {
 public:
   static void makeConfigTree(const std::string &path);
-//   static std::vector<ServerConfig *> makeServerConfigList(WebServer *webServer, Node *configTree);
-  static std::map<int, ServerConfig *> makeServerConfigList(WebServer *webServer,
+//   static std::vector<Server *> makeServerList(WebServer *webServer, Node *configTree);
+  static std::map<int, Server *> makeServerList(WebServer *webServer,
                                                          Node *configTree);
 
 private:

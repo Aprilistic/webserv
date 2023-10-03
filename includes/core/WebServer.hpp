@@ -1,10 +1,10 @@
 #ifndef WEBSERVER_HPP
 #define WEBSERVER_HPP
 
+#include "Config.hpp"
 #include "Core.hpp"
-#include "ServerConfig.hpp"
+#include "Server.hpp"
 #include "Client.hpp"
-#include "Common.hpp"
 
 /* Signal hadling SIGHUP, SIGQUIT or SIGTERM */
 
@@ -13,6 +13,7 @@ public:
 	WebServer(const std::string &path);
 	~WebServer(void);
 	void Run(void);
+	int GetKqueue(void) const;
 	bool IsGood(void) const;
 
 private:
@@ -28,12 +29,12 @@ private:
 	void onClientRead(int ident);
 	void onServerWrite(int ident);
 	void onClientWrite(int ident);
-public:
-
 private:
 	bool mGood;
-	// std::vector<ServerConfig *> mServerConfigList;
-	std::map<int, ServerConfig *> mServerConfigList;
+	int mKqueue;
+	Node *mConfigTree;
+	// std::vector<Server *> mServerList;
+	std::map<int, Server *> mServerList;
 	// std::vector<Client *> mClientList;
 	std::map<int, Client *> mClientList;
 	std::vector<struct kevent> mEventList;

@@ -1,14 +1,14 @@
-#define SERVERCONFIG_LEVEL (1 << 2)
-#define LOCATIONCONFIG_LEVEL (1 << 3)
+#define SERVER_LEVEL (1 << 2)
+#define LOCATION_LEVEL (1 << 3)
 
-#include "ServerConfig.hpp"
+#include "Server.hpp"
 #include "WebServer.hpp"
 
-ServerConfig::ServerConfig(WebServer *webServer, Node *serverConfigNode)
+Server::Server(WebServer *webServer, Node *ServerNode)
     : mWebServer(webServer)
-    , mServerConfigNode(serverConfigNode) {
+    , mServerNode(ServerNode) {
 
-  makeLocationConfigHashMap(serverConfigNode);
+  makeLocationHashMap(ServerNode);
 
   // printHashMap();
 
@@ -43,7 +43,7 @@ ServerConfig::ServerConfig(WebServer *webServer, Node *serverConfigNode)
 //   int n = kevent(mWebServer->GetKqueue(), NULL, 0, events, 1, timeout);
 }
 
-ServerConfig::~ServerConfig() {
+Server::~Server() {
   // Remove the socket from the mKqueue
   struct kevent events[2];
   EV_SET(&events[0], mSocket, EVFILT_READ, EV_DELETE, 0, 0, NULL);
@@ -54,10 +54,10 @@ ServerConfig::~ServerConfig() {
   close(mSocket);
 }
 
-void ServerConfig::makeLocationConfigHashMap(Node *curNode) {
-  if (curNode->mLevel & SERVERCONFIG_LEVEL) {
+void Server::makeLocationHashMap(Node *curNode) {
+  if (curNode->mLevel & SERVER_LEVEL) {
     assert(curNode->mChildren.size());
-  } else if (curNode->mLevel & LOCATIONCONFIG_LEVEL) {
+  } else if (curNode->mLevel & LOCATION_LEVEL) {
     std::pair<std::string, Node *> LocDict =
         std::make_pair(curNode->mDirectives["location"][0], curNode);
     mLocationConfigHashMap.insert(LocDict);
@@ -65,11 +65,11 @@ void ServerConfig::makeLocationConfigHashMap(Node *curNode) {
 
   for (std::vector<Node *>::iterator it = curNode->mChildren.begin();
        it != curNode->mChildren.end(); ++it) {
-    makeLocationConfigHashMap(*it);
+    makeLocationHashMap(*it);
   }
 }
 
-// void ServerConfig::printHashMap() {
+// void Server::printHashMap() {
 //   std::cout << "Location HashMap" << std::endl;
 //   std::map<std::string, Node *>::iterator it;
 //   for (it = mLocationConfigHashMap.begin(); it != mLocationConfigHashMap.end(); ++it) {

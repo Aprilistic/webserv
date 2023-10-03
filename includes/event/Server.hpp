@@ -1,5 +1,5 @@
-#ifndef SERVERCONFIG_HPP
-#define SERVERCONFIG_HPP
+#ifndef Server_HPP
+#define Server_HPP
 
 #include "Core.hpp"
 
@@ -7,24 +7,24 @@ class Node;
 class WebServer;
 class Connection;
 
-class ServerConfig {
+class Server {
 public:
-  ServerConfig(WebServer *webServer, Node *serverConfigNode);
+  Server(WebServer *webServer, Node *ServerNode);
 
-  ~ServerConfig();
+  ~Server();
 
 private:
-  ServerConfig();
+  Server();
 //   void makeHashMap(Node *curNode);
 //   void printHashMap(void);
-  void makeLocationConfigHashMap(Node *curNode);
+  void makeLocationHashMap(Node *curNode);
 //   void deleteLocationConfigHashMap(void);
 
 public:
   int mSocket;
 private:
   WebServer *mWebServer;
-  Node *mServerConfigNode;
+  Node *mServerNode;
   std::map<std::string, Node *> mLocationConfigHashMap;
   std::map<int, Connection *> mConnection;
   struct sockaddr_in mAddr;
