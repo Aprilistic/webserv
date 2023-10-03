@@ -1,19 +1,20 @@
 #ifndef RESPONSEPARSER_HPP
 #define RESPONSEPARSER_HPP
 
-#include "Response.hpp"
 #include "Enum.hpp"
+#include "ResponseSyntax.hpp"
 
 class ResponseParser {
 public:
   ResponseParser();
   ~ResponseParser();
 
-  eParseResult parse(Response &resp, const char *begin, const char *end);
+  eParseResult parse(ResponseSyntax &resp, const char *begin, const char *end);
 
 private:
-  static bool checkIfConnection(const Response::HeaderItem &item);
-  eParseResult consume(Response &resp, const char *begin, const char *end);
+  static bool checkIfConnection(const ResponseSyntax::HeaderItem &item);
+  eParseResult consume(ResponseSyntax &resp, const char *begin,
+                       const char *end);
   // Check if a byte is an HTTP character.
   inline bool isChar(int c);
   // Check if a byte is an HTTP control character.

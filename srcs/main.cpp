@@ -1,6 +1,6 @@
 #include "Http.hpp"
-#include "Response.hpp"
 #include "ResponseParser.hpp"
+#include "ResponseSyntax.hpp"
 #include "WebServer.hpp"
 
 void ExitHandler(void) { system("leaks webserv"); }
@@ -14,7 +14,7 @@ int main(void) {
                     "\r\n"
                     "username=test&password=1234";
 
-  std::cout << "mStatus: " << http.getStatus() << std::endl;
+  http.httpProcess(str);
 }
 
 // 1. config 파일 확인

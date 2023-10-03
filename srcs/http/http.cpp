@@ -10,23 +10,38 @@ int Http::getStatus() const { return mStatus; }
 
 void Http::receiveRequest(std::string &buf) {
   RequestParser parser;
-  RequestSyntax syntax;
+
+  if (mRes == ParsingIncompleted && mTemp.size() > 0) {
+    buf = mTemp + buf;
+    mTemp.clear();
+  }
 
   mRes = parser.parse(mReq, buf.c_str(), buf.c_str() + buf.size());
   // event
 
-  if (mRes == ParsingCompleted) {
-    std::cout << "ParsingCompleted" << std::endl;
-    std::cout << parser.getRemainingBuffer() << std::endl;
-    mStatus = syntax.checksyntax(mReq);
-    // mRemainingBuffer =
+  if (mRes == ParsingIncompleted) {
+    mTemp = parser.getRemainingBuffer();
   }
 }
 
-void Http::httpProcess() {
-  // Request
-  // RequestParser
-  // RequestSyntax
-  // for ()
-  // Response
+void Http::httpProcess(std::string &buf) {
+  RequestSyntax syntax;
+
+  while (true) {
+    switch (mRes) {
+    case ParsingIncompleted: {
+      receiveRequest(buf);
+      break;
+    }
+    case ParsingCompleted: {
+      mStatus = syntax.checksyntax(mReq);
+      Response res(mReq, mStatus);
+      std::string response = res.getResponse();
+      mRes = ParsingIncompleted;
+      break;
+    }
+    default:
+      break;
+    }
+  }
 }

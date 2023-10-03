@@ -3,8 +3,10 @@
 
 #include "Core.hpp"
 #include "Request.hpp"
+#include "Response.hpp"
 #include "RequestParser.hpp"
 #include "RequestSyntax.hpp"
+#include "ResponseSyntax.hpp"
 
 class Http {
 public:
@@ -12,13 +14,13 @@ public:
   ~Http();
   int getStatus() const;
   void receiveRequest(std::string &buf);
-  void httpProcess();
+  void httpProcess(std::string &buf);
 
 private:
   Request mReq;
   eParseResult mRes;
   eStatustCode mStatus;
-  // std::string mRemainingBuffer;
+  std::string mTemp;
 };
 
 #endif

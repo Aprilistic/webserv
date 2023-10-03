@@ -2,28 +2,31 @@
 #define RESPONSE_HPP
 
 #include "Core.hpp"
+#include "Request.hpp"
 
-struct Response {
+class Response {
 public:
-  Response();
+  Response(Request &req, int status);
   ~Response();
+  void makeResponse();
+  void sendResponse();
+  std::string getResponse() const;
 
-  struct HeaderItem {
-    std::string name;
-    std::string value;
-  };
+private:
+  void makeResponseVersion();
+  void makeResponseStatusCode();
+  void makeResponseServer();
+  void makeResponseDate();
+  void makeResponseContentLength();
+  void makeResponseContentType();
+  void makeResponseLastModified();
+  void makeResponseConnection();
+  void makeResponseBody();
 
-  std::string inspect() const;
-
-public:
-  int versionMajor;
-  int versionMinor;
-  std::vector<HeaderItem> headers;
-  std::vector<char> content;
-  bool keepAlive;
-
-  unsigned int statusCode;
-  std::string status;
+private:
+  Request &mReq;
+  int mStatus;
+  std::string mResponse;
 };
 
 #endif
