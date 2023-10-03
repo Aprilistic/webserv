@@ -4,9 +4,8 @@
 #include "Server.hpp"
 #include "WebServer.hpp"
 
-Server::Server(WebServer *webServer, Node *ServerNode)
-    : mWebServer(webServer)
-    , mServerNode(ServerNode) {
+Server::Server(Node *ServerNode)
+    : mServerNode(ServerNode) {
 
   makeLocationHashMap(ServerNode);
 
@@ -51,6 +50,11 @@ Server::~Server() {
   kevent(Common::mKqueue, events, 2, NULL, 0, NULL);
 
   // Close the socket
+  for (std::map<int, Connection *>::iterator it = mConnection.begin();
+       it != mConnection.end(); ++it) {
+    delete it->second;
+  }
+
   close(mSocket);
 }
 
@@ -67,6 +71,26 @@ void Server::makeLocationHashMap(Node *curNode) {
        it != curNode->mChildren.end(); ++it) {
     makeLocationHashMap(*it);
   }
+}
+
+void Server::HandleReadEvent()
+{
+	int socket = accept(mSocket, NULL, NULL);
+
+	if (socket == -1)
+	{
+		//error
+	}
+	mConnection[socket] = new Connection(socket);
+}
+
+
+void Server::HandleWriteEvent()
+{
+}
+
+void Server::HandleTimerEvent()
+{
 }
 
 // void Server::printHashMap() {

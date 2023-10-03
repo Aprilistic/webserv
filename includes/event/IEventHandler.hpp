@@ -3,10 +3,10 @@
 
 class IEventHandler {
 public:
-	virtual void HandleReadEvent(struct kevent& currentEvent) = 0;
-	virtual void HandleWriteEvent(struct kevent& currentEvent) = 0;
-	virtual void HandleTimerEvent(struct kevent& currentEvent) = 0;
-	virtual void HandleSignalEvent(struct kevent& currentEvent) = 0;
+	virtual void HandleReadEvent(void) = 0;
+	virtual void HandleWriteEvent(void) = 0;
+	virtual void HandleTimerEvent(void) = 0;
+	// virtual void HandleSignalEvent(void) = 0;
 };
 
 #endif

@@ -44,8 +44,7 @@ void Config::checkSum(Node *configTree) {
   }
 }
 
-std::map<int, Server *> Config::makeServerList(WebServer *webServer,
-                                                           Node *configTree) {
+std::map<int, Server *> Config::makeServerList(Node *configTree) {
   std::map<int, Server *> ServerList;
   try {
     if (!configTree->mChildren.empty()) {
@@ -54,7 +53,7 @@ std::map<int, Server *> Config::makeServerList(WebServer *webServer,
       for (std::vector<Node *>::iterator serverNode =
                httpNode->mChildren.begin();
            serverNode != httpNode->mChildren.end(); ++serverNode) {
-        Server *newConfig = new Server(webServer, *serverNode);
+        Server *newConfig = new Server(*serverNode);
         ServerList[newConfig->mSocket] = newConfig;
       }
     }

@@ -5,14 +5,11 @@
 #include "Node.hpp"
 #include "Common.hpp"
 
-
 // class Node;
 class Config {
 public:
   static void makeConfigTree(const std::string &path);
-//   static std::vector<Server *> makeServerList(WebServer *webServer, Node *configTree);
-  static std::map<int, Server *> makeServerList(WebServer *webServer,
-                                                         Node *configTree);
+  static std::map<int, Server *> makeServerList(Node *configTree);
 
 private:
   Config();

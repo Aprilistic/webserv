@@ -10,8 +10,7 @@ class Connection;
 
 class Server : public IEventHandler {
 public:
-  Server(WebServer *webServer, Node *ServerNode);
-
+  Server(Node *ServerNode);
   ~Server();
 
 private:
@@ -19,19 +18,19 @@ private:
 //   void makeHashMap(Node *curNode);
 //   void printHashMap(void);
   void makeLocationHashMap(Node *curNode);
+  virtual void HandleReadEvent();
+  virtual void HandleWriteEvent();
+  virtual void HandleTimerEvent();
 //   void deleteLocationConfigHashMap(void);
 
 public:
   int mSocket;
-private:
-  WebServer *mWebServer;
-  Node *mServerNode;  //May not need this
   std::map<std::string, Node *> mLocationHashMap;
   std::map<int, Connection *> mConnection;
+private:
+  Node *mServerNode;  //May not need this
   struct sockaddr_in mAddr;
   int mPort;
-  std::vector<char> mRecvBuffer;
-  std::vector<char> mSendBuffer;
 };
 
 #endif
