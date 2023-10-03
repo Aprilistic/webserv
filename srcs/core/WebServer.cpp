@@ -116,15 +116,15 @@ void WebServer::handleReadEvent(struct kevent& currentEvent)
 	{
 		onServerRead(currentEvent.ident);
 	}
-	else if (mClientList.count(currentEvent.ident) == true)
+	else if (mConnectionList.count(currentEvent.ident) == true)
 	{
-		onClientRead(currentEvent.ident);
+		onConnectionRead(currentEvent.ident);
 	}
 }
 
 void WebServer::onServerRead(int ident)
 {
-	Client * client = new Client;
+	Connection * client = new Connection;
 	struct kevent events[2];
 
 	if ((client->mSocket = accept(mServerList[ident]->mSocket, NULL, NULL)) == -1)
@@ -136,17 +136,17 @@ void WebServer::onServerRead(int ident)
 	EV_SET(&events[0], client->mSocket, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, client);
 	EV_SET(&events[1], client->mSocket, EVFILT_WRITE, EV_ADD | EV_ENABLE,0, 0, client);
 	kevent(Common::mKqueue, events, 2, NULL, 0, NULL);
-	mClientList[client->mSocket] = client;
+	mConnectionList[client->mSocket] = client;
 }
 
-void WebServer::onClientRead(int ident)
+void WebServer::onConnectionRead(int ident)
 {
-	std::map<int, Client*>::iterator iter = mClientList.find(ident);
-	if (iter == mClientList.end()) 
+	std::map<int, Connection*>::iterator iter = mConnectionList.find(ident);
+	if (iter == mConnectionList.end()) 
 	{
 		return;
 	}
-	Client* client = iter->second;
+	Connection* client = iter->second;
 	char tempBuffer[1024];
 	ssize_t bytesRead;
 
@@ -168,9 +168,9 @@ void WebServer::onClientRead(int ident)
 
 void WebServer::handleWriteEvent(struct kevent& currentEvent)
 {
-	if (mClientList.count(currentEvent.ident) == true)
+	if (mConnectionList.count(currentEvent.ident) == true)
 	{
-		onClientWrite(currentEvent.ident);
+		onConnectionWrite(currentEvent.ident);
 	}
 }
 
@@ -178,14 +178,14 @@ void WebServer::onServerWrite(int ident)
 {
 }
 
-void WebServer::onClientWrite(int ident)
+void WebServer::onConnectionWrite(int ident)
 {
-    std::map<int, Client*>::iterator iter = mClientList.find(ident);
-    if (iter == mClientList.end()) 
+    std::map<int, Connection*>::iterator iter = mConnectionList.find(ident);
+    if (iter == mConnectionList.end()) 
     {
         return;
     }
-    Client* client = iter->second;
+    Connection* client = iter->second;
     if (client->mSendBuffer.empty()) 
     {
         return;

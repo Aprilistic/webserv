@@ -19,7 +19,7 @@ private:
   static void checkSum(Node *configTree);
 
   static void checkErrorPage(std::vector<std::string> &value);
-  static void checkClientMaxBodySize(std::vector<std::string> &value);
+  static void checkConnectionMaxBodySize(std::vector<std::string> &value);
   static void checkIndex(std::vector<std::string> &value);
   static void checkAutoIndex(std::vector<std::string> &value);
   static void checkListen(std::vector<std::string> &value);

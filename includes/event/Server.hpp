@@ -2,12 +2,13 @@
 #define Server_HPP
 
 #include "Core.hpp"
+#include "IEventHandler.hpp"
 
 class Node;
 class WebServer;
 class Connection;
 
-class Server {
+class Server : public IEventHandler {
 public:
   Server(WebServer *webServer, Node *ServerNode);
 

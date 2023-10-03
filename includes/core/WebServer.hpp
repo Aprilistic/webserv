@@ -4,11 +4,12 @@
 #include "Config.hpp"
 #include "Core.hpp"
 #include "Server.hpp"
-#include "Client.hpp"
+#include "Connection.hpp"
+#include "IEventHandler.hpp"
 
 /* Signal hadling SIGHUP, SIGQUIT or SIGTERM */
 
-class WebServer {
+class WebServer : public IEventHandler {
 public:
 	WebServer(const std::string &path);
 	~WebServer(void);
@@ -26,15 +27,15 @@ private:
 	void handleSignalEvent(struct kevent& currentEvent);
 
 	void onServerRead(int ident);
-	void onClientRead(int ident);
+	void onConnectionRead(int ident);
 	void onServerWrite(int ident);
-	void onClientWrite(int ident);
+	void onConnectionWrite(int ident);
 private:
 	bool mGood;
 	int mKqueue;
 	Node *mConfigTree;
 	std::map<int, Server *> mServerList;
-	std::map<int, Client *> mClientList;
+	std::map<int, Connection *> mConnectionList;
 	std::vector<struct kevent> mEventList;
 };
 
