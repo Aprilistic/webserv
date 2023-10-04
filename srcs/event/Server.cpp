@@ -13,7 +13,7 @@ Server::Server(Node *ServerNode)
 
   mSocket = socket(AF_INET, SOCK_STREAM, 0);
   if (mSocket < 0) {
-    //FD limit exceeded
+    //FD limit exceededw
     throw std::runtime_error("Error: socket() creation failed: " + std::string(strerror(errno)));
   }
 
