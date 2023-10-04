@@ -8,8 +8,9 @@ class Response {
 public:
   Response(Request &req, int status);
   ~Response();
-  void makeResponse();
-  void sendResponse();
+  void makeStartLine();
+  void makeHeaderField();
+  void makeBody();
   std::string getResponse() const;
 
 private:
@@ -26,6 +27,7 @@ private:
 private:
   Request &mReq;
   int mStatus;
+
   std::string mResponse;
 };
 

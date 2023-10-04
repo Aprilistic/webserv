@@ -1,24 +1,30 @@
 #include "Response.hpp"
 
 Response::Response(Request &req, int status) : mReq(req), mStatus(status) {
-  makeResponse();
+  makeStartLine();
+  makeHeaderField();
+  makeBody();
 }
 
 Response::~Response() {}
 
 std::string Response::getResponse() const { return mResponse; }
 
-void Response::makeResponse() {
+void Response::makeStartLine() {
   makeResponseVersion();
   makeResponseStatusCode();
+}
+
+void Response::makeHeaderField() {
   makeResponseServer();
   makeResponseDate();
   makeResponseContentLength();
   makeResponseContentType();
   makeResponseLastModified();
   makeResponseConnection();
-  makeResponseBody();
 }
+
+void Response::makeBody() { makeResponseBody(); }
 
 void Response::makeResponseVersion() {
   mResponse += "HTTP/1.1 ";
@@ -167,7 +173,7 @@ void Response::makeResponseStatusCode() {
     mResponse += "HTTP Version Not Supported";
     break;
   }
-  mResponse += "\r\n";
+  mResponse.append("\r\n");
 }
 
 void Response::makeResponseServer() {

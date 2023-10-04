@@ -27,21 +27,21 @@ void Http::receiveRequest(std::string &buf) {
 void Http::httpProcess(std::string &buf) {
   RequestSyntax syntax;
 
-  while (true) {
-    switch (mRes) {
-    case ParsingIncompleted: {
+  // while (true) {
+  //   switch (mRes) {
+  //   case ParsingIncompleted: {
       receiveRequest(buf);
-      break;
-    }
-    case ParsingCompleted: {
+    //   break;
+    // }
+    // case ParsingCompleted: {
       mStatus = syntax.checksyntax(mReq);
       Response res(mReq, mStatus);
       std::string response = res.getResponse();
       mRes = ParsingIncompleted;
-      break;
-    }
-    default:
-      break;
-    }
-  }
+  //     break;
+  //   }
+  //   default:
+  //     break;
+  //   }
+  // }
 }
