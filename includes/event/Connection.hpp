@@ -12,10 +12,13 @@ class Connection : public IEventHandler {
 public:
   Connection(int socket);
   ~Connection();
-  virtual void HandleReadEvent();
-  virtual void HandleWriteEvent();
-  virtual void HandleSignalEvent();
-  virtual void HandleTimerEvent();
+  virtual void EventHandler(struct kevent &currentEvent);
+
+private:
+	void handleReadEvent();
+	void handleWriteEvent();
+  void handleTimerEvent();
+  void handleSignalEvent();
 
 private:
   int mSocket;
