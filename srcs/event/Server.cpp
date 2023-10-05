@@ -2,6 +2,7 @@
 #define LOCATION_LEVEL (1 << 3)
 
 #include "Server.hpp"
+#include "Connection.hpp"
 #include "WebServer.hpp"
 
 Server::Server(Node *ServerNode)
@@ -13,7 +14,7 @@ Server::Server(Node *ServerNode)
 
   mSocket = socket(AF_INET, SOCK_STREAM, 0);
   if (mSocket < 0) {
-    //FD limit exceeded
+    //FD limit exceededw
     throw std::runtime_error("Error: socket() creation failed: " + std::string(strerror(errno)));
   }
 
@@ -73,7 +74,29 @@ void Server::makeLocationHashMap(Node *curNode) {
   }
 }
 
-void Server::HandleReadEvent()
+void Server::EventHandler(struct kevent &currentEvent) {
+  if (currentEvent.flags & EV_ERROR) {
+    // error
+  }
+  switch (currentEvent.filter) {
+  case EVFILT_READ:
+    handleReadEvent();
+    break;
+  case EVFILT_WRITE:
+    handleWriteEvent();
+    break;
+  case EVFILT_TIMER:
+    handleTimerEvent();
+    break;
+  case EVFILT_SIGNAL:
+    handleSignalEvent();
+    break;
+  default:
+    break;
+  }
+}
+
+void Server::handleReadEvent()
 {
 	int socket = accept(mSocket, NULL, NULL);
 
@@ -85,11 +108,15 @@ void Server::HandleReadEvent()
 }
 
 
-void Server::HandleWriteEvent()
+void Server::handleWriteEvent()
 {
 }
 
-void Server::HandleTimerEvent()
+void Server::handleTimerEvent()
+{
+}
+
+void Server::handleSignalEvent()
 {
 }
 
