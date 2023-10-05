@@ -2,6 +2,7 @@
 #define LOCATION_LEVEL (1 << 3)
 
 #include "Server.hpp"
+#include "Connection.hpp"
 #include "WebServer.hpp"
 
 Server::Server(Node *ServerNode)

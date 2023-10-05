@@ -6,28 +6,28 @@
 class IRequestHandler;
 class Request;
 
-class Router
-{
-	public:
-		Router();
-		~Router();
-		IRequestHandler* GetHandler(Request& request);
-	private:
-		std::map<std::string, IRequestHandler*> mRouteTable;
-};
+// class Router
+// {
+// 	public:
+// 		Router();
+// 		~Router();
+// 		IRequestHandler* GetHandler(Request& request);
+// 	private:
+// 		std::map<std::string, IRequestHandler*> mRouteTable;
+// };
 
 
-/* test */
-class StaticFileHandler : public IRequestHandler
-{
-	public:
-		virtual Response handle(Request& request);
-};
+// /* test */
+// class StaticFileHandler : public IRequestHandler
+// {
+// 	public:
+// 		virtual Response handle(Request& request);
+// };
 
-class CgiHandler : public IRequestHandler
-{
-	public:
-		virtual Response handle(Request& request);
-};
+// class CgiHandler : public IRequestHandler
+// {
+// 	public:
+// 		virtual Response handle(Request& request);
+// };
 /* test */
 #endif
