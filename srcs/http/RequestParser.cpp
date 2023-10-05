@@ -11,8 +11,13 @@ eParseResult RequestParser::parse(Request &req, const char *begin,
   return consume(req, begin, end);
 }
 
-bool RequestParser::checkIfConnection(const Request::HeaderItem &item) {
-  return strcasecmp(item.name.c_str(), "Connection") == 0;
+// bool RequestParser::checkIfConnection(const Request::HeaderItem &item) {
+//   return strcasecmp(item.name.c_str(), "Connection") == 0;
+// }
+
+bool RequestParser::checkIfConnection(
+    const std::pair<const std::string, std::string> &item) {
+  return (item.first == "Connection");
 }
 
 eParseResult RequestParser::consume(Request &req, const char *begin,
@@ -150,10 +155,12 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
       } else if (!isChar(input) || isControl(input) || isSpecial(input)) {
         return ParsingError;
       } else {
-        req.mHeaders.push_back(Request::HeaderItem());
-        req.mHeaders.back().name.reserve(16);
-        req.mHeaders.back().value.reserve(16);
-        req.mHeaders.back().name.push_back(input);
+        // req.mHeaders.push_back(Request::HeaderItem());
+        // req.mHeaders.back().name.reserve(16);
+        // req.mHeaders.back().value.reserve(16);
+        // req.mHeaders.back().name.push_back(input);
+        mHeaderName.clear();
+        mHeaderName.push_back(input);
         mState = HeaderName;
       }
       break;
@@ -165,7 +172,8 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
         return ParsingError;
       } else {
         mState = HeaderValue;
-        req.mHeaders.back().value.push_back(input);
+        // req.mHeaders.back().value.push_back(input);
+        mHeaderValue.push_back(input);
       }
       break;
     case HeaderName:
@@ -174,7 +182,8 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
       } else if (!isChar(input) || isControl(input) || isSpecial(input)) {
         return ParsingError;
       } else {
-        req.mHeaders.back().name.push_back(input);
+        // req.mHeaders.back().name.push_back(input);
+        mHeaderName.push_back(input);
       }
       break;
     case SpaceBeforeHeaderValue:
@@ -187,21 +196,32 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
     case HeaderValue:
       if (input == '\r') {
         if (req.mMethod == "POST" || req.mMethod == "PUT") {
-          Request::HeaderItem &h = req.mHeaders.back();
+          // Request::HeaderItem &h = req.mHeaders.back();
 
-          if (strcasecmp(h.name.c_str(), "Content-Length") == 0) {
-            mContentsize = atoi(h.value.c_str());
+          // if (strcasecmp(h.name.c_str(), "Content-Length") == 0) {
+          //   mContentsize = atoi(h.value.c_str());
+          //   req.mContent.reserve(mContentsize);
+          // } else if (strcasecmp(h.name.c_str(), "Transfer-Encoding") == 0) {
+          //   if (strcasecmp(h.value.c_str(), "Chunked") == 0)
+          //     mChunked = true;
+          // }
+          if (strcasecmp(mHeaderName.c_str(), "Content-Length") == 0) {
+            mContentsize = atoi(mHeaderValue.c_str());
             req.mContent.reserve(mContentsize);
-          } else if (strcasecmp(h.name.c_str(), "Transfer-Encoding") == 0) {
-            if (strcasecmp(h.value.c_str(), "Chunked") == 0)
+          } else if (strcasecmp(mHeaderName.c_str(), "Transfer-Encoding") ==
+                     0) {
+            if (strcasecmp(mHeaderValue.c_str(), "Chunked") == 0)
               mChunked = true;
           }
         }
+        req.mHeaders.insert(std::make_pair(mHeaderName, mHeaderValue));
+        mHeaderValue.clear();
         mState = ExpectingNewline_2;
       } else if (isControl(input)) {
         return ParsingError;
       } else {
-        req.mHeaders.back().value.push_back(input);
+        // req.mHeaders.back().value.push_back(input);
+        mHeaderValue.push_back(input);
       }
       break;
     case ExpectingNewline_2:
@@ -212,11 +232,19 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
       }
       break;
     case ExpectingNewline_3: {
-      std::vector<Request::HeaderItem>::iterator it = std::find_if(
+      // std::vector<Request::HeaderItem>::iterator it = std::find_if(
+      //     req.mHeaders.begin(), req.mHeaders.end(), checkIfConnection);
+      std::map<std::string, std::string>::iterator it = std::find_if(
           req.mHeaders.begin(), req.mHeaders.end(), checkIfConnection);
 
       if (it != req.mHeaders.end()) {
-        if (strcasecmp(it->value.c_str(), "Keep-Alive") == 0) {
+        // if (strcasecmp(it->value.c_str(), "Keep-Alive") == 0) {
+        //   req.mKeepAlive = true;
+        // } else // == Close
+        // {
+        //   req.mKeepAlive = false;
+        // }
+        if (strcasecmp(it->second.c_str(), "Keep-Alive") == 0) {
           req.mKeepAlive = true;
         } else // == Close
         {

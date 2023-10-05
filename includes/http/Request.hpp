@@ -8,10 +8,10 @@ public:
   Request();
   ~Request();
 
-  struct HeaderItem {
-    std::string name;
-    std::string value;
-  };
+  // struct HeaderItem {
+  //   std::string name;
+  //   std::string value;
+  // };
 
   std::string inspect() const;
 
@@ -20,7 +20,8 @@ public:
   std::string mUri;
   int mVersionMajor;
   int mVersionMinor;
-  std::vector<HeaderItem> mHeaders;
+  // std::vector<HeaderItem> mHeaders;
+  std::map<std::string, std::string> mHeaders;
   std::vector<char> mContent;
   bool mKeepAlive;
 };

@@ -12,7 +12,8 @@ public:
   std::string getRemainingBuffer(void);
 
 private:
-  static bool checkIfConnection(const Request::HeaderItem &item);
+  // static bool checkIfConnection(const Request::HeaderItem &item);
+  static bool checkIfConnection(const std::pair<const std::string, std::string> &item);
   eParseResult consume(Request &req, const char *begin, const char *end);
   // Check if a byte is an HTTP character.
   inline bool isChar(int c);
@@ -29,6 +30,8 @@ public:
 private:
   std::string mRemainingBuffer;
   std::string mChunkSizeStr;
+  std::string mHeaderName;
+  std::string mHeaderValue;
   size_t mChunkSize;
   bool mChunked;
   int mState;

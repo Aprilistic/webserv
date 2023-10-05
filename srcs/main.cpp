@@ -33,5 +33,5 @@ int main(void) {
                     "Content-Length: 29\r\n"
                     "\r\n"
                     "username=test&password=1234";
-  http.httpProcess(post);
+  http.httpProcess(get);
 }

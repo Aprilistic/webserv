@@ -55,16 +55,30 @@ eStatustCode RequestSyntax::httpVersion(Request &request) {
 eStatustCode RequestSyntax::headerField(Request &request) {
   int hostCount = 0;
 
-  for (std::vector<Request::HeaderItem>::const_iterator it = request.mHeaders.begin(); 
+  // for (std::vector<Request::HeaderItem>::const_iterator it = request.mHeaders.begin(); 
+  //      it != request.mHeaders.end(); ++it) 
+  // {
+  //   std::string upperName = it->name;
+  //   std::transform(upperName.begin(), upperName.end(), upperName.begin(), ::toupper);
+
+  //   if (upperName == "HOST") {
+  //     hostCount++;
+      
+  //     if (it->value.empty() || hostCount > 1) {
+  //       return CLIENT_ERROR_BAD_REQUEST;
+  //     }
+  //   }
+  // }
+  for (std::map<std::string, std::string>::const_iterator it = request.mHeaders.begin(); 
        it != request.mHeaders.end(); ++it) 
   {
-    std::string upperName = it->name;
+    std::string upperName = it->first;
     std::transform(upperName.begin(), upperName.end(), upperName.begin(), ::toupper);
 
     if (upperName == "HOST") {
       hostCount++;
       
-      if (it->value.empty() || hostCount > 1) {
+      if (it->second.empty() || hostCount > 1) {
         return CLIENT_ERROR_BAD_REQUEST;
       }
     }

@@ -9,9 +9,14 @@ std::string Request::inspect() const {
   stream << mMethod << " " << mUri << " HTTP/" << mVersionMajor << "."
          << mVersionMinor << "\n";
 
-  for (std::vector<Request::HeaderItem>::const_iterator it = mHeaders.begin();
+  // for (std::vector<Request::HeaderItem>::const_iterator it =
+  // mHeaders.begin();
+  //      it != mHeaders.end(); ++it) {
+  //   stream << it->name << ": " << it->value << "\n";
+  // }
+  for (std::map<std::string, std::string>::const_iterator it = mHeaders.begin();
        it != mHeaders.end(); ++it) {
-    stream << it->name << ": " << it->value << "\n";
+    stream << it->first << ": " << it->second << "\n";
   }
 
   std::string data(mContent.begin(), mContent.end());
