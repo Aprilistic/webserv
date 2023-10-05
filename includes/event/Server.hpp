@@ -12,15 +12,17 @@ class Server : public IEventHandler {
 public:
   Server(Node *ServerNode);
   ~Server();
+  virtual void EventHandler(struct kevent &currentEvent);
 
 private:
   Server();
 //   void makeHashMap(Node *curNode);
 //   void printHashMap(void);
   void makeLocationHashMap(Node *curNode);
-  virtual void HandleReadEvent();
-  virtual void HandleWriteEvent();
-  virtual void HandleTimerEvent();
+	void handleReadEvent();
+	void handleWriteEvent();
+  void handleTimerEvent();
+  void handleSignalEvent();
 //   void deleteLocationConfigHashMap(void);
 
 public:

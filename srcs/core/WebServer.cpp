@@ -81,21 +81,5 @@ void WebServer::eventHandler(struct kevent &currentEvent) {
     // error
   }
   IEventHandler *object = static_cast<IEventHandler *>(currentEvent.udata);
-  switch (currentEvent.filter) {
-  case EVFILT_READ:
-    object->HandleReadEvent();
-    break;
-  case EVFILT_WRITE:
-    object->HandleWriteEvent();
-    break;
-  case EVFILT_TIMER:
-    object->HandleTimerEvent();
-    break;
-//   case EVFILT_SIGNAL:
-//     object->HandleSignalEvent();
-//     break;
-  default:
-    break;
-  }
+  object->EventHandler(currentEvent);
 }
-

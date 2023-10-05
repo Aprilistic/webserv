@@ -27,7 +27,32 @@ Connection::~Connection()
 	close(mSocket);
 }
 
-void Connection::HandleReadEvent()
+void Connection::EventHandler(struct kevent &currentEvent)
+{
+	if (currentEvent.flags & EV_ERROR)
+	{
+		// error
+	}
+	switch (currentEvent.filter)
+	{
+	case EVFILT_READ:
+		handleReadEvent();
+		break;
+	case EVFILT_WRITE:
+		handleWriteEvent();
+		break;
+	case EVFILT_TIMER:
+		handleTimerEvent();
+		break;
+	case EVFILT_SIGNAL:
+		handleSignalEvent();
+		break;
+	default:
+		break;
+	}
+}
+
+void Connection::handleReadEvent()
 {
 	mRecvBuffer.clear();
 	ssize_t bytesRead;
@@ -62,7 +87,7 @@ void Connection::HandleReadEvent()
 	mSendBuffer = responsBuilder.build(response);
 }
 
-void Connection::HandleWriteEvent() 
+void Connection::handleWriteEvent() 
 {
     ssize_t bytesSent = send(mSocket, &mSendBuffer[0], mSendBuffer.size(), 0);
     
@@ -76,7 +101,7 @@ void Connection::HandleWriteEvent()
     }
 }
 
-void Connection::HandleTimerEvent()
+void Connection::handleTimerEvent()
 {
 	// error
 }
