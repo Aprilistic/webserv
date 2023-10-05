@@ -21,7 +21,10 @@ WebServer::WebServer(const std::string &path) : mGood(true) {
   }
 }
 
-bool WebServer::IsGood(void) const { return (mGood); }
+bool WebServer::IsGood(void) const
+{
+  return (mGood);
+}
 
 WebServer::~WebServer(void) {
   int safeExit = 1;
@@ -57,11 +60,12 @@ void WebServer::Run(void) {
   if (!IsGood()) {
     return;
   }
+  Common::mRunning = true;
   eventMonitoring();
 }
 
 void WebServer::eventMonitoring(void) {
-  while (true) {
+  while (Common::mRunning) {
     int newEvent = kevent(Common::mKqueue, NULL, 0, &mEventList[0],
                           mEventList.size(), NULL);
 
@@ -71,15 +75,12 @@ void WebServer::eventMonitoring(void) {
 
     for (int index = 0; index < newEvent; index++) {
       struct kevent currentEvent = mEventList[index];
-      eventHandler(currentEvent);
+
+      if (currentEvent.flags & EV_ERROR) {
+        // error
+      }
+      IEventHandler *object = static_cast<IEventHandler *>(currentEvent.udata);
+      object->EventHandler(currentEvent);
     }
   }
-}
-
-void WebServer::eventHandler(struct kevent &currentEvent) {
-  if (currentEvent.flags & EV_ERROR) {
-    // error
-  }
-  IEventHandler *object = static_cast<IEventHandler *>(currentEvent.udata);
-  object->EventHandler(currentEvent);
 }
