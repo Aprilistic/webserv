@@ -12,10 +12,11 @@ class Connection : public IEventHandler {
 public:
   Connection(int socket);
   ~Connection();
-	virtual void HandleReadEvent();
-	virtual void HandleWriteEvent();
-  // virtual void HandleSignalEvent();
+  virtual void HandleReadEvent();
+  virtual void HandleWriteEvent();
+  virtual void HandleSignalEvent();
   virtual void HandleTimerEvent();
+
 private:
   int mSocket;
   std::vector<char> mRecvBuffer;

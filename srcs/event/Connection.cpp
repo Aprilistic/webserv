@@ -54,3 +54,8 @@ void Connection::HandleTimerEvent()
 {
 	// error
 }
+
+void Connection::HandleSignalEvent()
+{
+	// error
+}

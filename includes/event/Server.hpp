@@ -21,6 +21,7 @@ private:
   virtual void HandleReadEvent();
   virtual void HandleWriteEvent();
   virtual void HandleTimerEvent();
+  virtual void HandleSignalEvent();
 //   void deleteLocationConfigHashMap(void);
 
 public:

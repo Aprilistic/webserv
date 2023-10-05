@@ -93,6 +93,10 @@ void Server::HandleTimerEvent()
 {
 }
 
+void Server::HandleSignalEvent()
+{
+}
+
 // void Server::printHashMap() {
 //   std::cout << "Location HashMap" << std::endl;
 //   std::map<std::string, Node *>::iterator it;
