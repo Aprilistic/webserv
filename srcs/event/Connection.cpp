@@ -48,6 +48,7 @@ void Connection::EventHandler(struct kevent &currentEvent)
 		SignalHandler();
 		break;
 	default:
+		assert("Connection::EventHandler: default" == 0);
 		break;
 	}
 }

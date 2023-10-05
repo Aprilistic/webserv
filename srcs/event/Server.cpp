@@ -92,6 +92,7 @@ void Server::EventHandler(struct kevent &currentEvent) {
     SignalHandler();
     break;
   default:
+    assert("Server::EventHandler: default" == 0);
     break;
   }
 }

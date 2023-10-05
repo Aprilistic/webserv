@@ -6,18 +6,19 @@ void Signal::EventHandler(struct kevent &currentEvent) {
   }
   switch (currentEvent.filter) {
   case EVFILT_READ:
-    ReadHandler();
+		assert("Signal::EventHandler: EVFILT_READ" == 0);
     break;
   case EVFILT_WRITE:
-    WriteHandler();
+		assert("Signal::EventHandler: EVFILT_WRITE" == 0);
     break;
   case EVFILT_TIMER:
-    TimerHandler();
+		assert("Signal::EventHandler: EVFILT_TIMER" == 0);
     break;
   case EVFILT_SIGNAL:
-    SignalHandler();
+		signalHandler(currentEvent.ident);
     break;
   default:
+		assert("Signal::EventHandler: default" == 0);
     break;
   }
 }

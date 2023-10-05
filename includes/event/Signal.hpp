@@ -9,12 +9,12 @@ public:
 	Signal(void);
 
 	virtual void EventHandler(struct kevent &currentEvent);
-	static void RegisterSignalEvent(void);
-	static void UnregisterSignalEvent(void);
+	static void RegisterSignalsWithKqueue(void);
+	static void UnregisterSignalsWithKqueue(void);
 
 private:
-	static void registerSignalEvent(int signal, void (*handler)(int));
-	static void handleSigalEvent(void);
+	static void signalHandler(int signal);
+	static void registerKqueueSignalHandler(int signal, void (*handler)(int));
 };
 
 
