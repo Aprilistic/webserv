@@ -6,8 +6,6 @@
 #include "Server.hpp"
 #include "Connection.hpp"
 
-/* Signal hadling SIGHUP, SIGQUIT or SIGTERM */
-
 class WebServer {
 public:
 	WebServer(const std::string &path);
@@ -17,7 +15,6 @@ public:
 
 private:
 	void eventMonitoring(void);
-	void eventHandler(struct kevent& currentEvent);
 	
 private:
 	bool mGood;
