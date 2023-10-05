@@ -5,6 +5,7 @@
 #include "Core.hpp"
 #include "Server.hpp"
 #include "Connection.hpp"
+#include "Signal.hpp"
 
 class WebServer {
 public:
@@ -20,6 +21,7 @@ private:
 	bool mGood;
 	std::map<int, Server *> mServerList;
 	std::vector<struct kevent> mEventList;
+	Signal mSignalInstance;
 };
 
 #endif
