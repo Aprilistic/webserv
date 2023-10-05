@@ -6,16 +6,16 @@ ResponseParser::ResponseParser()
 
 ResponseParser::~ResponseParser() {}
 
-eParseResult ResponseParser::parse(ResponseSyntax &resp, const char *begin,
+eParseResult ResponseParser::parse(Response &resp, const char *begin,
                                    const char *end) {
   return consume(resp, begin, end);
 }
 
-bool ResponseParser::checkIfConnection(const ResponseSyntax::HeaderItem &item) {
+bool ResponseParser::checkIfConnection(const Response::HeaderItem &item) {
   return strcasecmp(item.name.c_str(), "Connection") == 0;
 }
 
-eParseResult ResponseParser::consume(ResponseSyntax &resp, const char *begin,
+eParseResult ResponseParser::consume(Response &resp, const char *begin,
                                      const char *end) {
   while (begin != end) {
     char input = *begin++;
@@ -146,7 +146,7 @@ eParseResult ResponseParser::consume(ResponseSyntax &resp, const char *begin,
       } else if (!isChar(input) || isControl(input) || isSpecial(input)) {
         return ParsingError;
       } else {
-        resp.headers.push_back(ResponseSyntax::HeaderItem());
+        resp.headers.push_back(Response::HeaderItem());
         resp.headers.back().name.reserve(16);
         resp.headers.back().value.reserve(16);
         resp.headers.back().name.push_back(input);
@@ -182,7 +182,7 @@ eParseResult ResponseParser::consume(ResponseSyntax &resp, const char *begin,
       break;
     case HeaderValue:
       if (input == '\r') {
-        ResponseSyntax::HeaderItem &h = resp.headers.back();
+        Response::HeaderItem &h = resp.headers.back();
 
         if (strcasecmp(h.name.c_str(), "Content-Length") == 0) {
           mContentSize = atoi(h.value.c_str());
@@ -206,7 +206,7 @@ eParseResult ResponseParser::consume(ResponseSyntax &resp, const char *begin,
       }
       break;
     case ExpectingNewline_3: {
-      std::vector<ResponseSyntax::HeaderItem>::iterator it = std::find_if(
+      std::vector<Response::HeaderItem>::iterator it = std::find_if(
           resp.headers.begin(), resp.headers.end(), checkIfConnection);
 
       if (it != resp.headers.end()) {

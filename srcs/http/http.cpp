@@ -35,9 +35,9 @@ void Http::httpProcess(std::string &buf) {
     // }
     // case ParsingCompleted: {
       mStatus = syntax.checksyntax(mReq);
-      Response res(mReq, mStatus);
-      std::string response = res.getResponse();
       mRes = ParsingIncompleted;
+      std::cout << "mStatus: " << mStatus << std::endl;
+      std::cout << mReq.inspect();
   //     break;
   //   }
   //   default:

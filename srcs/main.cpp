@@ -1,6 +1,6 @@
 #include "Http.hpp"
 #include "ResponseParser.hpp"
-#include "ResponseSyntax.hpp"
+#include "Response.hpp"
 #include "WebServer.hpp"
 
 void ExitHandler(void) { system("leaks webserv"); }
@@ -33,5 +33,5 @@ int main(void) {
                     "Content-Length: 29\r\n"
                     "\r\n"
                     "username=test&password=1234";
-  http.httpProcess(get);
+  http.httpProcess(post);
 }
