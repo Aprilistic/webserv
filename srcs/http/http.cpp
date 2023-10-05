@@ -30,14 +30,18 @@ void Http::httpProcess(std::string &buf) {
   // while (true) {
   //   switch (mRes) {
   //   case ParsingIncompleted: {
-      receiveRequest(buf);
+      // receiveRequest(buf);
     //   break;
     // }
     // case ParsingCompleted: {
-      mStatus = syntax.checksyntax(mReq);
-      mRes = ParsingIncompleted;
-      std::cout << "mStatus: " << mStatus << std::endl;
-      std::cout << mReq.inspect();
+      // mStatus = syntax.checksyntax(mReq);
+      // mRes = ParsingIncompleted;
+      Response res;
+      ResponseParser parser;
+
+      eParseResult resParse = parser.parse(res, buf.c_str(), buf.c_str() + buf.size());
+
+      std::cout << res.inspect();
   //     break;
   //   }
   //   default:

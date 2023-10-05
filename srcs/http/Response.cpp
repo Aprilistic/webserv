@@ -10,10 +10,14 @@ std::string Response::inspect() const {
   stream << "HTTP/" << versionMajor << "." << versionMinor << " " << statusCode
          << " " << status << "\n";
 
-  for (std::vector<Response::HeaderItem>::const_iterator it =
-           headers.begin();
+  // for (std::vector<Response::HeaderItem>::const_iterator it =
+  //          headers.begin();
+  //      it != headers.end(); ++it) {
+  //   stream << it->name << ": " << it->value << "\n";
+  // }
+  for (std::map<std::string, std::string>::const_iterator it = headers.begin();
        it != headers.end(); ++it) {
-    stream << it->name << ": " << it->value << "\n";
+    stream << it->first << ": " << it->second << "\n";
   }
 
   std::string data(content.begin(), content.end());

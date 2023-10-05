@@ -6,7 +6,7 @@
 #include "Response.hpp"
 #include "RequestParser.hpp"
 #include "RequestSyntax.hpp"
-#include "Response.hpp"
+#include "ResponseParser.hpp"
 
 class Http {
 public:

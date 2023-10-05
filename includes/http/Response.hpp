@@ -8,17 +8,18 @@ public:
   Response();
   ~Response();
 
-  struct HeaderItem {
-    std::string name;
-    std::string value;
-  };
+  // struct HeaderItem {
+  //   std::string name;
+  //   std::string value;
+  // };
 
   std::string inspect() const;
 
 public:
   int versionMajor;
   int versionMinor;
-  std::vector<HeaderItem> headers;
+  // std::vector<HeaderItem> headers;
+  std::map<std::string, std::string> headers;
   std::vector<char> content;
   bool keepAlive;
 

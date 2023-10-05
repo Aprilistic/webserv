@@ -33,5 +33,11 @@ int main(void) {
                     "Content-Length: 29\r\n"
                     "\r\n"
                     "username=test&password=1234";
-  http.httpProcess(get);
+
+  std::string response = "HTTP/1.1 200 OK\r\n"
+                         "Content-Type: text/plain\r\n"
+                         "Content-Length: 12\r\n"
+                         "\r\n"
+                         "Hello world!";
+  http.httpProcess(response);
 }
