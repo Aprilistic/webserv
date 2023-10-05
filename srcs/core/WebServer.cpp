@@ -61,10 +61,7 @@ WebServer::~WebServer(void) {
 }
 
 void WebServer::Run(void) {
-  if (!IsGood()) {
-    return;
-  }
-  Common::mRunning = true;
+  Common::mRunning = IsGood();
   eventMonitoring();
 }
 

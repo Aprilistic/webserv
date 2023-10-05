@@ -22,3 +22,38 @@ void Signal::EventHandler(struct kevent &currentEvent) {
     break;
   }
 }
+
+void Signal::RegisterSignalsWithKqueue(void) {
+	struct kevent event;
+
+	EV_SET(&event, SIGINT, EVFILT_SIGNAL, EV_ADD, 0, 0, this);
+	kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
+	EV_SET(&event, SIGTERM, EVFILT_SIGNAL, EV_ADD, 0, 0, this);
+	kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
+	EV_SET(&event, SIGQUIT, EVFILT_SIGNAL, EV_ADD, 0, 0, this);
+	kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
+}
+
+void Signal::UnregisterSignalsWithKqueue(void) {
+	struct kevent event;
+
+	EV_SET(&event, SIGINT, EVFILT_SIGNAL, EV_DELETE, 0, 0, this);
+	kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
+	EV_SET(&event, SIGTERM, EVFILT_SIGNAL, EV_DELETE, 0, 0, this);
+	kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
+	EV_SET(&event, SIGQUIT, EVFILT_SIGNAL, EV_DELETE, 0, 0, this);
+	kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
+}
+
+void Signal::signalHandler(int signal) {
+	switch (signal) {
+	case SIGINT:
+	case SIGTERM:
+	case SIGQUIT:
+		Common::mRunning = false;
+		break;
+	default:
+		assert("Signal::signalHandler: default" == 0);
+		break;
+	}
+}
