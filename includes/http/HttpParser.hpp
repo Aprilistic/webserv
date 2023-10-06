@@ -1,5 +1,5 @@
-#ifndef HTTP_HPP
-#define HTTP_HPP
+#ifndef HTTPPARSER_HPP
+#define HTTPPARSER_HPP
 
 #include "Core.hpp"
 #include "Request.hpp"
@@ -13,15 +13,8 @@ class Http {
 public:
   Http();
   ~Http();
-  int getStatus() const;
-  void receiveRequest(std::string &buf);
-  void httpProcess(std::string &buf);
 
 private:
-  Request mReq;
-  eParseResult mRes;
-  eStatustCode mStatus;
-  std::string mTemp;
 };
 
 #endif
