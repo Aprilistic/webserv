@@ -14,7 +14,10 @@ void ResponseMessage::MakeResponseMessage(Response &resp) {
 std::string ResponseMessage::getMessage() const { return mMessage; }
 
 void ResponseMessage::setStatusLine(Response &resp) {
-	mMessage += "HTTP/1.1";
+	mMessage += "HTTP/";
+	mMessage += std::to_string(resp.mVersionMajor);
+	mMessage += ".";
+	mMessage += std::to_string(resp.mVersionMinor);
 	mMessage += SP;
 	mMessage += std::to_string(resp.mStatusCode);
 	mMessage += SP;
