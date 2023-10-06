@@ -1,20 +1,20 @@
-#ifndef REQUESTPARSER_HPP
-#define REQUESTPARSER_HPP
+#ifndef RESPONSEPARSER_HPP
+#define RESPONSEPARSER_HPP
 
 #include "Enum.hpp"
-#include "Request.hpp"
-class RequestParser {
-public:
-  RequestParser();
-  ~RequestParser();
+#include "Response.hpp"
 
-  eParseResult parse(Request &req, const char *begin, const char *end);
-  std::string getRemainingBuffer(void);
+class ResponseParser {
+public:
+  ResponseParser();
+  ~ResponseParser();
+
+  eParseResult parse(Response &resp, const char *begin, const char *end);
 
 private:
-  // static bool checkIfConnection(const Request::HeaderItem &item);
+  // static bool checkIfConnection(const Response::HeaderItem &item);
   static bool checkIfConnection(const std::pair<const std::string, std::string> &item);
-  eParseResult consume(Request &req, const char *begin, const char *end);
+  eParseResult consume(Response &resp, const char *begin, const char *end);
   // Check if a byte is an HTTP character.
   inline bool isChar(int c);
   // Check if a byte is an HTTP control character.
@@ -25,10 +25,7 @@ private:
   inline bool isDigit(int c);
 
 public:
-  size_t mContentsize;
-
-private:
-  std::string mRemainingBuffer;
+  size_t mContentSize;
   std::string mChunkSizeStr;
   std::string mHeaderName;
   std::string mHeaderValue;

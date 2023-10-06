@@ -1,12 +1,12 @@
-#ifndef REQUEST_HPP
-#define REQUEST_HPP
+#ifndef RESPONSE_HPP
+#define RESPONSE_HPP
 
 #include "Core.hpp"
 
-class Request {
+class Response {
 public:
-  Request();
-  ~Request();
+  Response();
+  ~Response();
 
   // struct HeaderItem {
   //   std::string name;
@@ -16,14 +16,15 @@ public:
   std::string inspect() const;
 
 public:
-  std::string mMethod;
-  std::string mUri;
   int mVersionMajor;
   int mVersionMinor;
   // std::vector<HeaderItem> mHeaders;
   std::multimap<std::string, std::string> mHeaders;
   std::vector<char> mContent;
   bool mKeepAlive;
+
+  unsigned int mStatusCode;
+  std::string mStatus;
 };
 
 #endif
