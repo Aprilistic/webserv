@@ -1,26 +1,27 @@
 #include "Response.hpp"
 
 Response::Response()
-    : versionMajor(0), versionMinor(0), keepAlive(false), statusCode(0) {}
+    : mVersionMajor(0), mVersionMinor(0), mKeepAlive(false), mStatusCode(0) {}
 
 Response::~Response() {}
 
 std::string Response::inspect() const {
   std::stringstream stream;
-  stream << "HTTP/" << versionMajor << "." << versionMinor << " " << statusCode
-         << " " << status << "\n";
+  stream << "HTTP/" << mVersionMajor << "." << mVersionMinor << " "
+         << mStatusCode << " " << mStatus << "\n";
 
   // for (std::vector<Response::HeaderItem>::const_iterator it =
-  //          headers.begin();
-  //      it != headers.end(); ++it) {
+  //          mHeaders.begin();
+  //      it != mHeaders.end(); ++it) {
   //   stream << it->name << ": " << it->value << "\n";
   // }
-  for (std::multimap<std::string, std::string>::const_iterator it = headers.begin();
-       it != headers.end(); ++it) {
+  for (std::multimap<std::string, std::string>::const_iterator it =
+           mHeaders.begin();
+       it != mHeaders.end(); ++it) {
     stream << it->first << ": " << it->second << "\n";
   }
 
-  std::string data(content.begin(), content.end());
+  std::string data(mContent.begin(), mContent.end());
   stream << data << "\n";
   return stream.str();
 }

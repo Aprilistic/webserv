@@ -56,8 +56,8 @@ eParseResult ResponseParser::consume(Response &resp, const char *begin,
       break;
     case ResponseHttpVersion_slash:
       if (input == '/') {
-        resp.versionMajor = 0;
-        resp.versionMinor = 0;
+        resp.mVersionMajor = 0;
+        resp.mVersionMinor = 0;
         mState = ResponseHttpVersion_majorStart;
       } else {
         return ParsingError;
@@ -65,7 +65,7 @@ eParseResult ResponseParser::consume(Response &resp, const char *begin,
       break;
     case ResponseHttpVersion_majorStart:
       if (isDigit(input)) {
-        resp.versionMajor = input - '0';
+        resp.mVersionMajor = input - '0';
         mState = ResponseHttpVersion_major;
       } else {
         return ParsingError;
@@ -75,14 +75,14 @@ eParseResult ResponseParser::consume(Response &resp, const char *begin,
       if (input == '.') {
         mState = ResponseHttpVersion_minorStart;
       } else if (isDigit(input)) {
-        resp.versionMajor = resp.versionMajor * 10 + input - '0';
+        resp.mVersionMajor = resp.mVersionMajor * 10 + input - '0';
       } else {
         return ParsingError;
       }
       break;
     case ResponseHttpVersion_minorStart:
       if (isDigit(input)) {
-        resp.versionMinor = input - '0';
+        resp.mVersionMinor = input - '0';
         mState = ResponseHttpVersion_minor;
       } else {
         return ParsingError;
@@ -91,16 +91,16 @@ eParseResult ResponseParser::consume(Response &resp, const char *begin,
     case ResponseHttpVersion_minor:
       if (input == ' ') {
         mState = ResponseHttpVersion_statusCodeStart;
-        resp.statusCode = 0;
+        resp.mStatusCode = 0;
       } else if (isDigit(input)) {
-        resp.versionMinor = resp.versionMinor * 10 + input - '0';
+        resp.mVersionMinor = resp.mVersionMinor * 10 + input - '0';
       } else {
         return ParsingError;
       }
       break;
     case ResponseHttpVersion_statusCodeStart:
       if (isDigit(input)) {
-        resp.statusCode = input - '0';
+        resp.mStatusCode = input - '0';
         mState = ResponseHttpVersion_statusCode;
       } else {
         return ParsingError;
@@ -108,9 +108,9 @@ eParseResult ResponseParser::consume(Response &resp, const char *begin,
       break;
     case ResponseHttpVersion_statusCode:
       if (isDigit(input)) {
-        resp.statusCode = resp.statusCode * 10 + input - '0';
+        resp.mStatusCode = resp.mStatusCode * 10 + input - '0';
       } else {
-        if (resp.statusCode < 100 || resp.statusCode > 999) {
+        if (resp.mStatusCode < 100 || resp.mStatusCode > 999) {
           return ParsingError;
         } else if (input == ' ') {
           mState = ResponseHttpVersion_statusTextStart;
@@ -121,7 +121,7 @@ eParseResult ResponseParser::consume(Response &resp, const char *begin,
       break;
     case ResponseHttpVersion_statusTextStart:
       if (isChar(input)) {
-        resp.status += input;
+        resp.mStatus += input;
         mState = ResponseHttpVersion_statusText;
       } else {
         return ParsingError;
@@ -131,7 +131,7 @@ eParseResult ResponseParser::consume(Response &resp, const char *begin,
       if (input == '\r') {
         mState = ResponseHttpVersion_newLine;
       } else if (isChar(input)) {
-        resp.status += input;
+        resp.mStatus += input;
       } else {
         return ParsingError;
       }
@@ -146,15 +146,15 @@ eParseResult ResponseParser::consume(Response &resp, const char *begin,
     case HeaderLineStart:
       if (input == '\r') {
         mState = ExpectingNewline_3;
-      } else if (!resp.headers.empty() && (input == ' ' || input == '\t')) {
+      } else if (!resp.mHeaders.empty() && (input == ' ' || input == '\t')) {
         mState = HeaderLws;
       } else if (!isChar(input) || isControl(input) || isSpecial(input)) {
         return ParsingError;
       } else {
-        // resp.headers.push_back(Response::HeaderItem());
-        // resp.headers.back().name.reserve(16);
-        // resp.headers.back().value.reserve(16);
-        // resp.headers.back().name.push_back(input);
+        // resp.mHeaders.push_back(Response::HeaderItem());
+        // resp.mHeaders.back().name.reserve(16);
+        // resp.mHeaders.back().value.reserve(16);
+        // resp.mHeaders.back().name.push_back(input);
         mHeaderName.clear();
         mHeaderName.push_back(input);
         mState = HeaderName;
@@ -168,7 +168,7 @@ eParseResult ResponseParser::consume(Response &resp, const char *begin,
         return ParsingError;
       } else {
         mState = HeaderValue;
-        // resp.headers.back().value.push_back(input);
+        // resp.mHeaders.back().value.push_back(input);
         mHeaderValue.push_back(input);
       }
       break;
@@ -178,7 +178,7 @@ eParseResult ResponseParser::consume(Response &resp, const char *begin,
       } else if (!isChar(input) || isControl(input) || isSpecial(input)) {
         return ParsingError;
       } else {
-        // resp.headers.back().name.push_back(input);
+        // resp.mHeaders.back().name.push_back(input);
         mHeaderName.push_back(input);
       }
       break;
@@ -191,29 +191,30 @@ eParseResult ResponseParser::consume(Response &resp, const char *begin,
       break;
     case HeaderValue:
       if (input == '\r') {
-        // Response::HeaderItem &h = resp.headers.back();
+        // Response::HeaderItem &h = resp.mHeaders.back();
 
         // if (strcasecmp(h.name.c_str(), "Content-Length") == 0) {
         //   mContentSize = atoi(h.value.c_str());
-        //   resp.content.reserve(mContentSize);
+        //   resp.mContent.reserve(mContentSize);
         // } else if (strcasecmp(h.name.c_str(), "Transfer-Encoding") == 0) {
         //   if (strcasecmp(h.value.c_str(), "mChunked") == 0)
         //     mChunked = true;
         // }
         if (strcasecmp(mHeaderName.c_str(), "Content-Length") == 0) {
           mContentSize = atoi(mHeaderValue.c_str());
-          resp.content.reserve(mContentSize);
+          resp.mContent.reserve(mContentSize);
         } else if (strcasecmp(mHeaderName.c_str(), "Transfer-Encoding") == 0) {
           if (strcasecmp(mHeaderValue.c_str(), "mChunked") == 0)
             mChunked = true;
         }
-        resp.headers.insert(std::pair<std::string, std::string>(mHeaderName, mHeaderValue));
+        resp.mHeaders.insert(
+            std::pair<std::string, std::string>(mHeaderName, mHeaderValue));
         mHeaderValue.clear();
         mState = ExpectingNewline_2;
       } else if (isControl(input)) {
         return ParsingError;
       } else {
-        // resp.headers.back().value.push_back(input);
+        // resp.mHeaders.back().value.push_back(input);
         mHeaderValue.push_back(input);
       }
       break;
@@ -226,27 +227,27 @@ eParseResult ResponseParser::consume(Response &resp, const char *begin,
       break;
     case ExpectingNewline_3: {
       // std::vector<Response::HeaderItem>::iterator it = std::find_if(
-      //     resp.headers.begin(), resp.headers.end(), checkIfConnection);
+      //     resp.mHeaders.begin(), resp.mHeaders.end(), checkIfConnection);
       std::multimap<std::string, std::string>::iterator it = std::find_if(
-          resp.headers.begin(), resp.headers.end(), checkIfConnection);
+          resp.mHeaders.begin(), resp.mHeaders.end(), checkIfConnection);
 
-      if (it != resp.headers.end()) {
+      if (it != resp.mHeaders.end()) {
         // if (strcasecmp(it->value.c_str(), "Keep-Alive") == 0) {
-        //   resp.keepAlive = true;
+        //   resp.mKeepAlive = true;
         // } else // == Close
         // {
-        //   resp.keepAlive = false;
+        //   resp.mKeepAlive = false;
         // }
         if (strcasecmp(it->second.c_str(), "Keep-Alive") == 0) {
-          resp.keepAlive = true;
+          resp.mKeepAlive = true;
         } else // == Close
         {
-          resp.keepAlive = false;
+          resp.mKeepAlive = false;
         }
       } else {
-        if (resp.versionMajor > 1 ||
-            (resp.versionMajor == 1 && resp.versionMinor == 1))
-          resp.keepAlive = true;
+        if (resp.mVersionMajor > 1 ||
+            (resp.mVersionMajor == 1 && resp.mVersionMinor == 1))
+          resp.mKeepAlive = true;
       }
 
       if (mChunked) {
@@ -265,7 +266,7 @@ eParseResult ResponseParser::consume(Response &resp, const char *begin,
     }
     case Post:
       --mContentSize;
-      resp.content.push_back(input);
+      resp.mContent.push_back(input);
 
       if (mContentSize == 0) {
         return ParsingCompleted;
@@ -306,7 +307,7 @@ eParseResult ResponseParser::consume(Response &resp, const char *begin,
       if (input == '\n') {
         mChunkSize = strtol(mChunkSizeStr.c_str(), NULL, 16);
         mChunkSizeStr.clear();
-        resp.content.reserve(resp.content.size() + mChunkSize);
+        resp.mContent.reserve(resp.mContent.size() + mChunkSize);
 
         if (mChunkSize == 0)
           mState = ChunkSizeNewLine_2;
@@ -351,7 +352,7 @@ eParseResult ResponseParser::consume(Response &resp, const char *begin,
       }
       break;
     case ChunkData:
-      resp.content.push_back(input);
+      resp.mContent.push_back(input);
 
       if (--mChunkSize == 0) {
         mState = ChunkDataNewLine_1;
