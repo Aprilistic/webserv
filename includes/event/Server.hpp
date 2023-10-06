@@ -19,11 +19,11 @@ private:
 //   void makeHashMap(Node *curNode);
 //   void printHashMap(void);
   void makeLocationHashMap(Node *curNode);
-	void ReadHandler();
-	void WriteHandler();
-  void TimerHandler();
-  void SignalHandler();
 //   void deleteLocationConfigHashMap(void);
+	void readHandler();
+	void writeHandler();
+  void timerHandler();
+  void signalHandler();
 
 public:
   int mSocket;
