@@ -19,6 +19,8 @@ WebServer::WebServer(const std::string &path) : mGood(true) {
     mGood = false;
     return;
   }
+
+  mSignalInstance.RegisterSignalsWithKqueue();
 }
 
 bool WebServer::IsGood(void) const
@@ -28,6 +30,8 @@ bool WebServer::IsGood(void) const
 
 WebServer::~WebServer(void) {
   int safeExit = 1;
+
+  mSignalInstance.UnregisterSignalsWithKqueue();
 
   if (Common::mKqueue != -1) {
     close(Common::mKqueue);
@@ -57,10 +61,7 @@ WebServer::~WebServer(void) {
 }
 
 void WebServer::Run(void) {
-  if (!IsGood()) {
-    return;
-  }
-  Common::mRunning = true;
+  Common::mRunning = IsGood();
   eventMonitoring();
 }
 
