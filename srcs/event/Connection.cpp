@@ -1,13 +1,5 @@
 #include "Connection.hpp"
 
-/* test */
-#include "Request.hpp"
-#include "RequestParser.hpp"
-#include "Router.hpp"
-#include "Response.hpp"
-#include "ResponseBuilder.hpp"
-/* test */
-
 Connection::Connection(int socket)
 	: mSocket(socket)
 {
