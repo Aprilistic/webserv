@@ -41,7 +41,11 @@ void Http::httpProcess(std::string &buf) {
 
       eParseResult resParse = parser.parse(res, buf.c_str(), buf.c_str() + buf.size());
 
-      std::cout << res.inspect();
+      if (resParse == ParsingCompleted) {
+        ResponseMessage resMsg;
+        resMsg.MakeResponseMessage(res);
+        std::cout << resMsg.getMessage();
+      }
   //     break;
   //   }
   //   default:
