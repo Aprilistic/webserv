@@ -19,10 +19,10 @@ private:
 //   void makeHashMap(Node *curNode);
 //   void printHashMap(void);
   void makeLocationHashMap(Node *curNode);
-	void ReadHandler();
-	void WriteHandler();
-  void TimerHandler();
-  void SignalHandler();
+	void readHandler();
+	void writeHandler();
+  void timerHandler();
+  void signalHandler();
 //   void deleteLocationConfigHashMap(void);
 
 public:
