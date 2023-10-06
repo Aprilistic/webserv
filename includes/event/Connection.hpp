@@ -15,10 +15,10 @@ public:
   virtual void EventHandler(struct kevent &currentEvent);
 
 private:
-	void ReadHandler();
-	void WriteHandler();
-  void TimerHandler();
-  void SignalHandler();
+	void readHandler();
+	void writeHandler();
+  void timerHandler();
+  void signalHandler();
 
 private:
   int mSocket;
