@@ -14,3 +14,4 @@ int main(int argc, char **argv) {
     std::cout << "Usage: ./" << argv[0] << "[config_file]" << std::endl;
   }
   return (0);
+}
