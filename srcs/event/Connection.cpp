@@ -111,8 +111,3 @@ void Connection::SignalHandler()
 {
 	// error
 }
-
-void Connection::SignalHandler()
-{
-
-}
