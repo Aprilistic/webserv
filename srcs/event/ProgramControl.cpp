@@ -1,4 +1,4 @@
-#include "Signal.hpp"
+#include "ProgramControl.hpp"
 
 void Signal::EventHandler(struct kevent &currentEvent) {
   if (currentEvent.flags & EV_ERROR) {

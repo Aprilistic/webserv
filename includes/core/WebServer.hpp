@@ -5,7 +5,7 @@
 #include "Core.hpp"
 #include "Server.hpp"
 #include "Connection.hpp"
-#include "Signal.hpp"
+#include "ProgramControl.hpp"
 
 class WebServer {
 public:

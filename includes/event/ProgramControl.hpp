@@ -1,5 +1,5 @@
-#ifndef SIGNAL_HPP
-#define SIGNAL_HPP
+#ifndef PROGRAMCONTROL_HPP
+#define PROGRAMCONTROL_HPP
 
 #include "Core.hpp"
 #include "Common.hpp"
