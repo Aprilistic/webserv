@@ -23,7 +23,7 @@ void Signal::EventHandler(struct kevent &currentEvent) {
   }
 }
 
-void Signal::RegisterSignalsWithKqueue(void) {
+void Signal::RegisterTerminationSignals(void) {
 	struct kevent event;
 
 	EV_SET(&event, SIGINT, EVFILT_SIGNAL, EV_ADD, 0, 0, this);
@@ -34,7 +34,7 @@ void Signal::RegisterSignalsWithKqueue(void) {
 	kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
 }
 
-void Signal::UnregisterSignalsWithKqueue(void) {
+void Signal::UnregisterTerminationSignals(void) {
 	struct kevent event;
 
 	EV_SET(&event, SIGINT, EVFILT_SIGNAL, EV_DELETE, 0, 0, this);

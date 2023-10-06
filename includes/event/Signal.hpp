@@ -8,8 +8,8 @@
 class Signal : public IEventHandler {
 public:
 	virtual void EventHandler(struct kevent &currentEvent);
-	void RegisterSignalsWithKqueue(void);
-	void UnregisterSignalsWithKqueue(void);
+	void RegisterTerminationSignals(void);
+	void UnregisterTerminationSignals(void);
 
 private:
 	static void signalHandler(int signal);
