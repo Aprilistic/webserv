@@ -227,7 +227,7 @@ eParseResult ResponseParser::consume(Response &resp, const char *begin,
     case ExpectingNewline_3: {
       // std::vector<Response::HeaderItem>::iterator it = std::find_if(
       //     resp.headers.begin(), resp.headers.end(), checkIfConnection);
-      std::map<std::string, std::string>::iterator it = std::find_if(
+      std::multimap<std::string, std::string>::iterator it = std::find_if(
           resp.headers.begin(), resp.headers.end(), checkIfConnection);
 
       if (it != resp.headers.end()) {

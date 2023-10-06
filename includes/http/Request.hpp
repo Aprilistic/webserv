@@ -21,7 +21,7 @@ public:
   int mVersionMajor;
   int mVersionMinor;
   // std::vector<HeaderItem> mHeaders;
-  std::map<std::string, std::string> mHeaders;
+  std::multimap<std::string, std::string> mHeaders;
   std::vector<char> mContent;
   bool mKeepAlive;
 };

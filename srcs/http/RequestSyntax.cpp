@@ -69,7 +69,7 @@ eStatustCode RequestSyntax::headerField(Request &request) {
   //     }
   //   }
   // }
-  for (std::map<std::string, std::string>::const_iterator it = request.mHeaders.begin(); 
+  for (std::multimap<std::string, std::string>::const_iterator it = request.mHeaders.begin(); 
        it != request.mHeaders.end(); ++it) 
   {
     std::string upperName = it->first;

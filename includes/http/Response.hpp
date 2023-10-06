@@ -19,7 +19,7 @@ public:
   int versionMajor;
   int versionMinor;
   // std::vector<HeaderItem> headers;
-  std::map<std::string, std::string> headers;
+  std::multimap<std::string, std::string> headers;
   std::vector<char> content;
   bool keepAlive;
 

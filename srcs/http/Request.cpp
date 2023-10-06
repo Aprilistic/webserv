@@ -14,7 +14,7 @@ std::string Request::inspect() const {
   //      it != mHeaders.end(); ++it) {
   //   stream << it->name << ": " << it->value << "\n";
   // }
-  for (std::map<std::string, std::string>::const_iterator it = mHeaders.begin();
+  for (std::multimap<std::string, std::string>::const_iterator it = mHeaders.begin();
        it != mHeaders.end(); ++it) {
     stream << it->first << ": " << it->second << "\n";
   }
