@@ -1,13 +1,5 @@
 #include "Connection.hpp"
 
-/* test */
-#include "Request.hpp"
-#include "RequestParser.hpp"
-#include "Router.hpp"
-#include "Response.hpp"
-#include "ResponseBuilder.hpp"
-/* test */
-
 Connection::Connection(int socket)
 	: mSocket(socket)
 {
@@ -36,23 +28,24 @@ void Connection::EventHandler(struct kevent &currentEvent)
 	switch (currentEvent.filter)
 	{
 	case EVFILT_READ:
-		handleReadEvent();
+		ReadHandler();
 		break;
 	case EVFILT_WRITE:
-		handleWriteEvent();
+		WriteHandler();
 		break;
 	case EVFILT_TIMER:
-		handleTimerEvent();
+		TimerHandler();
 		break;
 	case EVFILT_SIGNAL:
-		handleSignalEvent();
+		SignalHandler();
 		break;
 	default:
+		assert("Connection::EventHandler: default" == 0);
 		break;
 	}
 }
 
-void Connection::handleReadEvent()
+void Connection::ReadHandler()
 {
 	mRecvBuffer.clear();
 	ssize_t bytesRead;
@@ -87,7 +80,7 @@ void Connection::handleReadEvent()
 	// mSendBuffer = responsBuilder.build(response);
 }
 
-void Connection::handleWriteEvent() 
+void Connection::WriteHandler() 
 {
     ssize_t bytesSent = send(mSocket, &mSendBuffer[0], mSendBuffer.size(), 0);
     
@@ -101,12 +94,12 @@ void Connection::handleWriteEvent()
     }
 }
 
-void Connection::handleTimerEvent()
+void Connection::TimerHandler()
 {
 	// error
 }
 
-void Connection::handleSignalEvent()
+void Connection::SignalHandler()
 {
-
+	// error
 }

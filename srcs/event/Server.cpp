@@ -80,23 +80,24 @@ void Server::EventHandler(struct kevent &currentEvent) {
   }
   switch (currentEvent.filter) {
   case EVFILT_READ:
-    handleReadEvent();
+    ReadHandler();
     break;
   case EVFILT_WRITE:
-    handleWriteEvent();
+    WriteHandler();
     break;
   case EVFILT_TIMER:
-    handleTimerEvent();
+    TimerHandler();
     break;
   case EVFILT_SIGNAL:
-    handleSignalEvent();
+    SignalHandler();
     break;
   default:
+    assert("Server::EventHandler: default" == 0);
     break;
   }
 }
 
-void Server::handleReadEvent()
+void Server::ReadHandler()
 {
 	int socket = accept(mSocket, NULL, NULL);
 
@@ -108,15 +109,15 @@ void Server::handleReadEvent()
 }
 
 
-void Server::handleWriteEvent()
+void Server::WriteHandler()
 {
 }
 
-void Server::handleTimerEvent()
+void Server::TimerHandler()
 {
 }
 
-void Server::handleSignalEvent()
+void Server::SignalHandler()
 {
 }
 
