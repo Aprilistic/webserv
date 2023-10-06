@@ -21,7 +21,7 @@ private:
 	bool mGood;
 	std::map<int, Server *> mServerList;
 	std::vector<struct kevent> mEventList;
-	Signal mSignalInstance;
+	ProgramControl mControlInstance;
 };
 
 #endif

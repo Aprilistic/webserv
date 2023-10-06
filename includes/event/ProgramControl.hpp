@@ -5,7 +5,7 @@
 #include "Common.hpp"
 #include "IEventHandler.hpp"
 
-class Signal : public IEventHandler {
+class ProgramControl : public IEventHandler {
 public:
 	virtual void EventHandler(struct kevent &currentEvent);
 	void RegisterTerminationSignals(void);

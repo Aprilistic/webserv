@@ -20,7 +20,7 @@ WebServer::WebServer(const std::string &path) : mGood(true) {
     return;
   }
 
-  mSignalInstance.RegisterTerminationSignals();
+  mControlInstance.RegisterTerminationSignals();
 }
 
 bool WebServer::IsGood(void) const
@@ -31,7 +31,7 @@ bool WebServer::IsGood(void) const
 WebServer::~WebServer(void) {
   int safeExit = 1;
 
-  mSignalInstance.UnregisterTerminationSignals();
+  mControlInstance.UnregisterTerminationSignals();
 
   if (Common::mKqueue != -1) {
     close(Common::mKqueue);
