@@ -24,25 +24,21 @@ void ProgramControl::EventHandler(struct kevent &currentEvent) {
 }
 
 void ProgramControl::RegisterTerminationSignals(void) {
-	struct kevent event;
+	struct kevent event[3];
 
-	EV_SET(&event, SIGINT, EVFILT_SIGNAL, EV_ADD, 0, 0, this);
-	kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
-	EV_SET(&event, SIGTERM, EVFILT_SIGNAL, EV_ADD, 0, 0, this);
-	kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
-	EV_SET(&event, SIGQUIT, EVFILT_SIGNAL, EV_ADD, 0, 0, this);
-	kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
+	EV_SET(&event[0], SIGINT, EVFILT_SIGNAL, EV_ADD, 0, 0, this);
+	EV_SET(&event[1], SIGTERM, EVFILT_SIGNAL, EV_ADD, 0, 0, this);
+	EV_SET(&event[2], SIGQUIT, EVFILT_SIGNAL, EV_ADD, 0, 0, this);
+	kevent(Common::mKqueue, event, 3, NULL, 0, NULL);
 }
 
 void ProgramControl::UnregisterTerminationSignals(void) {
-	struct kevent event;
+	struct kevent event[3];
 
-	EV_SET(&event, SIGINT, EVFILT_SIGNAL, EV_DELETE, 0, 0, this);
-	kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
-	EV_SET(&event, SIGTERM, EVFILT_SIGNAL, EV_DELETE, 0, 0, this);
-	kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
-	EV_SET(&event, SIGQUIT, EVFILT_SIGNAL, EV_DELETE, 0, 0, this);
-	kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
+	EV_SET(&event[0], SIGINT, EVFILT_SIGNAL, EV_DELETE, 0, 0, this);
+	EV_SET(&event[1], SIGTERM, EVFILT_SIGNAL, EV_DELETE, 0, 0, this);
+	EV_SET(&event[2], SIGQUIT, EVFILT_SIGNAL, EV_DELETE, 0, 0, this);
+	kevent(Common::mKqueue, event, 3, NULL, 0, NULL);
 }
 
 void ProgramControl::signalHandler(int signal) {

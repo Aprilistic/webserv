@@ -1,15 +1,12 @@
 #include "WebServer.hpp"
 #include "Config.hpp"
 
-WebServer::WebServer(const std::string &path) : mGood(true) {
+WebServer::WebServer(const std::string &path)
+	: mGood(true) 
+	, mEventList(MAX_EVENT)
+{
   Config::makeConfigTree(path);
   if (Common::mConfigTree == NULL) {
-    mGood = false;
-    return;
-  }
-
-  mServerList = Config::makeServerList(Common::mConfigTree);
-  if (mServerList.empty()) {
     mGood = false;
     return;
   }
@@ -20,7 +17,14 @@ WebServer::WebServer(const std::string &path) : mGood(true) {
     return;
   }
 
+  mServerList = Config::makeServerList(Common::mConfigTree);
+  if (mServerList.empty()) {
+    mGood = false;
+    return;
+  }
+
   mControlInstance.RegisterTerminationSignals();
+  
 }
 
 bool WebServer::IsGood(void) const
@@ -67,8 +71,9 @@ void WebServer::Run(void) {
 
 void WebServer::eventMonitoring(void) {
   while (Common::mRunning) {
+    mEventList.clear();
     int newEvent = kevent(Common::mKqueue, NULL, 0, &mEventList[0],
-                          mEventList.size(), NULL);
+                          MAX_EVENT, NULL);
 
     if (newEvent < 0 && errno == EINTR) {
       return;
