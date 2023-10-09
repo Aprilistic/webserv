@@ -15,8 +15,8 @@ public:
   virtual void EventHandler(struct kevent &currentEvent);
 
 private:
-	void readHandler();
-	void writeHandler();
+  void readHandler();
+  void writeHandler();
   void timerHandler();
   void signalHandler();
 
