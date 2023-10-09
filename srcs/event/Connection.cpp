@@ -57,11 +57,14 @@ void Connection::readHandler() {
     // // 적절한 핸들러를 통해 response 생성
     // Response response = handler->handle(request);
 
-    ResponseMessage responsMessage;
+    ResponseMessage responseMessage;
 
     // // 생성된  response를 sendBuffer에 문법에 맞게 입력
-    std::string message = responsMessage.getMessage();
+    std::string message = responseMessage.getMessage();
     mSendBuffer.assign(message.begin(), message.end());
+
+    mHttpParser.resetRequest();
+    // buffer 초기화 확인
   } else if (parserResult == ParsingIncompleted) {
     return;
   } else if (parserResult == ParsingError) {
@@ -78,6 +81,7 @@ void Connection::writeHandler() {
     }
     return;
   }
+  mHttpParser.resetResponse();
 }
 
 void Connection::timerHandler() {

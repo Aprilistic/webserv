@@ -23,4 +23,8 @@ eParseResult HttpParser::parseRequest(const std::vector<char> &buffer) {
   }
 }
 
+void HttpParser::resetRequest() { mRequest = Request(); }
+
+void HttpParser::resetResponse() { mResponse = Response(); }
+
 Request &HttpParser::getRequest() { return mRequest; }

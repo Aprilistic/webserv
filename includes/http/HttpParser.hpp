@@ -19,6 +19,8 @@ public:
   eParseResult parseRequest(const std::vector<char> &buffer);
   eParseResult parseResponse(const std::vector<char> &buffer);
 
+  void resetRequest(void);
+  void resetResponse(void);
   Request &getRequest(void);
   // Respone &getResponse(void);
 private:
