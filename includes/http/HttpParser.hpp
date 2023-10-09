@@ -2,19 +2,29 @@
 #define HTTPPARSER_HPP
 
 #include "Core.hpp"
+#include "Enum.hpp"
 #include "Request.hpp"
-#include "Response.hpp"
 #include "RequestParser.hpp"
 #include "RequestSyntax.hpp"
-#include "ResponseParser.hpp"
+#include "Response.hpp"
 #include "ResponseMessage.hpp"
+#include "ResponseParser.hpp"
+#include "Router.hpp"
 
-class Http {
+class HttpParser {
 public:
-  Http();
-  ~Http();
+  HttpParser();
+  ~HttpParser();
 
+  eParseResult parseRequest(const std::vector<char> &buffer);
+  eParseResult parseResponse(const std::vector<char> &buffer);
+
+  Request &getRequest(void);
+  // Respone &getResponse(void);
 private:
+  Request mRequest;
+  Response mResponse;
+  std::string mBuffer;
 };
 
 #endif
