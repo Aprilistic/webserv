@@ -9,7 +9,8 @@ public:
        std::vector<std::string>::iterator &tokenLocation, Node *parent, int level);
   ~Node(void);
   void PrintTree(int level);
-  
+  std::vector<std::string> FindValue(Node *current, std::string &key) const;
+
 private:
   Node();
   int getTokenInfo(std::string token);
@@ -22,9 +23,9 @@ public:
   std::map<std::string, std::vector<std::string> > mDirectives;
   std::vector<Node *> mChildren;
   int mLevel;
+  Node *mParent;
 
 private:
-  Node *mParent;
 };
 
 
