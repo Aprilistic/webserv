@@ -4,15 +4,17 @@ LDFLAGS =
 
 INCLUDES = -I ./includes \
 			-I ./includes/core \
+			-I ./includes/core/config \
 			-I ./includes/event \
 			-I ./includes/http \
 			-I ./includes/stream
 OBJ_DIR = objs
 
-SRCS := $(wildcard srcs/core/*.cpp) \
-		$(wildcard srcs/http/*.cpp) \
-		$(wildcard srcs/*.cpp) \
-		$(wildcard srcs/event/*.cpp)
+SRCS := $(wildcard srcs/**/*.cpp)
+# SRCS := $(wildcard srcs/core/*.cpp) \
+# 		$(wildcard srcs/http/*.cpp) \
+# 		$(wildcard srcs/*.cpp) \
+# 		$(wildcard srcs/event/*.cpp)
 # $(wildcard srcs/event/modules/*.cpp)
 # $(wildcard srcs/stream/*.cpp)
 SRCS_DIR := $(dir $(SRCS))
