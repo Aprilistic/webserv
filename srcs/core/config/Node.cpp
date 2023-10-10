@@ -182,3 +182,15 @@ void Node::nodeError(const std::string &msg) {
   // delete(Common::mConfigTree);
   throw std::runtime_error(msg);
 }
+
+std::vector<std::string> FindValue(Node *current, std::string &key) {
+  std::vector<std::string, std::vector<std::string> >::iterator it;
+  if (current == NULL) {
+    return std::vector<std::string>();
+  }
+
+  if (current->mDirectives.count(key) == 0) {
+    return FindValue(current->mParent, key);
+  }
+	return current->mDirectives[key];
+}
