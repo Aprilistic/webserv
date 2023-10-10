@@ -7,6 +7,8 @@
 #include "Connection.hpp"
 #include "ProgramControl.hpp"
 
+#define MAX_EVENT 1024
+
 class WebServer {
 public:
 	WebServer(const std::string &path);
@@ -21,6 +23,7 @@ private:
 	bool mGood;
 	std::map<int, Server *> mServerList;
 	std::vector<struct kevent> mEventList;
+	
 	ProgramControl mControlInstance;
 };
 

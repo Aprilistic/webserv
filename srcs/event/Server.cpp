@@ -23,8 +23,9 @@ Server::Server(Node *ServerNode)
   memset(&mAddr, 0, sizeof(mAddr));
   mAddr.sin_family = AF_INET;
   mAddr.sin_port = htons(mPort);
-  mAddr.sin_addr.s_addr = htonl(0);
 
+	mAddr.sin_addr.s_addr = htonl(0);
+	// mAddr.sin_addr.s_addr = INADDR_ANY;
   if (bind(mSocket, (struct sockaddr *)&mAddr, sizeof(mAddr)) < 0) {
     throw std::runtime_error("Error: Failed to bind the socket: " + std::string(strerror(errno)));
   }
@@ -37,7 +38,8 @@ Server::Server(Node *ServerNode)
 
   EV_SET(&events[0], mSocket, EVFILT_READ, EV_ADD | EV_CLEAR, 0, 0, this);
   EV_SET(&events[1], mSocket, EVFILT_WRITE, EV_ADD | EV_CLEAR, 0, 0, this);
-  kevent(Common::mKqueue, events, 2, NULL, 0, NULL);
+
+  kevent(Common::mKqueue, events, 4, NULL, 0, NULL);
 
 //   struct timespec *timeout = NULL; // wait indefinitely
 //   int n = kevent(mWebServer->GetKqueue(), NULL, 0, events, 1, timeout);
