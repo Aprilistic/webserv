@@ -21,6 +21,7 @@ public:
   // std::vector<HeaderItem> mHeaders;
   std::multimap<std::string, std::string> mHeaders;
   std::vector<char> mContent;
+  std::string mBody;
   bool mKeepAlive;
 
   unsigned int mStatusCode;

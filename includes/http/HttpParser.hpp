@@ -17,7 +17,7 @@ public:
   ~HttpParser();
 
   eParseResult parseRequest(const std::vector<char> &buffer);
-  eParseResult parseResponse(const std::vector<char> &buffer);
+  std::vector<char>& parseResponse(Response response);
 
   void resetRequest(void);
   void resetResponse(void);
