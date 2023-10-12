@@ -1,21 +1,25 @@
 #include "WebServer.hpp"
 #include "Config.hpp"
+#include "ConfigShortcut.hpp"
 
 WebServer::WebServer(const std::string &path)
 	: mGood(true) 
 	, mEventList(MAX_EVENT)
 {
+  Common::mKqueue = kqueue();
+  if (Common::mKqueue == -1) {
+    mGood = false;
+    return;
+  }
+
   Config::makeConfigTree(path);
   if (Common::mConfigTree == NULL) {
     mGood = false;
     return;
   }
 
-  Common::mKqueue = kqueue();
-  if (Common::mKqueue == -1) {
-    mGood = false;
-    return;
-  }
+  ConfigShortcut::makeConfigHashmap(path);
+  
 
   mServerList = Config::makeServerList(Common::mConfigTree);
   if (mServerList.empty()) {
