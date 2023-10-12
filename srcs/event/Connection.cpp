@@ -50,7 +50,7 @@ void Connection::readHandler() {
     return;
   }
   
-  if (mHttpParser.parseRequest(mRecvBuffer) == ParsingCompleted)
+  if (mHttpParser.parseRequest(mRecvBuffer) == ParsingIncompleted)
   {
 	return ;
   }
