@@ -10,7 +10,7 @@
 class Config {
 public:
   static void MakeConfigTree(const std::string &path);
-  static std::map<int, Server *> MakeServerList(Node *configTree);
+  static std::map<int, Server *> MakeServerList();
   static void MakeConfigMap();
 private:
   Config();

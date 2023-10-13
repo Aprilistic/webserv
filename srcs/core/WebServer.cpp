@@ -23,7 +23,7 @@ WebServer::WebServer(const std::string &path)
     return;
   }
 
-  mServerList = Config::MakeServerList(Common::mConfigTree);
+  mServerList = Config::MakeServerList();
   if (mServerList.empty()) {
     mGood = false;
     return;

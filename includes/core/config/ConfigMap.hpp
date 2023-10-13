@@ -12,6 +12,7 @@ public:
   ConfigMap(Node *configTree);
   Node *GetConfigNode(int port, const std::string &hostname,
                       const std::string &uri);
+  const std::vector<int> GetPorts() const;
 
 private:
   class PortMap {
@@ -22,13 +23,12 @@ private:
     Node *GetConfigNode(const std::string &hostname, const std::string &uri);
 
   private:
-    Node *searchInServerConfig(UriMap *uriConfigs,
-                               const std::string &uri);
+    Node *searchInServerConfig(UriMap *uriConfigs, const std::string &uri);
     UriMap makeUriMap(Node *serverNode);
     void addLocationNode(UriMap *uriConfigs, Node *locationNode);
 
     HostnameMap mHostnameConfigs;
-    UriMap* mDefaultServer; // pointer to default server config
+    UriMap *mDefaultServer; // pointer to default server config
     bool mbDefaultServerSet;
   };
 

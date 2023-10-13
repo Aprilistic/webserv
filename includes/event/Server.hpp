@@ -10,16 +10,16 @@ class Connection;
 
 class Server : public IEventHandler {
 public:
-  Server(Node *ServerNode);
+  Server(int port);
   ~Server();
   virtual void EventHandler(struct kevent &currentEvent);
 
 private:
   Server();
-//   void makeHashMap(Node *curNode);
-//   void printHashMap(void);
-  void makeLocationHashMap(Node *curNode);
-//   void deleteLocationConfigHashMap(void);
+  //   void makeHashMap(Node *curNode);
+  //   void printHashMap(void);
+  //   void deleteLocationConfigHashMap(void);
+  // void makeLocationHashMap(Node *curNode);
 	void readHandler();
 	void writeHandler();
   void timerHandler();
@@ -27,10 +27,10 @@ private:
 
 public:
   int mSocket;
-  std::map<std::string, Node *> mLocationHashMap;
+  // std::map<std::string, Node *> mLocationHashMap;
   std::map<int, Connection *> mConnection;
 private:
-  Node *mServerNode;  //May not need this
+  // Node *mServerNode;  //May not need this
   struct sockaddr_in mAddr;
   int mPort;
 };

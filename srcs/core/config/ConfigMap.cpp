@@ -24,8 +24,7 @@ void ConfigMap::PortMap::AddServerConfig(Node *serverNode) {
   }
   std::vector<std::string> &listenDirectives =
       serverNode->mDirectives["listen"];
-  if (std::find(listenDirectives.begin(), listenDirectives.end(),
-                "default_server") != listenDirectives.end()) {
+  if (std::find(listenDirectives.begin(), listenDirectives.end(), "default_server") != listenDirectives.end()) {
     if (mbDefaultServerSet) {
       throw std::runtime_error("Multiple default servers specified");
     }
@@ -50,7 +49,15 @@ Node* ConfigMap::PortMap::GetConfigNode(const std::string &hostname, const std::
         if (configNode != NULL) { return configNode; }
     }
 
-    return NULL;  // If no matching node is found and no default server is set
+    return NULL;  // node not found 404
+}
+
+const std::vector<int> ConfigMap::GetPorts() const {
+    std::vector<int> mPorts;
+    for (std::map<int, ConfigMap::PortMap>::const_iterator it = mPortConfigs.begin(); it != mPortConfigs.end(); ++it) {
+        mPorts.push_back(it->first);
+    }
+    return mPorts;
 }
 
 Node* ConfigMap::PortMap::searchInServerConfig(UriMap *uriConfigs, const std::string &uri) {
