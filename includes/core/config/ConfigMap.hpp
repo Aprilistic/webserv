@@ -4,30 +4,35 @@
 #include "Core.hpp"
 #include "Node.hpp"
 
-typedef std::map<std::string, Node*> UriMap;
+typedef std::map<std::string, Node *> UriMap;
 typedef std::multimap<std::string, UriMap> HostnameMap; // Allows duplicate hostnames
 
 class PortConfig {
 public:
-    PortConfig();
-    ~PortConfig();
+  PortConfig();
 
-    Node* GetConfigNode(const std::string& hostname, const std::string& uri);
-    void AddServerConfig(Node* serverNode);
-    void SetDefaultServer(void); // To set the default server for this port
+  void AddServerConfig(Node *serverNode);
+  void SetDefaultServer(void); // To set the default server for this port
+  Node *GetConfigNode(const std::string &hostname, const std::string &uri);
+
 private:
-    HostnameMap mHostnameConfigs;
-    HostnameMap::iterator mDefaultServer; // iterator pointing to default server
+  UriMap makeUriMap(Node *serverNode);
+  void addLocationNode(UriMap *uriConfigs, Node *locationNode);
+
+private:
+  HostnameMap mHostnameConfigs;
+  HostnameMap::iterator mDefaultServer; // iterator pointing to default server
 };
 
 class ConfigMap {
 public:
-    ConfigMap(Node* configTree);
+  ConfigMap(Node *configTree);
 
-    Node* GetConfigNode(int port, const std::string& hostname, const std::string& uri);
+  Node *GetConfigNode(int port, const std::string &hostname,
+                      const std::string &uri);
+
 private:
-    std::map<int, PortConfig> mPortConfigs;
+  std::map<int, PortConfig> mPortConfigs;
 };
-
 
 #endif
