@@ -15,7 +15,7 @@ void Config::MakeConfigTree(const std::string &path) {
   }
 }
 
-void MakeConfigMap()
+void Config::MakeConfigMap()
 {
   try {
     Common::mConfigMap = new ConfigMap(Common::mConfigTree);

@@ -37,6 +37,8 @@ void Connection::EventHandler(struct kevent &currentEvent) {
   }
 }
 
+#include "Node.hpp"
+
 void Connection::readHandler() {
   mRecvBuffer.clear();
   ssize_t bytesRead;
@@ -49,19 +51,26 @@ void Connection::readHandler() {
     // disconnection();
     return;
   }
-  
-  if (mHttpParser.parseRequest(mRecvBuffer) == ParsingCompleted)
-  {
-	return ;
-  }
 
-  Router router;
+  Node *test = Common::mConfigMap->GetConfigNode(80, "localhostt", "/");
 
-  IRequestHandler* handler =  router.Routing(mHttpParser.getRequest());
+  std::string str = "alias";
+  std::cout << test->FindValue(test, str)[0] << std::endl;
 
-  Response response = handler->handle(mHttpParser.getRequest());
+  std::string str1 = "client_max_body_size";
+  std::cout << test->FindValue(test, str1)[0] << std::endl;
+  // if (mHttpParser.parseRequest(mRecvBuffer) == ParsingCompleted)
+  // {
+	// return ;
+  // }
+
+  // Router router;
+
+  // IRequestHandler* handler =  router.Routing(mHttpParser.getRequest());
+
+  // Response response = handler->handle(mHttpParser.getRequest());
  
-  mSendBuffer = mHttpParser.parseResponse(response);
+  // mSendBuffer = mHttpParser.parseResponse(response);
   
 }
 

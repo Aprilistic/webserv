@@ -83,7 +83,6 @@ void Server::EventHandler(struct kevent &currentEvent) {
 void Server::readHandler()
 {
 	int socket = accept(mSocket, NULL, NULL);
-
 	if (socket == -1)
 	{
 		//error

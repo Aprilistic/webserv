@@ -24,13 +24,14 @@ void ConfigMap::PortMap::AddServerConfig(Node *serverNode) {
   }
   std::vector<std::string> &listenDirectives =
       serverNode->mDirectives["listen"];
-  if (std::find(listenDirectives.begin(), listenDirectives.end(), "default_server") != listenDirectives.end()) {
-    if (mbDefaultServerSet) {
-      throw std::runtime_error("Multiple default servers specified");
+    if (std::find(listenDirectives.begin(), listenDirectives.end(),
+                  "\"default_server\"") != listenDirectives.end()) {
+      if (mbDefaultServerSet) {
+        throw std::runtime_error("Multiple default servers specified");
+      }
+      mDefaultServer = &(insertedItem->second);
+      mbDefaultServerSet = true;
     }
-    mDefaultServer = &(insertedItem->second);
-    mbDefaultServerSet = true;
-  }
 }
 
 Node* ConfigMap::PortMap::GetConfigNode(const std::string &hostname, const std::string &uri) {
