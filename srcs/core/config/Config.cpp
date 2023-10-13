@@ -1,7 +1,7 @@
 #include "Config.hpp"
 #include "Tokenizer.hpp"
 
-void Config::makeConfigTree(const std::string &path) {
+void Config::MakeConfigTree(const std::string &path) {
 
   try {
     std::vector<std::string> configTokens = Tokenizer::makeTokens(path);
@@ -11,6 +11,16 @@ void Config::makeConfigTree(const std::string &path) {
   } catch (std::exception &e) {
     delete (Common::mConfigTree);
     Common::mConfigTree = NULL;
+    std::cerr << e.what() << std::endl;
+  }
+}
+
+void Config::MakeConfigMap()
+{
+  try {
+    Common::mConfigMap = new ConfigMap(Common::mConfigTree);
+  } catch (std::exception &e) {
+    Common::mConfigMap = NULL;
     std::cerr << e.what() << std::endl;
   }
 }
@@ -44,18 +54,13 @@ void Config::checkSum(Node *configTree) {
   }
 }
 
-std::map<int, Server *> Config::makeServerList(Node *configTree) {
+std::map<int, Server *> Config::MakeServerList() {
   std::map<int, Server *> ServerList;
   try {
-    if (!configTree->mChildren.empty()) {
-      Node *httpNode = configTree->mChildren[0];
-
-      for (std::vector<Node *>::iterator serverNode =
-               httpNode->mChildren.begin();
-           serverNode != httpNode->mChildren.end(); ++serverNode) {
-        Server *newConfig = new Server(*serverNode);
-        ServerList[newConfig->mSocket] = newConfig;
-      }
+    std::vector<int> ports = Common::mConfigMap->GetPorts();
+    for (size_t i = 0; i < ports.size(); i++) {
+      Server *newServer = new Server(ports[i]);
+      ServerList[ports[i]] = newServer;
     }
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;

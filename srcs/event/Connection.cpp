@@ -37,6 +37,8 @@ void Connection::EventHandler(struct kevent &currentEvent) {
   }
 }
 
+#include "Node.hpp"
+
 void Connection::readHandler() {
   mRecvBuffer.clear();
   ssize_t bytesRead;
@@ -50,26 +52,26 @@ void Connection::readHandler() {
     return;
   }
 
-  eParseResult parserResult = mHttpParser.parseRequest(mRecvBuffer);
-  if (parserResult == ParsingCompleted) {
-    // Router router;
-    // IEventHandler *handler = router.GetHandler(mHttpParser.getRequest());
-    // // 적절한 핸들러를 통해 response 생성
-    // Response response = handler->handle(request);
+  Node *test = Common::mConfigMap->GetConfigNode(80, "localhostt", "/");
 
-    ResponseMessage responseMessage;
+  std::string str = "alias";
+  std::cout << test->FindValue(test, str)[0] << std::endl;
 
-    // // 생성된  response를 sendBuffer에 문법에 맞게 입력
-    std::string message = responseMessage.getMessage();
-    mSendBuffer.assign(message.begin(), message.end());
+  std::string str1 = "client_max_body_size";
+  std::cout << test->FindValue(test, str1)[0] << std::endl;
+  // if (mHttpParser.parseRequest(mRecvBuffer) == ParsingCompleted)
+  // {
+	// return ;
+  // }
 
-    mHttpParser.resetRequest();
-    // buffer 초기화 확인
-  } else if (parserResult == ParsingIncompleted) {
-    return;
-  } else if (parserResult == ParsingError) {
-    // error
-  }
+  // Router router;
+
+  // IRequestHandler* handler =  router.Routing(mHttpParser.getRequest());
+
+  // Response response = handler->handle(mHttpParser.getRequest());
+ 
+  // mSendBuffer = mHttpParser.parseResponse(response);
+  
 }
 
 void Connection::writeHandler() {

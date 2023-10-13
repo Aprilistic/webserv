@@ -3,31 +3,52 @@
 
 #include "Core.hpp"
 #include "Common.hpp"
-class IRequestHandler;
+#include "IRequestHandler.hpp"
+#include "Request.hpp"
+#include "Response.hpp"
+
+// class IRequestHandler;
 class Request;
 
-// class Router
-// {
-// 	public:
-// 		Router();
-// 		~Router();
-// 		IRequestHandler* GetHandler(Request& request);
-// 	private:
-// 		std::map<std::string, IRequestHandler*> mRouteTable;
-// };
+class Router
+{
+	public:
+		Router();
+		~Router();
+		Router(const Router& other);
+		Router& operator=(const Router& other);
+		IRequestHandler* Routing(Request& request);
+	private:
+};
+
+class GetHandler : public IRequestHandler
+{
+	public:
+		virtual Response handle(Request& request);
+};
+
+class PostHandler : public IRequestHandler
+{
+	public:
+		virtual Response handle(Request& request);
+};
+
+class DeleteHandler : public IRequestHandler
+{
+	public:
+		virtual Response handle(Request& request);
+};
+
+class PutHandler : public IRequestHandler
+{
+	public:
+		virtual Response handle(Request& request);
+};
+class CgiHandler : public IRequestHandler
+{
+	public:
+		virtual Response handle(Request& request);
+};
 
 
-// /* test */
-// class StaticFileHandler : public IRequestHandler
-// {
-// 	public:
-// 		virtual Response handle(Request& request);
-// };
-
-// class CgiHandler : public IRequestHandler
-// {
-// 	public:
-// 		virtual Response handle(Request& request);
-// };
-/* test */
 #endif

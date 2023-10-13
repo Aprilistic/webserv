@@ -5,19 +5,25 @@ WebServer::WebServer(const std::string &path)
 	: mGood(true) 
 	, mEventList(MAX_EVENT)
 {
-  Config::makeConfigTree(path);
-  if (Common::mConfigTree == NULL) {
-    mGood = false;
-    return;
-  }
-
   Common::mKqueue = kqueue();
   if (Common::mKqueue == -1) {
     mGood = false;
     return;
   }
 
-  mServerList = Config::makeServerList(Common::mConfigTree);
+  Config::MakeConfigTree(path);
+  if (Common::mConfigTree == NULL) {
+    mGood = false;
+    return;
+  }
+
+  Config::MakeConfigMap();
+  if (Common::mConfigMap == NULL) {
+    mGood = false;
+    return;
+  }
+
+  mServerList = Config::MakeServerList();
   if (mServerList.empty()) {
     mGood = false;
     return;
@@ -55,6 +61,12 @@ WebServer::~WebServer(void) {
 
   if (Common::mConfigTree) {
     delete (Common::mConfigTree);
+  } else {
+    safeExit = 0;
+  }
+
+  if (Common::mConfigMap) {
+    delete (Common::mConfigMap);
   } else {
     safeExit = 0;
   }

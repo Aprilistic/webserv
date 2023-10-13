@@ -5,12 +5,8 @@
 #include "Connection.hpp"
 #include "WebServer.hpp"
 
-Server::Server(Node *ServerNode)
-    : mServerNode(ServerNode) {
-
-  makeLocationHashMap(ServerNode);
-
-  // printHashMap();
+Server::Server(int port)
+    : mPort(port) {
 
   mSocket = socket(AF_INET, SOCK_STREAM, 0);
   if (mSocket < 0) {
@@ -61,21 +57,6 @@ Server::~Server() {
   close(mSocket);
 }
 
-void Server::makeLocationHashMap(Node *curNode) {
-  if (curNode->mLevel & SERVER_LEVEL) {
-    assert(curNode->mChildren.size());
-  } else if (curNode->mLevel & LOCATION_LEVEL) {
-    std::pair<std::string, Node *> LocDict =
-        std::make_pair(curNode->mDirectives["location"][0], curNode);
-    mLocationHashMap.insert(LocDict);
-  }
-
-  for (std::vector<Node *>::iterator it = curNode->mChildren.begin();
-       it != curNode->mChildren.end(); ++it) {
-    makeLocationHashMap(*it);
-  }
-}
-
 void Server::EventHandler(struct kevent &currentEvent) {
   if (currentEvent.flags & EV_ERROR) {
     // error
@@ -102,7 +83,6 @@ void Server::EventHandler(struct kevent &currentEvent) {
 void Server::readHandler()
 {
 	int socket = accept(mSocket, NULL, NULL);
-
 	if (socket == -1)
 	{
 		//error
@@ -122,12 +102,3 @@ void Server::timerHandler()
 void Server::signalHandler()
 {
 }
-
-// void Server::printHashMap() {
-//   std::cout << "Location HashMap" << std::endl;
-//   std::map<std::string, Node *>::iterator it;
-//   for (it = mLocationHashMap.begin(); it != mLocationHashMap.end(); ++it) {
-//     std::cout << "Key: " << it->first << ", Node Address: " << it->second
-//               << std::endl;
-//   }
-// }

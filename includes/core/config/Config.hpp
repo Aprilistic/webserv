@@ -3,18 +3,18 @@
 
 #include "Server.hpp"
 #include "Node.hpp"
+#include "ConfigMap.hpp"
 #include "Common.hpp"
 
 // class Node;
 class Config {
 public:
-  static void makeConfigTree(const std::string &path);
-  static std::map<int, Server *> makeServerList(Node *configTree);
-
+  static void MakeConfigTree(const std::string &path);
+  static std::map<int, Server *> MakeServerList();
+  static void MakeConfigMap();
 private:
   Config();
   static void checkSum(Node *configTree);
-
   static void checkErrorPage(std::vector<std::string> &value);
   static void checkConnectionMaxBodySize(std::vector<std::string> &value);
   static void checkIndex(std::vector<std::string> &value);

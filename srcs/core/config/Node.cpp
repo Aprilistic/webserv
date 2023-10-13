@@ -183,8 +183,7 @@ void Node::nodeError(const std::string &msg) {
   throw std::runtime_error(msg);
 }
 
-std::vector<std::string> FindValue(Node *current, std::string &key) {
-  std::vector<std::string, std::vector<std::string> >::iterator it;
+std::vector<std::string> Node::FindValue(Node *current, std::string key) {
   if (current == NULL) {
     return std::vector<std::string>();
   }
