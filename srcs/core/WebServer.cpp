@@ -1,6 +1,5 @@
 #include "WebServer.hpp"
 #include "Config.hpp"
-#include "ConfigShortcut.hpp"
 
 WebServer::WebServer(const std::string &path)
 	: mGood(true) 
@@ -12,16 +11,19 @@ WebServer::WebServer(const std::string &path)
     return;
   }
 
-  Config::makeConfigTree(path);
+  Config::MakeConfigTree(path);
   if (Common::mConfigTree == NULL) {
     mGood = false;
     return;
   }
 
-  ConfigShortcut::makeConfigHashmap(path);
-  
+  Config::MakeConfigMap();
+  if (Common::mConfigMap == NULL) {
+    mGood = false;
+    return;
+  }
 
-  mServerList = Config::makeServerList(Common::mConfigTree);
+  mServerList = Config::MakeServerList(Common::mConfigTree);
   if (mServerList.empty()) {
     mGood = false;
     return;
@@ -59,6 +61,12 @@ WebServer::~WebServer(void) {
 
   if (Common::mConfigTree) {
     delete (Common::mConfigTree);
+  } else {
+    safeExit = 0;
+  }
+
+  if (Common::mConfigMap) {
+    delete (Common::mConfigMap);
   } else {
     safeExit = 0;
   }

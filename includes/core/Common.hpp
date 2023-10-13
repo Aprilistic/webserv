@@ -3,17 +3,14 @@
 
 #include "Core.hpp"
 #include "Node.hpp"
+#include "ConfigMap.hpp"
 
 class Common {
 public:
-    // Nested map definitions for clarity.
-    class UriMap : public std::map<std::string, std::string> {};
-    class HostnameMap : public std::map<std::string, UriMap> {};
-
     static int mKqueue;                         // Description for mKqueue
     static bool mRunning;                       // Description for mRunning
     static Node *mConfigTree;                   // Root node for some configuration tree (assuming from the name)
-    static HostnameMap complex_map;               // A complex map with described structure
+    static ConfigMap *mConfigMap;               // A complex map with described structure
 
     // ... other members and methods ...
 };
