@@ -5,13 +5,13 @@
 #include "Connection.hpp"
 #include "WebServer.hpp"
 
-Server::Server(int port)
-    : mPort(port) {
+Server::Server(int port) : mPort(port) {
 
   mSocket = socket(AF_INET, SOCK_STREAM, 0);
   if (mSocket < 0) {
-    //FD limit exceededw
-    throw std::runtime_error("Error: socket() creation failed: " + std::string(strerror(errno)));
+    // FD limit exceededw
+    throw std::runtime_error("Error: socket() creation failed: " +
+                             std::string(strerror(errno)));
   }
 
   fcntl(mSocket, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
@@ -20,14 +20,24 @@ Server::Server(int port)
   mAddr.sin_family = AF_INET;
   mAddr.sin_port = htons(mPort);
 
-	mAddr.sin_addr.s_addr = htonl(0);
-	// mAddr.sin_addr.s_addr = INADDR_ANY;
+  mAddr.sin_addr.s_addr = htonl(0);
+  // mAddr.sin_addr.s_addr = INADDR_ANY;
+
+  int optval = 1;
+  if (setsockopt(mSocket, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval)) <
+      0) {
+    throw std::runtime_error("Error: Failed to set socket option: " +
+                             std::string(strerror(errno)));
+  }
+
   if (bind(mSocket, (struct sockaddr *)&mAddr, sizeof(mAddr)) < 0) {
-    throw std::runtime_error("Error: Failed to bind the socket: " + std::string(strerror(errno)));
+    throw std::runtime_error("Error: Failed to bind the socket: " +
+                             std::string(strerror(errno)));
   }
 
   if (listen(mSocket, SOMAXCONN /* backlog size*/) < 0) {
-    throw std::runtime_error("Error: Failed to listen on the socket: " + std::string(strerror(errno)));
+    throw std::runtime_error("Error: Failed to listen on the socket: " +
+                             std::string(strerror(errno)));
   }
 
   struct kevent events[2];
@@ -37,8 +47,8 @@ Server::Server(int port)
 
   kevent(Common::mKqueue, events, 4, NULL, 0, NULL);
 
-//   struct timespec *timeout = NULL; // wait indefinitely
-//   int n = kevent(mWebServer->GetKqueue(), NULL, 0, events, 1, timeout);
+  //   struct timespec *timeout = NULL; // wait indefinitely
+  //   int n = kevent(mWebServer->GetKqueue(), NULL, 0, events, 1, timeout);
 }
 
 Server::~Server() {
@@ -80,25 +90,16 @@ void Server::EventHandler(struct kevent &currentEvent) {
   }
 }
 
-void Server::readHandler()
-{
-	int socket = accept(mSocket, NULL, NULL);
-	if (socket == -1)
-	{
-		//error
-	}
-	mConnection[socket] = new Connection(socket);
+void Server::readHandler() {
+  int socket = accept(mSocket, NULL, NULL);
+  if (socket == -1) {
+    // error
+  }
+  mConnection[socket] = new Connection(socket);
 }
 
+void Server::writeHandler() {}
 
-void Server::writeHandler()
-{
-}
+void Server::timerHandler() {}
 
-void Server::timerHandler()
-{
-}
-
-void Server::signalHandler()
-{
-}
+void Server::signalHandler() {}
