@@ -51,6 +51,11 @@ void Connection::readHandler() {
     // disconnection();
     return;
   }
+  
+  if (mHttpParser.parseRequest(mRecvBuffer) == ParsingIncompleted)
+  {
+	return ;
+  }
 
   Node *test = Common::mConfigMap->GetConfigNode(80, "localhostt", "/");
 

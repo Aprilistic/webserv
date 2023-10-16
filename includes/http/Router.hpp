@@ -17,7 +17,9 @@ class Router
 		~Router();
 		Router(const Router& other);
 		Router& operator=(const Router& other);
+		
 		IRequestHandler* Routing(Request& request);
+		bool IsCgiRequest(Request& request);
 	private:
 };
 
