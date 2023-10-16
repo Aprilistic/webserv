@@ -24,48 +24,56 @@ void ConfigMap::PortMap::AddServerConfig(Node *serverNode) {
   }
   std::vector<std::string> &listenDirectives =
       serverNode->mDirectives["listen"];
-    if (std::find(listenDirectives.begin(), listenDirectives.end(),
-                  "default_server") != listenDirectives.end()) {
-      if (mbDefaultServerSet) {
-        throw std::runtime_error("Multiple default servers specified");
-      }
-      mDefaultServer = &(insertedItem->second);
-      mbDefaultServerSet = true;
+  if (std::find(listenDirectives.begin(), listenDirectives.end(),
+                "default_server") != listenDirectives.end()) {
+    if (mbDefaultServerSet) {
+      throw std::runtime_error("Multiple default servers specified");
     }
+    mDefaultServer = &(insertedItem->second);
+    mbDefaultServerSet = true;
+  }
 }
 
-Node* ConfigMap::PortMap::GetConfigNode(const std::string &hostname, const std::string &uri) {
-    Node *configNode = NULL;
-    
-    // Search URI in hostname config
-    HostnameMap::iterator it = mHostnameConfigs.find(hostname);
-    if (it != mHostnameConfigs.end()) {
-        configNode = searchInServerConfig(&(it->second), uri);
-        if (configNode != NULL) { return configNode; }
-    }
+Node *ConfigMap::PortMap::GetConfigNode(const std::string &hostname,
+                                        const std::string &uri) {
+  Node *configNode = NULL;
 
-    // If not found, search URI in default server config
-    if (&(it->second) != mDefaultServer) {
-        configNode = searchInServerConfig(mDefaultServer, uri);
-        if (configNode != NULL) { return configNode; }
+  // Search URI in hostname config
+  HostnameMap::iterator it = mHostnameConfigs.find(hostname);
+  if (it != mHostnameConfigs.end()) {
+    configNode = searchInServerConfig(&(it->second), uri);
+    if (configNode != NULL) {
+      return configNode;
     }
+  }
 
-    return NULL;  // node not found 404
+  // If not found, search URI in default server config
+  if (&(it->second) != mDefaultServer) {
+    configNode = searchInServerConfig(mDefaultServer, uri);
+    if (configNode != NULL) {
+      return configNode;
+    }
+  }
+
+  return NULL; // node not found 404
 }
 
 const std::vector<int> ConfigMap::GetPorts() const {
-    std::vector<int> mPorts;
-    for (std::map<int, ConfigMap::PortMap>::const_iterator it = mPortConfigs.begin(); it != mPortConfigs.end(); ++it) {
-        mPorts.push_back(it->first);
-    }
-    return mPorts;
+  std::vector<int> mPorts;
+  for (std::map<int, ConfigMap::PortMap>::const_iterator it =
+           mPortConfigs.begin();
+       it != mPortConfigs.end(); ++it) {
+    mPorts.push_back(it->first);
+  }
+  return mPorts;
 }
 
-Node* ConfigMap::PortMap::searchInServerConfig(UriMap *uriConfigs, const std::string &uri) {
-    if (uriConfigs->find(uri) != uriConfigs->end()) {
-        return (*uriConfigs)[uri];
-    }
-    return NULL;
+Node *ConfigMap::PortMap::searchInServerConfig(UriMap *uriConfigs,
+                                               const std::string &uri) {
+  if (uriConfigs->find(uri) != uriConfigs->end()) {
+    return (*uriConfigs)[uri];
+  }
+  return NULL;
 }
 
 ConfigMap::UriMap ConfigMap::PortMap::makeUriMap(Node *serverNode) {

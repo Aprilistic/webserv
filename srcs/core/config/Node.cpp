@@ -32,7 +32,8 @@
 /* { } ; */
 
 Node::Node(std::vector<std::string> &configTokens,
-           std::vector<std::string>::iterator &tokenLocation, Node *parent, int level)
+           std::vector<std::string>::iterator &tokenLocation, Node *parent,
+           int level)
     : mParent(parent), mLevel(level) {
   int tokenInfo;
 
@@ -191,5 +192,21 @@ std::vector<std::string> Node::FindValue(Node *current, std::string key) {
   if (current->mDirectives.count(key) == 0) {
     return FindValue(current->mParent, key);
   }
-	return current->mDirectives[key];
+  return current->mDirectives[key];
+}
+
+std::vector<std::string> Node::FindTopValue(Node *current, std::string key,
+                                            std::vector<std::string> value) {
+  if (current == NULL) {
+    if (value.size() == 0) {
+      return std::vector<std::string>();
+    } else {
+      return value;
+    }
+  }
+
+  if (current->mDirectives.count(key) != 0) {
+    value = current->mDirectives[key];
+  }
+  return FindTopValue(current->mParent, key, value);
 }
