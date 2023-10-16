@@ -25,7 +25,7 @@ void ConfigMap::PortMap::AddServerConfig(Node *serverNode) {
   std::vector<std::string> &listenDirectives =
       serverNode->mDirectives["listen"];
     if (std::find(listenDirectives.begin(), listenDirectives.end(),
-                  "\"default_server\"") != listenDirectives.end()) {
+                  "default_server") != listenDirectives.end()) {
       if (mbDefaultServerSet) {
         throw std::runtime_error("Multiple default servers specified");
       }
