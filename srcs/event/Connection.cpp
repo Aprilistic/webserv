@@ -1,6 +1,9 @@
 #include "Connection.hpp"
 
-Connection::Connection(int socket) : mSocket(socket) {
+Connection::Connection(int socket, int port)
+: mSocket(socket)
+, mPort(port)
+{
   struct kevent events[2];
 
   mRecvBuffer.reserve(RECV_BUFFER_SIZE);
@@ -70,15 +73,15 @@ void Connection::readHandler() {
   }
   // 포트가 같은데 둘 다 이름이 없는 경우 localhost로 접근할 때,
   // default_server로 안 가는 문제
-  Node *test = Common::mConfigMap->GetConfigNode(4242, "test", "/");
+  // Node *test = Common::mConfigMap->GetConfigNode(mPort, "test", "/");
 
-  std::string str = "alias";
-  std::cout << test->FindValue(test, str)[0] << std::endl;
+  // std::string str = "alias";
+  // std::cout << test->FindValue(test, str)[0] << std::endl;
 
-  std::string str1 = "client_max_body_size";
-  std::cout << test->FindValue(test, str1)[0] << std::endl;
+  // std::string str1 = "client_max_body_size";
+  // std::cout << test->FindValue(test, str1)[0] << std::endl;
 
-  Node *location = Common::mConfigMap->GetConfigNode(4242, "", "/");
+  Node *location = Common::mConfigMap->GetConfigNode(mPort, "", "/");
 
   // client_max_bidy_size
   std::string cmbs = "client_max_body_size";
@@ -98,7 +101,6 @@ void Connection::readHandler() {
     }
   }
 
-  std::cout << location->FindValue(test, str1)[0] << std::endl;
 
   // return
   int retValue;
@@ -134,6 +136,19 @@ void Connection::readHandler() {
     }
   }
 
+  // 
+  std::multimap<std::string, std::string>::iterator it;
+  it = mHttpParser.getRequest().mHeaders.find("Host");
+
+  if (it == mHttpParser.getRequest().mHeaders.end())
+  {
+	// CLIENT_ERROR_BAD_REQUEST 400 error
+  }
+
+  std::string hostName = it->second;
+  Node *location = Common::mConfigMap->GetConfigNode(mPort, hostName, mHttpParser.getRequest().mUri);
+
+  
   // Router router;
 
   // IRequestHandler* handler =  router.Routing(mHttpParser.getRequest());
@@ -148,7 +163,7 @@ void Connection::writeHandler() {
 
   if (bytesSent <= 0) {
     if (bytesSent < 0) {
-      // error
+      // error 
     }
     return;
   }

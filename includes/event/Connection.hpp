@@ -11,7 +11,7 @@
 
 class Connection : public IEventHandler {
 public:
-  Connection(int socket);
+  Connection(int socket, int port);
   ~Connection();
   virtual void EventHandler(struct kevent &currentEvent);
 
@@ -23,6 +23,7 @@ private:
 
 private:
   int mSocket;
+  int mPort;
   HttpParser mHttpParser;
   std::vector<char> mRecvBuffer;
   std::vector<char> mSendBuffer;

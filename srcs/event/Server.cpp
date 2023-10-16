@@ -95,7 +95,7 @@ void Server::readHandler() {
   if (socket == -1) {
     // error
   }
-  mConnection[socket] = new Connection(socket);
+  mConnection[socket] = new Connection(socket, mPort);
 }
 
 void Server::writeHandler() {}
