@@ -42,9 +42,11 @@ void Connection::EventHandler(struct kevent &currentEvent) {
 void Connection::readHandler() {
   mRecvBuffer.clear();
   ssize_t bytesRead;
-  bytesRead = recv(mSocket, &mRecvBuffer[0], RECV_BUFFER_SIZE, 0);
+  char tmp[RECV_BUFFER_SIZE];
+  bytesRead = recv(mSocket, tmp, RECV_BUFFER_SIZE, 0);
+  mRecvBuffer.insert(mRecvBuffer.end(), tmp, tmp + bytesRead);
 
-  std::cout << bytesRead << std::endl;
+  // std::cout << "bytesRead: " << bytesRead << std::endl;
   if (bytesRead <= 0) {
     if (bytesRead < 0) {
       // error
@@ -53,18 +55,7 @@ void Connection::readHandler() {
     return;
   }
 
-  // if (mHttp.parseRequest(mRecvBuffer) == ParsingIncompleted) {
-  //   return;
-  // }
-  // std::string string = "GET / HTTP/1.1\r\n"
-  //                      "Host: localhost:4242\r\n"
-  //                      "User-Agent: curl/7.64.1\r\n"
-  //                      "Accept: */*\r\n\r\n";
-
-  // std::vector<char> wow;
-  // wow = std::vector<char>(string.begin(), string.end());
-  // std::cout << "this: " << mHttp.parseRequest(mRecvBuffer) <<
-  // std::endl;
+  std::cout << "this: " << mHttp.parseRequest(mRecvBuffer) << std::endl;
 
   if (mHttp.parseRequest(mRecvBuffer) == ParsingIncompleted) {
     return;
@@ -141,9 +132,8 @@ void Connection::readHandler() {
     // CLIENT_ERROR_BAD_REQUEST 400 error
   }
 
-  std::string hostName = it->second;
-  Node *location2 = Common::mConfigMap->GetConfigNode(mPort, hostName,
-                                                      mHttp.getRequest().mUri);
+  // std::string hostName = it->second;
+  // Node *location = Common::mConfigMap->GetConfigNode(mPort, hostName, mHttpParser.getRequest().mUri);
 
   // Router router;
 
