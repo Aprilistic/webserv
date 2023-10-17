@@ -1,10 +1,10 @@
-#include "HttpParser.hpp"
+#include "Http.hpp"
 
-HttpParser::HttpParser() {}
+Http::Http() {}
 
-HttpParser::~HttpParser() {}
+Http::~Http() {}
 
-eStatusCode HttpParser::parseRequest(const std::vector<char> &buffer) {
+eStatusCode Http::parseRequest(const std::vector<char> &buffer) {
 
   std::string tmp(buffer.begin(), buffer.end());
   mBuffer += tmp;
@@ -23,12 +23,12 @@ eStatusCode HttpParser::parseRequest(const std::vector<char> &buffer) {
   }
 }
 
-// std::vector<char>& HttpParser::parseResponse(Response response)
+// std::vector<char>& Http::parseResponse(Response response)
 // {
 // }
 
-void HttpParser::resetRequest() { mRequest = Request(); }
+void Http::resetRequest() { mRequest = Request(); }
 
-void HttpParser::resetResponse() { mResponse = Response(); }
+void Http::resetResponse() { mResponse = Response(); }
 
-Request &HttpParser::getRequest() { return mRequest; }
+Request &Http::getRequest() { return mRequest; }

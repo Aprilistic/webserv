@@ -1,5 +1,5 @@
-#ifndef HTTPPARSER_HPP
-#define HTTPPARSER_HPP
+#ifndef HTTP_HPP
+#define HTTP_HPP
 
 #include "Core.hpp"
 #include "Enum.hpp"
@@ -11,10 +11,10 @@
 #include "ResponseParser.hpp"
 #include "Router.hpp"
 
-class HttpParser {
+class Http {
 public:
-  HttpParser();
-  ~HttpParser();
+  Http();
+  ~Http();
 
   eStatusCode parseRequest(const std::vector<char> &buffer);
   std::vector<char> &parseResponse(Response response);
