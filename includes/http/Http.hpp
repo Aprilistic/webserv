@@ -23,10 +23,14 @@ public:
 //   std::vector<char> &parseResponse(Response response);
 
   void ErrorResponse(int port, eStatusCode errorStatus);
+  bool CheckRedirect(int port);
+  bool checkClientMaxBodySize(int port);
+  bool CheckLimitExcept(int port);
+
   void resetRequest(void);
   void resetResponse(void);
   Request &getRequest(void);
-  // Respone &getResponse(void);
+  Response &getResponse(void);
 private:
   Request mRequest;
   Response mResponse;

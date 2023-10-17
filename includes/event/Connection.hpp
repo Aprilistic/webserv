@@ -14,7 +14,7 @@ public:
   Connection(int socket, int port);
   ~Connection();
   virtual void EventHandler(struct kevent &currentEvent);
-//   void ErrorResponse(eStatusCode errorStatus);
+
 private:
   void readHandler();
   void writeHandler();

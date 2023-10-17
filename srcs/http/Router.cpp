@@ -46,48 +46,54 @@ bool Router::IsCgiRequest(Http &request) {
 }
 
 // ex
-Response GetHandler::handle(Http& http) {
-  Response res;
-  res.mStatusCode = 200;
+eStatusCode GetHandler::handle(int port, Http& http) {
+  eStatusCode res;
+  http.getResponse().mStatusCode = 200;
+  http.getResponse().mBody = "GET request received for URI: " + http.getRequest().mUri;
+  std::cout << http.getResponse().mStatusCode << std::endl;
+  std::cout << http.getResponse().mBody << std::endl;
 
-  res.mBody = "GET request received for URI: " + http.getRequest().mUri;
 
-  std::cout << res.mBody << std::endl;
+  Node* location = Common::mConfigMap->GetConfigNode(port, http.getRequest().mHost, http.getRequest().mUri);
+
+  (void)location;
+  // after logic
   return res;
 }
 
-Response PostHandler::handle(Http& http) {
-  Response res;
-  res.mStatusCode = 201;
+eStatusCode PostHandler::handle(int port, Http& http) {
+  eStatusCode res;
+  http.getResponse().mStatusCode = 201;
 
-  res.mBody = "POST request received with content: " +
+  http.getResponse().mBody = "POST request received with content: " +
               std::string(http.getRequest().mContent.begin(), http.getRequest().mContent.end());
 
   return res;
 }
 
-Response DeleteHandler::handle(Http& http) {
-  Response res;
-  res.mStatusCode = 200;
+eStatusCode DeleteHandler::handle(int port, Http& http) {
+  eStatusCode res;
+  http.getResponse().mStatusCode = 200;
 
-  res.mBody = "DELETE request received for URI: " + http.getRequest().mUri;
+  http.getResponse().mBody = "DELETE request received for URI: " + http.getRequest().mUri;
 
   return res;
 }
 
-Response PutHandler::handle(Http& http) {
-  Response res;
-  res.mStatusCode = 200;
+eStatusCode PutHandler::handle(int port, Http& http) {
+  eStatusCode res;
+  http.getResponse().mStatusCode = 200;
 
-  res.mBody = "PUT request received with content: " +
+  http.getResponse().mBody = "PUT request received with content: " +
               std::string(http.getRequest().mContent.begin(),http.getRequest().mContent.end());
 
   return res;
 }
 
-Response CgiHandler::handle(Http& http) {
-  Response res;
+eStatusCode CgiHandler::handle(int port, Http& http) {
+  eStatusCode res;
 
+  res = CLIENT_ERROR_BAD_REQUEST;
   if (http.getRequest().mMethod == "GET") {
 
   } else if (http.getRequest().mMethod == "POST") {

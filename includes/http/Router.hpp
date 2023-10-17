@@ -25,30 +25,30 @@ class Router
 class GetHandler : public IRequestHandler
 {
 	public:
-		virtual Response handle(Http& http);
+		virtual eStatusCode handle(int port, Http& http);
 };
 
 class PostHandler : public IRequestHandler
 {
 	public:
-		virtual Response handle(Http& http);
+		virtual eStatusCode handle(int port, Http& http);
 };
 
 class DeleteHandler : public IRequestHandler
 {
 	public:
-		virtual Response handle(Http& http);
+		virtual eStatusCode handle(int port, Http& http);
 };
 
 class PutHandler : public IRequestHandler
 {
 	public:
-		virtual Response handle(Http& http);
+		virtual eStatusCode handle(int port, Http& http);
 };
 class CgiHandler : public IRequestHandler
 {
 	public:
-		virtual Response handle(Http& http);
+		virtual eStatusCode handle(int port, Http& http);
 };
 
 
