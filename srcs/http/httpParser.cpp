@@ -4,13 +4,13 @@ HttpParser::HttpParser() {}
 
 HttpParser::~HttpParser() {}
 
-eParseResult HttpParser::parseRequest(const std::vector<char> &buffer) {
+eStatusCode HttpParser::parseRequest(const std::vector<char> &buffer) {
 
   std::string tmp(buffer.begin(), buffer.end());
   mBuffer += tmp;
 
   RequestParser parser;
-  eParseResult result =
+  eStatusCode result =
       parser.parse(mRequest, mBuffer.c_str(), mBuffer.c_str() + mBuffer.size());
 
   if (result == ParsingIncompleted) {
@@ -19,7 +19,7 @@ eParseResult HttpParser::parseRequest(const std::vector<char> &buffer) {
     mBuffer = parser.getRemainingBuffer();
     return ParsingCompleted;
   } else {
-    return ParsingError;
+    return CLIENT_ERROR_BAD_REQUEST;
   }
 }
 

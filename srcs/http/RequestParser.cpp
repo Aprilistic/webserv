@@ -6,8 +6,8 @@ RequestParser::RequestParser()
 
 RequestParser::~RequestParser() {}
 
-eParseResult RequestParser::parse(Request &req, const char *begin,
-                                  const char *end) {
+eStatusCode RequestParser::parse(Request &req, const char *begin,
+                                 const char *end) {
   return consume(req, begin, end);
 }
 
@@ -20,8 +20,8 @@ bool RequestParser::checkIfConnection(
   return (item.first == "Connection");
 }
 
-eParseResult RequestParser::consume(Request &req, const char *begin,
-                                    const char *end) {
+eStatusCode RequestParser::consume(Request &req, const char *begin,
+                                   const char *end) {
   while (begin != end) {
     char input = *begin++;
 
@@ -32,7 +32,7 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
     switch (mState) {
     case RequestMethodStart:
       if (!isChar(input) || isControl(input) || isSpecial(input)) {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       } else {
         mState = RequestMethod;
         req.mMethod.push_back(input);
@@ -42,14 +42,14 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
       if (input == ' ') {
         mState = RequestUriStart;
       } else if (!isChar(input) || isControl(input) || isSpecial(input)) {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       } else {
         req.mMethod.push_back(input);
       }
       break;
     case RequestUriStart:
       if (isControl(input)) {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       } else {
         mState = RequestUri;
         req.mUri.push_back(input);
@@ -64,7 +64,7 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
 
         return ParsingCompleted;
       } else if (isControl(input)) {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       } else {
         req.mUri.push_back(input);
       }
@@ -73,28 +73,28 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
       if (input == 'H') {
         mState = RequestHttpVersion_ht;
       } else {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       }
       break;
     case RequestHttpVersion_ht:
       if (input == 'T') {
         mState = RequestHttpVersion_htt;
       } else {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       }
       break;
     case RequestHttpVersion_htt:
       if (input == 'T') {
         mState = RequestHttpVersion_http;
       } else {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       }
       break;
     case RequestHttpVersion_http:
       if (input == 'P') {
         mState = RequestHttpVersion_slash;
       } else {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       }
       break;
     case RequestHttpVersion_slash:
@@ -103,7 +103,7 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
         req.mVersionMinor = 0;
         mState = RequestHttpVersion_majorStart;
       } else {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       }
       break;
     case RequestHttpVersion_majorStart:
@@ -111,7 +111,7 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
         req.mVersionMajor = input - '0';
         mState = RequestHttpVersion_major;
       } else {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       }
       break;
     case RequestHttpVersion_major:
@@ -120,7 +120,7 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
       } else if (isDigit(input)) {
         req.mVersionMajor = req.mVersionMajor * 10 + input - '0';
       } else {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       }
       break;
     case RequestHttpVersion_minorStart:
@@ -128,7 +128,7 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
         req.mVersionMinor = input - '0';
         mState = RequestHttpVersion_minor;
       } else {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       }
       break;
     case RequestHttpVersion_minor:
@@ -137,14 +137,14 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
       } else if (isDigit(input)) {
         req.mVersionMinor = req.mVersionMinor * 10 + input - '0';
       } else {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       }
       break;
     case ResponseHttpVersion_newLine:
       if (input == '\n') {
         mState = HeaderLineStart;
       } else {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       }
       break;
     case HeaderLineStart:
@@ -153,7 +153,7 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
       } else if (!req.mHeaders.empty() && (input == ' ' || input == '\t')) {
         mState = HeaderLws;
       } else if (!isChar(input) || isControl(input) || isSpecial(input)) {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       } else {
         // req.mHeaders.push_back(Request::HeaderItem());
         // req.mHeaders.back().name.reserve(16);
@@ -169,7 +169,7 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
         mState = ExpectingNewline_2;
       } else if (input == ' ' || input == '\t') {
       } else if (isControl(input)) {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       } else {
         mState = HeaderValue;
         // req.mHeaders.back().value.push_back(input);
@@ -180,7 +180,7 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
       if (input == ':') {
         mState = SpaceBeforeHeaderValue;
       } else if (!isChar(input) || isControl(input) || isSpecial(input)) {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       } else {
         // req.mHeaders.back().name.push_back(input);
         mHeaderName.push_back(input);
@@ -190,7 +190,7 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
       if (input == ' ') {
         mState = HeaderValue;
       } else {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       }
       break;
     case HeaderValue:
@@ -218,7 +218,7 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
         mHeaderValue.clear();
         mState = ExpectingNewline_2;
       } else if (isControl(input)) {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       } else {
         // req.mHeaders.back().value.push_back(input);
         mHeaderValue.push_back(input);
@@ -228,7 +228,7 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
       if (input == '\n') {
         mState = HeaderLineStart;
       } else {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       }
       break;
     case ExpectingNewline_3: {
@@ -262,7 +262,7 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
         if (input == '\n')
           return ParsingCompleted;
         else
-          return ParsingError;
+          return CLIENT_ERROR_BAD_REQUEST;
       } else {
         mState = Post;
       }
@@ -285,7 +285,7 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
       } else if (input == '\r') {
         mState = ChunkSizeNewLine;
       } else {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       }
       break;
     case ChunkExtensionName:
@@ -296,7 +296,7 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
       } else if (input == '\r') {
         mState = ChunkSizeNewLine;
       } else {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       }
       break;
     case ChunkExtensionValue:
@@ -305,7 +305,7 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
       } else if (input == '\r') {
         mState = ChunkSizeNewLine;
       } else {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       }
       break;
     case ChunkSizeNewLine:
@@ -319,7 +319,7 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
         else
           mState = ChunkData;
       } else {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       }
       break;
     case ChunkSizeNewLine_2:
@@ -328,14 +328,14 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
       } else if (isalpha(input)) {
         mState = ChunkTrailerName;
       } else {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       }
       break;
     case ChunkSizeNewLine_3:
       if (input == '\n') {
         return ParsingCompleted;
       } else {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       }
       break;
     case ChunkTrailerName:
@@ -344,7 +344,7 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
       } else if (input == ':') {
         mState = ChunkTrailerValue;
       } else {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       }
       break;
     case ChunkTrailerValue:
@@ -353,7 +353,7 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
       } else if (input == '\r') {
         mState = ChunkSizeNewLine;
       } else {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       }
       break;
     case ChunkData:
@@ -367,18 +367,18 @@ eParseResult RequestParser::consume(Request &req, const char *begin,
       if (input == '\r') {
         mState = ChunkDataNewLine_2;
       } else {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       }
       break;
     case ChunkDataNewLine_2:
       if (input == '\n') {
         mState = mChunkSize;
       } else {
-        return ParsingError;
+        return CLIENT_ERROR_BAD_REQUEST;
       }
       break;
     default:
-      return ParsingError;
+      return CLIENT_ERROR_BAD_REQUEST;
     }
   }
 

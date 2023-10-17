@@ -146,7 +146,7 @@ void Connection::readHandler() {
   }
 
   std::string hostName = it->second;
-  Node *location = Common::mConfigMap->GetConfigNode(mPort, hostName, mHttpParser.getRequest().mUri);
+  Node *location2 = Common::mConfigMap->GetConfigNode(mPort, hostName, mHttpParser.getRequest().mUri);
 
   
   // Router router;
