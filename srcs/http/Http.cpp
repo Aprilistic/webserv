@@ -23,6 +23,10 @@ eStatusCode Http::parseRequest(const std::vector<char> &buffer) {
   }
 }
 
+// void Http::ErrorResponse(eStatusCode errorStatus)
+// {
+// }
+
 // std::vector<char>& Http::parseResponse(Response response)
 // {
 // }

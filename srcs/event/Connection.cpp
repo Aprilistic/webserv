@@ -14,6 +14,33 @@ Connection::Connection(int socket, int port) : mSocket(socket), mPort(port) {
 
 Connection::~Connection() { close(mSocket); }
 
+
+void Connection::ErrorResponse(eStatusCode errorStatus)
+{
+	Node* location = Common::mConfigMap->GetConfigNode(mPort, mHttp.getRequest().mHost, mHttp.getRequest().mUri);
+
+	std::string errorPage = "error_page";
+	std::vector<std::string> configErrorPageValues = location->FindValue(location, errorPage);
+
+	if (configErrorPageValues.size() > 1)
+	{
+		for (std::vector<std::string>::iterator it = configErrorPageValues.begin(); it != configErrorPageValues.end() - 1; it++)
+		{
+			int errorCode;
+			std::stringstream ss(*it);
+			std::string errorPagePath;
+            if (ss >> errorCode && errorCode == errorStatus)
+            {
+            	errorPagePath = configErrorPageValues.back();
+                // errorPagePath response
+				return ;
+            }
+		}
+	}
+	// default error page response
+}
+
+
 void Connection::EventHandler(struct kevent &currentEvent) {
   if (currentEvent.flags & EV_ERROR) {
     // error
@@ -55,18 +82,31 @@ void Connection::readHandler() {
     return;
   }
 
-  std::cout << "this: " << mHttp.parseRequest(mRecvBuffer) << std::endl;
+  eStatusCode parseStatus = mHttp.parseRequest(mRecvBuffer);
 
-  if (mHttp.parseRequest(mRecvBuffer) == ParsingIncompleted) {
-    return;
+  if (parseStatus == ParsingIncompleted) {
+	return ;
   }
+  
+  switch (parseStatus)
+  {
+	case (ParsingCompleted):
+		break ;
+	case (ParsingIncompleted):
+		return ;
+	default:
+		return (ErrorResponse(parseStatus));
+  }
+  
+
+
   // 포트가 같은데 둘 다 이름이 없는 경우 localhost로 접근할 때,
   // default_server로 안 가는 문제
-  // Node *test = Common::mConfigMap->GetConfigNode(mPort, "test", "/");
+  Node *test = Common::mConfigMap->GetConfigNode(mPort, mHttp.getRequest().mHost, mHttp.getRequest().mUri);
 
-  // std::string str = "alias";
-  // std::cout << test->FindValue(test, str)[0] << std::endl;
-
+  std::string str = "location";
+  std::cout << test->FindValue(test, str)[0] << std::endl;
+  
   // std::string str1 = "client_max_body_size";
   // std::cout << test->FindValue(test, str1)[0] << std::endl;
 
