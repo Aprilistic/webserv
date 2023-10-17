@@ -15,30 +15,30 @@ Connection::Connection(int socket, int port) : mSocket(socket), mPort(port) {
 Connection::~Connection() { close(mSocket); }
 
 
-void Connection::ErrorResponse(eStatusCode errorStatus)
-{
-	Node* location = Common::mConfigMap->GetConfigNode(mPort, mHttp.getRequest().mHost, mHttp.getRequest().mUri);
+// void Connection::ErrorResponse(eStatusCode errorStatus)
+// {
+// 	Node* location = Common::mConfigMap->GetConfigNode(mPort, mHttp.getRequest().mHost, mHttp.getRequest().mUri);
 
-	std::string errorPage = "error_page";
-	std::vector<std::string> configErrorPageValues = location->FindValue(location, errorPage);
+// 	std::string errorPage = "error_page";
+// 	std::vector<std::string> configErrorPageValues = location->FindValue(location, errorPage);
 
-	if (configErrorPageValues.size() > 1)
-	{
-		for (std::vector<std::string>::iterator it = configErrorPageValues.begin(); it != configErrorPageValues.end() - 1; it++)
-		{
-			int errorCode;
-			std::stringstream ss(*it);
-			std::string errorPagePath;
-            if (ss >> errorCode && errorCode == errorStatus)
-            {
-            	errorPagePath = configErrorPageValues.back();
-                // errorPagePath response
-				return ;
-            }
-		}
-	}
-	// default error page response
-}
+// 	if (configErrorPageValues.size() > 1)
+// 	{
+// 		for (std::vector<std::string>::iterator it = configErrorPageValues.begin(); it != configErrorPageValues.end() - 1; it++)
+// 		{
+// 			int errorCode;
+// 			std::stringstream ss(*it);
+// 			std::string errorPagePath;
+//             if (ss >> errorCode && errorCode == errorStatus)
+//             {
+//             	errorPagePath = configErrorPageValues.back();
+//                 // errorPagePath response
+// 				return ;
+//             }
+// 		}
+// 	}
+// 	// default error page response
+// }
 
 
 void Connection::EventHandler(struct kevent &currentEvent) {
@@ -95,7 +95,7 @@ void Connection::readHandler() {
 	case (ParsingIncompleted):
 		return ;
 	default:
-		return (ErrorResponse(parseStatus));
+		return (mHttp.ErrorResponse(mPort, parseStatus));
   }
   
 
@@ -107,6 +107,7 @@ void Connection::readHandler() {
   std::string str = "location";
   std::cout << test->FindValue(test, str)[0] << std::endl;
   
+//   mHttp.ErrorResponse(mPort, CLIENT_ERROR_NOT_FOUND);
   // std::string str1 = "client_max_body_size";
   // std::cout << test->FindValue(test, str1)[0] << std::endl;
 

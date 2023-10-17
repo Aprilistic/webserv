@@ -18,7 +18,7 @@ public:
 
   eStatusCode parseRequest(const std::vector<char> &buffer);
   std::vector<char> &parseResponse(Response response);
-//   void ErrorResponse(eStatusCode errorStatus);
+  void ErrorResponse(int port, eStatusCode errorStatus);
   void resetRequest(void);
   void resetResponse(void);
   Request &getRequest(void);
