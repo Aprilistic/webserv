@@ -63,10 +63,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       if (input == ' ') {
         mState = RequestHttpVersion_h;
       } else if (input == '\r') {
-        req.mVersionMajor = 0;
-        req.mVersionMinor = 9;
-
-        return ParsingCompleted;
+        return CLIENT_ERROR_BAD_REQUEST;
       } else if (isControl(input)) {
         return CLIENT_ERROR_BAD_REQUEST;
       } else {
@@ -148,6 +145,9 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       }
       break;
     case ResponseHttpVersion_newLine:
+      if (req.mVersionMajor != 1 && req.mVersionMinor != 1) {
+        return SERVER_ERROR_HTTP_VERSION_NOT_SUPPORTED;
+      }
       if (input == '\n') {
         mState = HeaderLineStart;
       } else {
@@ -213,6 +213,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
           //     mChunked = true;
           // }
           if (strcasecmp(mHeaderName.c_str(), "Content-Length") == 0) {
+            req.mContentLength = atoi(mHeaderValue.c_str());
             mContentsize = atoi(mHeaderValue.c_str());
             req.mContent.reserve(mContentsize);
           } else if (strcasecmp(mHeaderName.c_str(), "Transfer-Encoding") ==
@@ -220,6 +221,11 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
             if (strcasecmp(mHeaderValue.c_str(), "Chunked") == 0)
               mChunked = true;
           }
+        }
+        std::string tmp = mHeaderName;
+        std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
+        if (tmp == "host") {
+          req.mHost = mHeaderValue;
         }
         req.mHeaders.insert(std::make_pair(mHeaderName, mHeaderValue));
         mHeaderValue.clear();
