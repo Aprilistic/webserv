@@ -48,6 +48,10 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       }
       break;
     case RequestUriStart:
+      if (req.mMethod != "GET" && req.mMethod != "POST" &&
+          req.mMethod != "DELETE") {
+        return CLIENT_ERROR_METHOD_NOT_ALLOWED;
+      }
       if (isControl(input)) {
         return CLIENT_ERROR_BAD_REQUEST;
       } else {
@@ -70,6 +74,9 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       }
       break;
     case RequestHttpVersion_h:
+      if (req.mUri.empty()) {
+        return CLIENT_ERROR_BAD_REQUEST;
+      }
       if (input == 'H') {
         mState = RequestHttpVersion_ht;
       } else {
