@@ -40,7 +40,7 @@ void Http::ErrorResponse(int port, eStatusCode errorStatus)
             if (ss >> errorCode && errorCode == errorStatus)
             {
             	errorPagePath = configErrorPageValues.back();
-				// std::cout << errorPagePath << std::endl;
+				std::cout << errorPagePath << std::endl;
                 // errorPagePath response
 				return ;
             }

@@ -9,7 +9,10 @@
 #include "Response.hpp"
 #include "ResponseMessage.hpp"
 #include "ResponseParser.hpp"
-#include "Router.hpp"
+#include "ConfigMap.hpp"
+#include "Common.hpp"
+
+// #include "Router.hpp"
 
 class Http {
 public:
@@ -17,7 +20,8 @@ public:
   ~Http();
 
   eStatusCode parseRequest(const std::vector<char> &buffer);
-  std::vector<char> &parseResponse(Response response);
+//   std::vector<char> &parseResponse(Response response);
+
   void ErrorResponse(int port, eStatusCode errorStatus);
   void resetRequest(void);
   void resetResponse(void);

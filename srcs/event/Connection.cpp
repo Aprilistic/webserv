@@ -1,4 +1,6 @@
 #include "Connection.hpp"
+#include "IRequestHandler.hpp"
+#include "Router.hpp"
 
 Connection::Connection(int socket, int port) : mSocket(socket), mPort(port) {
   struct kevent events[2];
@@ -173,16 +175,12 @@ void Connection::readHandler() {
     // CLIENT_ERROR_BAD_REQUEST 400 error
   }
 
-  // std::string hostName = it->second;
-  // Node *location = Common::mConfigMap->GetConfigNode(mPort, hostName, mHttpParser.getRequest().mUri);
 
-  // Router router;
+  IRequestHandler* handler =  Router::Routing(mHttp);
 
-  // IRequestHandler* handler =  router.Routing(mHttp.getRequest());
+  Response response = handler->handle(mHttp);
 
-  // Response response = handler->handle(mHttp.getRequest());
-
-  // mSendBuffer = mHttp.parseResponse(response);
+//   mSendBuffer = mHttp.parseResponse(response);
 }
 
 void Connection::writeHandler() {

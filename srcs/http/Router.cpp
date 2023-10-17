@@ -8,34 +8,34 @@ Router &Router::operator=(const Router &other) { return *this; }
 
 Router::~Router() {}
 
-IRequestHandler *Router::Routing(Request &request) {
+IRequestHandler *Router::Routing(Http &http) {
   // CGI 처리
-  if (IsCgiRequest(request)) {
+  if (IsCgiRequest(http)) {
     return (new CgiHandler());
   }
-  // 다른 요청 처리
-  if (request.mMethod == "GET") {
+//   다른 요청 처리
+  if (http.getRequest().mMethod == "GET") {
     return (new GetHandler());
-  } else if (request.mMethod == "POST") {
+  } else if (http.getRequest().mMethod == "POST") {
     return (new PostHandler());
-  } else if (request.mMethod == "DELETE") {
+  } else if (http.getRequest().mMethod == "DELETE") {
     return (new DeleteHandler());
-  } else if (request.mMethod == "PUT") {
+  } else if (http.getRequest().mMethod == "PUT") {
     return (new PutHandler());
   }
   return (NULL);
 }
 
-bool Router::IsCgiRequest(Request &request) {
+bool Router::IsCgiRequest(Http &request) {
   // uri에  이러한 경로가 있다면 무조건  cgi에서 처리된다는 가정
-  if (request.mUri.find("/cgi-bin/") != std::string::npos) {
+  if (request.getRequest().mUri.find("/cgi-bin/") != std::string::npos) {
     return (true);
   }
 
   // 클라이언트가 확장자를 지정해준 경우 이 파일은 무조건 cgi에서 처리된다는
   // 가정
-  if (request.mUri.size() > 4 &&
-      request.mUri.substr(request.mUri.size() - 4) == ".bla") {
+  if (request.getRequest().mUri.size() > 4 &&
+      request.getRequest().mUri.substr(request.getRequest().mUri.size() - 4) == ".bla") {
     return (true);
   }
 
@@ -46,51 +46,52 @@ bool Router::IsCgiRequest(Request &request) {
 }
 
 // ex
-Response GetHandler::handle(Request &request) {
+Response GetHandler::handle(Http& http) {
   Response res;
   res.mStatusCode = 200;
 
-  res.mBody = "GET request received for URI: " + request.mUri;
+  res.mBody = "GET request received for URI: " + http.getRequest().mUri;
 
+  std::cout << res.mBody << std::endl;
   return res;
 }
 
-Response PostHandler::handle(Request &request) {
+Response PostHandler::handle(Http& http) {
   Response res;
   res.mStatusCode = 201;
 
   res.mBody = "POST request received with content: " +
-              std::string(request.mContent.begin(), request.mContent.end());
+              std::string(http.getRequest().mContent.begin(), http.getRequest().mContent.end());
 
   return res;
 }
 
-Response DeleteHandler::handle(Request &request) {
+Response DeleteHandler::handle(Http& http) {
   Response res;
   res.mStatusCode = 200;
 
-  res.mBody = "DELETE request received for URI: " + request.mUri;
+  res.mBody = "DELETE request received for URI: " + http.getRequest().mUri;
 
   return res;
 }
 
-Response PutHandler::handle(Request &request) {
+Response PutHandler::handle(Http& http) {
   Response res;
   res.mStatusCode = 200;
 
   res.mBody = "PUT request received with content: " +
-              std::string(request.mContent.begin(), request.mContent.end());
+              std::string(http.getRequest().mContent.begin(),http.getRequest().mContent.end());
 
   return res;
 }
 
-Response CgiHandler::handle(Request &request) {
+Response CgiHandler::handle(Http& http) {
   Response res;
 
-  if (request.mMethod == "GET") {
+  if (http.getRequest().mMethod == "GET") {
 
-  } else if (request.mMethod == "POST") {
+  } else if (http.getRequest().mMethod == "POST") {
   }
-
+  
   return res;
 }
