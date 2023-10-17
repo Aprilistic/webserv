@@ -3,7 +3,7 @@
 
 #include "Common.hpp"
 #include "Core.hpp"
-#include "HttpParser.hpp"
+#include "Http.hpp"
 #include "IEventHandler.hpp"
 
 #define RECV_BUFFER_SIZE 4096
@@ -24,7 +24,7 @@ private:
 private:
   int mSocket;
   int mPort;
-  HttpParser mHttpParser;
+  Http mHttp;
   std::vector<char> mRecvBuffer;
   std::vector<char> mSendBuffer;
 };

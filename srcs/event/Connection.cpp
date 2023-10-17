@@ -1,9 +1,6 @@
 #include "Connection.hpp"
 
-Connection::Connection(int socket, int port)
-: mSocket(socket)
-, mPort(port)
-{
+Connection::Connection(int socket, int port) : mSocket(socket), mPort(port) {
   struct kevent events[2];
 
   mRecvBuffer.reserve(RECV_BUFFER_SIZE);
@@ -58,9 +55,9 @@ void Connection::readHandler() {
     return;
   }
 
-  std::cout << "this: " << mHttpParser.parseRequest(mRecvBuffer) << std::endl;
+  std::cout << "this: " << mHttp.parseRequest(mRecvBuffer) << std::endl;
 
-  if (mHttpParser.parseRequest(mRecvBuffer) == ParsingIncompleted) {
+  if (mHttp.parseRequest(mRecvBuffer) == ParsingIncompleted) {
     return;
   }
   // 포트가 같은데 둘 다 이름이 없는 경우 localhost로 접근할 때,
@@ -83,9 +80,9 @@ void Connection::readHandler() {
         location->FindValue(location, cmbs)[0].c_str()); // overflow, k,M,G
 
     std::multimap<std::string, std::string>::iterator it;
-    it = mHttpParser.getRequest().mHeaders.find("Content-Length");
+    it = mHttp.getRequest().mHeaders.find("Content-Length");
 
-    if (it != mHttpParser.getRequest().mHeaders.end()) {
+    if (it != mHttp.getRequest().mHeaders.end()) {
       int contentLength = std::atoi(it->second.c_str());
       if (contentLength > clientMaxBodySize) {
         // CLIENT_ERROR_CONTENT_TOO_LARGE 413 error
@@ -93,13 +90,12 @@ void Connection::readHandler() {
     }
   }
 
-
   // return
   int retValue;
   std::string retPath;
   std::string ret = "return";
 
-  if (mHttpParser.getRequest().mUri == "/") {
+  if (mHttp.getRequest().mUri == "/") {
     std::vector<std::string> Topvalue;
     Topvalue =
         location->FindTopValue(location, ret, std::vector<std::string>());
@@ -123,31 +119,29 @@ void Connection::readHandler() {
       location->FindValue(location, limitExcept); // 초기화가 필요합니다.
   if (limitExceptValue.size()) {
     if (std::find(limitExceptValue.begin(), limitExceptValue.end(),
-                  mHttpParser.getRequest().mMethod) == limitExceptValue.end()) {
+                  mHttp.getRequest().mMethod) == limitExceptValue.end()) {
       // CLIENT_ERROR_METHOD_NOT_ALLOWED 405 error
     }
   }
 
-  // 
+  //
   std::multimap<std::string, std::string>::iterator it;
-  it = mHttpParser.getRequest().mHeaders.find("Host");
+  it = mHttp.getRequest().mHeaders.find("Host");
 
-  if (it == mHttpParser.getRequest().mHeaders.end())
-  {
-	// CLIENT_ERROR_BAD_REQUEST 400 error
+  if (it == mHttp.getRequest().mHeaders.end()) {
+    // CLIENT_ERROR_BAD_REQUEST 400 error
   }
 
   // std::string hostName = it->second;
   // Node *location = Common::mConfigMap->GetConfigNode(mPort, hostName, mHttpParser.getRequest().mUri);
 
-  
   // Router router;
 
-  // IRequestHandler* handler =  router.Routing(mHttpParser.getRequest());
+  // IRequestHandler* handler =  router.Routing(mHttp.getRequest());
 
-  // Response response = handler->handle(mHttpParser.getRequest());
+  // Response response = handler->handle(mHttp.getRequest());
 
-  // mSendBuffer = mHttpParser.parseResponse(response);
+  // mSendBuffer = mHttp.parseResponse(response);
 }
 
 void Connection::writeHandler() {
@@ -155,11 +149,11 @@ void Connection::writeHandler() {
 
   if (bytesSent <= 0) {
     if (bytesSent < 0) {
-      // error 
+      // error
     }
     return;
   }
-  mHttpParser.resetResponse();
+  mHttp.resetResponse();
 }
 
 void Connection::timerHandler() {

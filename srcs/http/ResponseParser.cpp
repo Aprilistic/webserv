@@ -6,7 +6,7 @@ ResponseParser::ResponseParser()
 
 ResponseParser::~ResponseParser() {}
 
-eParseResult ResponseParser::parse(Response &resp, const char *begin,
+eStatusCode ResponseParser::parse(Response &resp, const char *begin,
                                    const char *end) {
   return consume(resp, begin, end);
 }
@@ -20,7 +20,7 @@ bool ResponseParser::checkIfConnection(
   return (item.first == "Connection");
 }
 
-eParseResult ResponseParser::consume(Response &resp, const char *begin,
+eStatusCode ResponseParser::consume(Response &resp, const char *begin,
                                      const char *end) {
   while (begin != end) {
     char input = *begin++;
