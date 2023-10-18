@@ -50,7 +50,7 @@ eStatusCode Http::setResponse(int &port) {
   eStatusCode handleStatus = handler->handle(port, *this);
 
   //나중에 signal 시 처리하기 위해 소멸자에 추가
-  delete handler;
+  // delete handler;
 
   switch (handleStatus) {
   case (SUCCESSFUL_OK):
@@ -157,6 +157,19 @@ bool Http::CheckLimitExcept(int port) {
     }
   }
   return (true);
+}
+
+eStatusCode Http::CheckPathType(const std::string& path)
+{
+  struct stat info;
+  if (stat(path.c_str(), &info) != 0)
+    return (PATH_INACCESSIBLE); // 권한 에러 Cannot access path
+  else if (info.st_mode & S_IFDIR)
+    return (PATH_IS_DIRECTORY); // 디렉토리 Directory
+  else if (info.st_mode & S_IFREG)
+    return (PATH_IS_FILE); // 파일 Regular file
+  else
+    return (PATH_UNKNOWN); // 디렉토리도 파일도 아닌 타입(소켓, 파이프, 심볼릭 링크 등등)
 }
 
 // std::vector<char>& Http::parseResponse(Response response)

@@ -33,6 +33,8 @@ public:
   bool CheckClientMaxBodySize(int port);
   bool CheckLimitExcept(int port);
 
+eStatusCode CheckPathType(const std::string& path);
+
   void resetRequest(void);
   void resetResponse(void);
   void resetBuffer(void);

@@ -6,6 +6,7 @@
 #include "IRequestHandler.hpp"
 #include "Request.hpp"
 #include "Response.hpp"
+#include <sys/stat.h>
 
 class Http;
 class Request;
