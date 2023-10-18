@@ -30,7 +30,7 @@ public:
 
   void ErrorHandle(int port, eStatusCode errorStatus);
   bool CheckRedirect(int port);
-  bool checkClientMaxBodySize(int port);
+  bool CheckClientMaxBodySize(int port);
   bool CheckLimitExcept(int port);
 
   void resetRequest(void);

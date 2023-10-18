@@ -97,24 +97,32 @@ void Connection::readHandler() {
   // 포트가 같은데 둘 다 이름이 없는 경우 localhost로 접근할 때,
   // default_server로 안 가는 문제'
 
-  // ResponseMessage responseMessage(mHttp.getResponse());
+  ResponseMessage responseMessage(mHttp.getResponse());
 
-  // mSendBuffer = responseMessage.getMessageToVector();
+  mSendBuffer = responseMessage.getMessageToVector();
 
-  // mHttp.resetRequest();
-  // mHttp.resetResponse();
+  // std::string httpResponse = "HTTP/1.1 200 OK\r\n"
+  //                            "Content-Type: text/plain\r\n"
+  //                            "\r\n"
+  //                            "Hello, World!";
+
+  // 문자열을 vector<char>에 담기
+  // std::vector<char> responseVec(httpResponse.begin(), httpResponse.end());
+  // mSendBuffer = responseVec;
+  mHttp.resetRequest();
+  mHttp.resetResponse();
 }
 
 void Connection::writeHandler() {
   ssize_t bytesSent = send(mSocket, &mSendBuffer[0], mSendBuffer.size(), 0);
 
+  mSendBuffer.clear();
   if (bytesSent <= 0) {
     if (bytesSent < 0) {
       // error
     }
     return;
   }
-  mHttp.resetResponse();
 }
 
 void Connection::timerHandler() {

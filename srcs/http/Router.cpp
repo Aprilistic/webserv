@@ -53,7 +53,6 @@ eStatusCode GetHandler::handle(int port, Http& http) {
   std::cout << http.getResponse().mStatusCode << std::endl;
   std::cout << http.getResponse().mBody << std::endl;
 
-
   Node* location = Common::mConfigMap->GetConfigNode(port, http.getRequest().mHost, http.getRequest().mUri);
 
   (void)location;

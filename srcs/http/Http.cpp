@@ -38,7 +38,7 @@ eStatusCode Http::requestParser(int &port, std::vector<char> &mRecvBuffer) {
 eStatusCode Http::priorityHeaders(int &port) {
   if (CheckRedirect(port))
     return REDIRECT; // redirect path 로  response
-  if (checkClientMaxBodySize(port) == false)
+  if (CheckClientMaxBodySize(port) == false)
     return (ErrorHandle(port, CLIENT_ERROR_CONTENT_TOO_LARGE), ERROR);
   if (CheckLimitExcept(port) == false)
     return (ErrorHandle(port, CLIENT_ERROR_METHOD_NOT_ALLOWED), ERROR);
@@ -48,6 +48,9 @@ eStatusCode Http::priorityHeaders(int &port) {
 eStatusCode Http::setResponse(int &port) {
   IRequestHandler *handler = Router::Routing(*this);
   eStatusCode handleStatus = handler->handle(port, *this);
+
+  //나중에 signal 시 처리하기 위해 소멸자에 추가
+  delete handler;
 
   switch (handleStatus) {
   case (SUCCESSFUL_OK):
@@ -115,7 +118,7 @@ bool Http::CheckRedirect(int port) {
   return (true);
 }
 
-bool Http::checkClientMaxBodySize(int port) {
+bool Http::CheckClientMaxBodySize(int port) {
   Node *location =
       Common::mConfigMap->GetConfigNode(port, mRequest.mHost, mRequest.mUri);
 
