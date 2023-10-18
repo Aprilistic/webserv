@@ -16,6 +16,7 @@ public:
   virtual void EventHandler(struct kevent &currentEvent);
 
 private:
+  eStatusCode readFromSocket();
   void readHandler();
   void writeHandler();
   void timerHandler();

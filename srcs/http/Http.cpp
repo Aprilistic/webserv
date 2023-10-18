@@ -23,6 +23,43 @@ eStatusCode Http::parseRequest(const std::vector<char> &buffer) {
   }
 }
 
+eStatusCode Http::requestParser(int &port, std::vector<char> &mRecvBuffer) {
+  eStatusCode parseStatus = parseRequest(mRecvBuffer);
+  switch (parseStatus) {
+  case (ParsingCompleted):
+    return ParsingCompleted;
+  case (ParsingIncompleted):
+    return ParsingIncompleted;
+  default:
+    return (ErrorHandle(port, parseStatus), ERROR);
+  }
+}
+
+eStatusCode Http::priorityHeaders(int &port) {
+  if (CheckRedirect(port))
+    return REDIRECT; // redirect path 로  response
+  if (checkClientMaxBodySize(port) == false)
+    return (ErrorHandle(port, CLIENT_ERROR_CONTENT_TOO_LARGE), ERROR);
+  if (CheckLimitExcept(port) == false)
+    return (ErrorHandle(port, CLIENT_ERROR_METHOD_NOT_ALLOWED), ERROR);
+  return PRIORITY_HEADER_OK;
+}
+
+eStatusCode Http::setResponse(int &port) {
+  IRequestHandler *handler = Router::Routing(*this);
+  eStatusCode handleStatus = handler->handle(port, *this);
+
+  switch (handleStatus) {
+  case (SUCCESSFUL_OK):
+  // case (SUCCESSFUL_CREATERD):
+  //   return ; // response
+  // case (SUCCESSFUL_ACCEPTED):
+  //   return; //
+  default:
+    return (ErrorHandle(port, handleStatus), ERROR);
+  }
+}
+
 void Http::ErrorHandle(int port, eStatusCode errorStatus) {
   Node *location =
       Common::mConfigMap->GetConfigNode(port, mRequest.mHost, mRequest.mUri);
@@ -44,7 +81,7 @@ void Http::ErrorHandle(int port, eStatusCode errorStatus) {
       }
     }
   }
-  // default error page response
+  // default error page responsㄷ
 }
 
 bool Http::CheckRedirect(int port) {
@@ -62,16 +99,18 @@ bool Http::CheckRedirect(int port) {
     if (Topvalue.size()) {
       redirectCode = std::atoi(Topvalue[0].c_str());
       redirectPath = Topvalue[1];
-    } else
+    } else {
       return (false);
+    }
   } else {
     std::vector<std::string> downValue;
     downValue = location->FindValue(location, redirect);
     if (downValue.size()) {
       redirectCode = std::atoi(downValue[0].c_str());
       redirectPath = downValue[1];
-    } else
+    } else {
       return (false);
+    }
   }
   return (true);
 }
@@ -125,5 +164,10 @@ void Http::resetRequest() { mRequest = Request(); }
 
 void Http::resetResponse() { mResponse = Response(); }
 
+void Http::resetBuffer() { mBuffer.clear(); }
+
 Request &Http::getRequest() { return mRequest; }
+
 Response &Http::getResponse() { return mResponse; }
+
+std::string Http::getBuffer() { return mBuffer; }

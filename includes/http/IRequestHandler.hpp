@@ -5,6 +5,8 @@
 // class Response;
 #include "Http.hpp"
 
+class Http;
+
 enum eHandleStatus {
 	INCOMPLETED = 0,
 	COMPLETED = 1

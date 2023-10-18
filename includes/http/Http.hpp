@@ -12,8 +12,10 @@
 #include "ResponseMessage.hpp"
 #include "ResponseParser.hpp"
 
-// #include "Router.hpp"
+#include "IRequestHandler.hpp"
+#include "Router.hpp"
 
+class IRequestHandler;
 class Http {
 public:
   Http();
@@ -22,6 +24,10 @@ public:
   eStatusCode parseRequest(const std::vector<char> &buffer);
   //   std::vector<char> &parseResponse(Response response);
 
+  eStatusCode requestParser(int &port, std::vector<char> &mRecvBuffer);
+  eStatusCode priorityHeaders(int &port);
+  eStatusCode setResponse(int &port);
+
   void ErrorHandle(int port, eStatusCode errorStatus);
   bool CheckRedirect(int port);
   bool checkClientMaxBodySize(int port);
@@ -29,13 +35,15 @@ public:
 
   void resetRequest(void);
   void resetResponse(void);
+  void resetBuffer(void);
+  std::string getBuffer(void);
   Request &getRequest(void);
   Response &getResponse(void);
 
 private:
+  std::string mBuffer;
   Request mRequest;
   Response mResponse;
-  std::string mBuffer;
 };
 
 #endif

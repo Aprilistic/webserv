@@ -1,5 +1,4 @@
 #include "Connection.hpp"
-#include "IRequestHandler.hpp"
 #include "Router.hpp"
 
 Connection::Connection(int socket, int port) : mSocket(socket), mPort(port) {
@@ -41,59 +40,69 @@ void Connection::EventHandler(struct kevent &currentEvent) {
 
 #include "Node.hpp"
 
-void Connection::readHandler() {
+eStatusCode Connection::readFromSocket() {
   mRecvBuffer.clear();
+
+  std::string httpBuffer(mHttp.getBuffer());
+  std::vector<char> httpBufferVector(httpBuffer.begin(), httpBuffer.end());
+  mRecvBuffer.insert(mRecvBuffer.end(), httpBufferVector.begin(),
+                     httpBufferVector.end());
+  mHttp.resetBuffer();
+
   ssize_t bytesRead;
   char tmp[RECV_BUFFER_SIZE];
   bytesRead = recv(mSocket, tmp, RECV_BUFFER_SIZE, 0);
   mRecvBuffer.insert(mRecvBuffer.end(), tmp, tmp + bytesRead);
 
-  // std::cout << "bytesRead: " << bytesRead << std::endl;
   if (bytesRead <= 0) {
     if (bytesRead < 0) {
       // error
+      return (SOCKET_READ_ERROR);
     }
     // disconnection();
-    return;
+    return (SOCKET_DISCONNECTED);
   }
+  return (READ_OK);
+}
 
-  eStatusCode parseStatus = mHttp.parseRequest(mRecvBuffer);
-
-  switch (parseStatus) {
-  case (ParsingCompleted):
+void Connection::readHandler() {
+  eStatusCode state = readFromSocket();
+  switch (state) {
+  case (SOCKET_READ_ERROR):
+    mHttp.ErrorHandle(mPort, state);
     break;
-  case (ParsingIncompleted):
-    return;
+  case (SOCKET_DISCONNECTED):
+    /* code */
+    break;
+  case (READ_OK):
+    state = mHttp.requestParser(mPort, mRecvBuffer);
+    if (state == ERROR) {
+      break;
+    } else if (state == ParsingIncompleted) {
+      return;
+    }
+  case (ParsingCompleted):
+    state = mHttp.priorityHeaders(mPort);
+    if (state == REDIRECT || state == ERROR) {
+      break;
+    }
+  case (PRIORITY_HEADER_OK):
+    state = mHttp.setResponse(mPort);
+    if (state == RESPONSE_INCOMPLETED) {
+      return;
+    }
   default:
-    return (mHttp.ErrorHandle(mPort, parseStatus));
+    break;
   }
-
   // 포트가 같은데 둘 다 이름이 없는 경우 localhost로 접근할 때,
-  // default_server로 안 가는 문제
+  // default_server로 안 가는 문제'
 
-  if (mHttp.CheckRedirect(mPort))
-    return; // redirect path 로  response
-  if (mHttp.checkClientMaxBodySize(mPort) == false)
-    return (mHttp.ErrorHandle(mPort, CLIENT_ERROR_CONTENT_TOO_LARGE));
-  if (mHttp.CheckLimitExcept(mPort) == false)
-    return (mHttp.ErrorHandle(mPort, CLIENT_ERROR_METHOD_NOT_ALLOWED));
+  // ResponseMessage responseMessage(mHttp.getResponse());
 
-  IRequestHandler *handler = Router::Routing(mHttp);
-  eStatusCode handleStatus = handler->handle(mPort, mHttp);
+  // mSendBuffer = responseMessage.getMessageToVector();
 
-  switch (handleStatus) {
-  case (SUCCESSFUL_OK):
-  case (SUCCESSFUL_CREATERD):
-    return; // response
-  case (SUCCESSFUL_ACCEPTED):
-    return; //
-  default:
-    return (mHttp.ErrorHandle(mPort, handleStatus));
-  }
-
-  ResponseMessage responseMessage(mHttp.getResponse());
-
-  mSendBuffer = responseMessage.getMessageToVector();
+  // mHttp.resetRequest();
+  // mHttp.resetResponse();
 }
 
 void Connection::writeHandler() {
