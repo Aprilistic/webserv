@@ -143,6 +143,7 @@ eStatusCode GetHandler::handle(int port, Http& http) {
       // 파일 처리 로직
       case PATH_IS_FILE:
         // 파일 탐색 성공 -> http.getResponse().mStatusCode = SUCCESSFUL_OK
+          return SUCCESSFUL_OK;
         // 파일 탐색 실패 -> http.ErrorHandle(port, CLIENT_ERROR_FORBIDDEN); 404;
         break;
       // 권한 에러
