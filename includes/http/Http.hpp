@@ -1,6 +1,8 @@
 #ifndef HTTP_HPP
 #define HTTP_HPP
 
+#include "Common.hpp"
+#include "ConfigMap.hpp"
 #include "Core.hpp"
 #include "Enum.hpp"
 #include "Request.hpp"
@@ -9,8 +11,6 @@
 #include "Response.hpp"
 #include "ResponseMessage.hpp"
 #include "ResponseParser.hpp"
-#include "ConfigMap.hpp"
-#include "Common.hpp"
 
 // #include "Router.hpp"
 
@@ -20,9 +20,9 @@ public:
   ~Http();
 
   eStatusCode parseRequest(const std::vector<char> &buffer);
-//   std::vector<char> &parseResponse(Response response);
+  //   std::vector<char> &parseResponse(Response response);
 
-  void ErrorResponse(int port, eStatusCode errorStatus);
+  void ErrorHandle(int port, eStatusCode errorStatus);
   bool CheckRedirect(int port);
   bool checkClientMaxBodySize(int port);
   bool CheckLimitExcept(int port);
@@ -31,6 +31,7 @@ public:
   void resetResponse(void);
   Request &getRequest(void);
   Response &getResponse(void);
+
 private:
   Request mRequest;
   Response mResponse;

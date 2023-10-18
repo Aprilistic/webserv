@@ -59,47 +59,42 @@ void Connection::readHandler() {
 
   eStatusCode parseStatus = mHttp.parseRequest(mRecvBuffer);
 
-  if (parseStatus == ParsingIncompleted) {
-	return ;
-  }
-  
-  switch (parseStatus)
-  {
-	case (ParsingCompleted):
-		break ;
-	case (ParsingIncompleted):
-		return ;
-	default:
-		return (mHttp.ErrorResponse(mPort, parseStatus));
+  switch (parseStatus) {
+  case (ParsingCompleted):
+    break;
+  case (ParsingIncompleted):
+    return;
+  default:
+    return (mHttp.ErrorHandle(mPort, parseStatus));
   }
 
   // 포트가 같은데 둘 다 이름이 없는 경우 localhost로 접근할 때,
   // default_server로 안 가는 문제
 
   if (mHttp.CheckRedirect(mPort))
-	return ; // redirect path 로  response
+    return; // redirect path 로  response
   if (mHttp.checkClientMaxBodySize(mPort) == false)
-	return (mHttp.ErrorResponse(mPort, CLIENT_ERROR_CONTENT_TOO_LARGE));
+    return (mHttp.ErrorHandle(mPort, CLIENT_ERROR_CONTENT_TOO_LARGE));
   if (mHttp.CheckLimitExcept(mPort) == false)
-	return (mHttp.ErrorResponse(mPort, CLIENT_ERROR_METHOD_NOT_ALLOWED));
+    return (mHttp.ErrorHandle(mPort, CLIENT_ERROR_METHOD_NOT_ALLOWED));
 
-  IRequestHandler* handler =  Router::Routing(mHttp);
+  IRequestHandler *handler = Router::Routing(mHttp);
   eStatusCode handleStatus = handler->handle(mPort, mHttp);
-  
-  switch (handleStatus)
-  {
-	case (SUCCESSFUL_OK):
-	case (SUCCESSFUL_CREATERD):
-		return ; // response
-	case(SUCCESSFUL_ACCEPTED):
-		return ; //
-	default:
-		return (mHttp.ErrorResponse(mPort, handleStatus));
-  }
-  
-//   mSendBuffer = mHttp.parseResponse(response);
-}
 
+  switch (handleStatus) {
+  case (SUCCESSFUL_OK):
+  case (SUCCESSFUL_CREATERD):
+    return; // response
+  case (SUCCESSFUL_ACCEPTED):
+    return; //
+  default:
+    return (mHttp.ErrorHandle(mPort, handleStatus));
+  }
+
+  ResponseMessage responseMessage(mHttp.getResponse());
+
+  mSendBuffer = responseMessage.getMessageToVector();
+}
 
 void Connection::writeHandler() {
   ssize_t bytesSent = send(mSocket, &mSendBuffer[0], mSendBuffer.size(), 0);
