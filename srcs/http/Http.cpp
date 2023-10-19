@@ -49,8 +49,8 @@ eStatusCode Http::setResponse(int &port) {
   IRequestHandler *handler = Router::Routing(*this);
   eStatusCode handleStatus = handler->handle(port, *this);
 
-  //나중에 signal 시 처리하기 위해 소멸자에 추가
-  // delete handler;
+  // 나중에 signal 시 처리하기 위해 소멸자에 추가
+  //  delete handler;
 
   switch (handleStatus) {
   case (SUCCESSFUL_OK):
@@ -67,9 +67,8 @@ void Http::ErrorHandle(int port, eStatusCode errorStatus) {
   Node *location =
       Common::mConfigMap->GetConfigNode(port, mRequest.mHost, mRequest.mUri);
 
-  std::string errorPage = "error_page";
   std::vector<std::string> configErrorPageValues =
-      location->FindValue(location, errorPage);
+      location->FindValue(location, "error_page");
 
   if (configErrorPageValues.size() > 1) {
     for (std::vector<std::string>::iterator it = configErrorPageValues.begin();
@@ -79,6 +78,7 @@ void Http::ErrorHandle(int port, eStatusCode errorStatus) {
       std::string errorPagePath;
       if (ss >> errorCode && errorCode == errorStatus) {
         errorPagePath = configErrorPageValues.back();
+        ReadFile(errorPagePath);
         // errorPagePath response
         return;
       }
@@ -87,18 +87,45 @@ void Http::ErrorHandle(int port, eStatusCode errorStatus) {
   // default error page responsㄷ
 }
 
+eStatusCode Http::ReadFile(const std::string &path) {
+  mFd = open(path.c_str(), O_RDONLY);
+
+  if (mFd == -1) {
+    if (errno == ENOENT) {
+      return (CLIENT_ERROR_NOT_FOUND);
+    } else if (errno == EACCES) {
+      return (CLIENT_ERROR_FORBIDDEN);
+    }
+  }
+  // fcntl(mFd, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
+
+  char buffer[4096];
+  ssize_t readSize;
+  while ((readSize = read(mFd, buffer, 4096)) > 0) {
+    getResponse().mBody += std::string(buffer, buffer + readSize);
+  }
+  if (readSize == -1) {
+    close(mFd);
+    return (SERVER_ERROR_INTERNAL_SERVER_ERROR);
+  }
+
+  close(mFd);
+  return (SUCCESSFUL_OK); // 성공 후 반환값 뭐로 하지?
+}
+
+eStatusCode Http::WriteFile(const std::string &path) {}
+
 bool Http::CheckRedirect(int port) {
   Node *location =
       Common::mConfigMap->GetConfigNode(port, mRequest.mHost, mRequest.mUri);
 
   int redirectCode;
   std::string redirectPath;
-  std::string redirect = "return";
 
   if (mRequest.mUri == "/") {
     std::vector<std::string> Topvalue;
     Topvalue =
-        location->FindTopValue(location, redirect, std::vector<std::string>());
+        location->FindTopValue(location, "return", std::vector<std::string>());
     if (Topvalue.size()) {
       redirectCode = std::atoi(Topvalue[0].c_str());
       redirectPath = Topvalue[1];
@@ -107,7 +134,7 @@ bool Http::CheckRedirect(int port) {
     }
   } else {
     std::vector<std::string> downValue;
-    downValue = location->FindValue(location, redirect);
+    downValue = location->FindValue(location, "return");
     if (downValue.size()) {
       redirectCode = std::atoi(downValue[0].c_str());
       redirectPath = downValue[1];
@@ -122,9 +149,8 @@ bool Http::CheckClientMaxBodySize(int port) {
   Node *location =
       Common::mConfigMap->GetConfigNode(port, mRequest.mHost, mRequest.mUri);
 
-  std::string clientMaxBodySize = "client_max_body_size";
   std::vector<std::string> clientMaxBodySizeValues =
-      location->FindValue(location, clientMaxBodySize);
+      location->FindValue(location, "client_max_body_size");
 
   if (clientMaxBodySizeValues.size()) {
     int valueSize =
@@ -147,9 +173,8 @@ bool Http::CheckLimitExcept(int port) {
   Node *location =
       Common::mConfigMap->GetConfigNode(port, mRequest.mHost, mRequest.mUri);
 
-  std::string limitExcept = "limit_except";
   std::vector<std::string> limitExceptValue =
-      location->FindValue(location, limitExcept); // 초기화가 필요합니다.
+      location->FindValue(location, "limit_except"); // 초기화가 필요합니다.
   if (limitExceptValue.size()) {
     if (std::find(limitExceptValue.begin(), limitExceptValue.end(),
                   mRequest.mMethod) == limitExceptValue.end()) {
@@ -159,8 +184,7 @@ bool Http::CheckLimitExcept(int port) {
   return (true);
 }
 
-eStatusCode Http::CheckPathType(const std::string& path)
-{
+eStatusCode Http::CheckPathType(const std::string &path) {
   struct stat info;
   if (stat(path.c_str(), &info) != 0)
     return (PATH_INACCESSIBLE); // 권한 에러 Cannot access path
@@ -169,7 +193,8 @@ eStatusCode Http::CheckPathType(const std::string& path)
   else if (info.st_mode & S_IFREG)
     return (PATH_IS_FILE); // 파일 Regular file
   else
-    return (PATH_UNKNOWN); // 디렉토리도 파일도 아닌 타입(소켓, 파이프, 심볼릭 링크 등등)
+    return (PATH_UNKNOWN); // 디렉토리도 파일도 아닌 타입(소켓, 파이프, 심볼릭
+                           // 링크 등등)
 }
 
 // std::vector<char>& Http::parseResponse(Response response)

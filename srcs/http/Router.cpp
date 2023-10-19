@@ -48,13 +48,6 @@ bool Router::IsCgiRequest(Http &request) {
 
 // ex
 eStatusCode GetHandler::handle(int port, Http &http) {
-  eStatusCode res;
-  http.getResponse().mStatusCode = 200;
-  http.getResponse().mBody =
-      "GET request received for URI: " + http.getRequest().mUri;
-  std::cout << http.getResponse().mStatusCode << std::endl;
-  std::cout << http.getResponse().mBody << std::endl;
-
   Node *location = Common::mConfigMap->GetConfigNode(
       port, http.getRequest().mHost, http.getRequest().mUri);
 
@@ -67,18 +60,16 @@ eStatusCode GetHandler::handle(int port, Http &http) {
     return CLIENT_ERROR_NOT_FOUND; // return 값 고민
   }
 
-  std::string findLocation = "location";
-  std::vector<std::string> uri = location->FindValue(location, findLocation);
+  std::vector<std::string> uri = location->FindValue(location, "location");
 
-  std::string findAlias = "alias";
-  std::vector<std::string> alias = location->FindValue(location, findAlias);
+  std::vector<std::string> alias = location->FindValue(location, "alias");
 
   // alias가 없는 경우 location 이 / 라면 기본 설정에 정의되어 있는 index.html
   // 그 외의 다른 location의 경우 404
   if (alias.empty()) {
     if (uri[0] == "/")
-      return SUCCESSFUL_OK; // 기본 설정에 정의되어 있는 index.html(Welcom
-                            // nginx)
+      return SUCCESSFUL_OK;
+    // 기본 설정에 정의되어 있는 index.html(Welcom nginx)
     else {
       http.getResponse().mStatusCode = CLIENT_ERROR_NOT_FOUND;
       return CLIENT_ERROR_NOT_FOUND; // return 값 고민
@@ -88,13 +79,12 @@ eStatusCode GetHandler::handle(int port, Http &http) {
     // resolvedPath = uri(/abc/)+ alias(/var/www/wow) = /var/www/wow/abc/
     // 구한 경로가 디렉토리인지 파일인지 권한에러인지 언노운파일인지 확인하는
     // 로직
-    std::string resolvedPath = uri[0] + alias[0];
+    std::string resolvedPath = alias[0];
 
     switch (http.CheckPathType(resolvedPath)) {
     // 디렉토리 처리 로직
     case PATH_IS_DIRECTORY: {
-      std::string findIndex = "index";
-      std::vector<std::string> index = location->FindValue(location, findIndex);
+      std::vector<std::string> index = location->FindValue(location, "index");
       bool found = false;
       std::string fullPath;
 
@@ -116,9 +106,8 @@ eStatusCode GetHandler::handle(int port, Http &http) {
       } else {
         // 경로에 파일이 없다면
         // autoindex 설정 확인
-        std::string findAutoIndex = "autoindex";
         std::vector<std::string> autoindex =
-            location->FindValue(location, findAutoIndex);
+            location->FindValue(location, "autoindex");
 
         if (autoindex.empty() == false && autoindex[0] == "on") {
           // autoindex on 일때 처리 로직
@@ -135,15 +124,18 @@ eStatusCode GetHandler::handle(int port, Http &http) {
     case PATH_IS_FILE: { // 파일 처리 로직
       // 파일 탐색 성공 -> http.getResponse().mStatusCode = SUCCESSFUL_OK
       return SUCCESSFUL_OK;
-      // 파일 탐색 실패 -> http.ErrorHandle(port, CLIENT_ERROR_FORBIDDEN); 404;
+      // 파일 탐색 실패 -> http.ErrorHandle(port, CLIENT_ERROR_FORBIDDEN);
+      // 404;
       break;
     }
     case PATH_INACCESSIBLE: { // 권한에러
-      http.getResponse().mStatusCode = CLIENT_ERROR_FORBIDDEN; // 권한에러 403 확인필요
+      http.getResponse().mStatusCode = CLIENT_ERROR_FORBIDDEN;
+      // 권한에러 403 확인필요
       return CLIENT_ERROR_FORBIDDEN;
     }
     default: { // 언노운 파일
-      http.getResponse().mStatusCode = CLIENT_ERROR_NOT_FOUND; // 파일도 디렉토리도 아니면 404 확인필요
+      http.getResponse().mStatusCode = CLIENT_ERROR_NOT_FOUND;
+      // 파일도 디렉토리도 아니면 404 확인필요
       return CLIENT_ERROR_FORBIDDEN;
     }
     }
@@ -176,7 +168,7 @@ eStatusCode PostHandler::handle(int port, Http &http) {
       return CLIENT_ERROR_NOT_FOUND;
     }
   } else {
-    resolvedPath = uri[0] + alias[0];
+    resolvedPath = alias[0];
   }
 
   // 데이터 처리
@@ -233,21 +225,21 @@ eStatusCode DeleteHandler::handle(int port, Http &http) {
       return CLIENT_ERROR_NOT_FOUND;
     }
   } else {
-    resolvedPath = uri[0] + alias[0];
+    resolvedPath = alias[0];
   }
 
   // 데이터 삭제
   switch (http.CheckPathType(resolvedPath)) {
   case PATH_IS_DIRECTORY: {
-    //DELETE 요청은 리소스와 관련된 메타데이터를 모두 삭제해야 함
-    //하지만 디렉토리를 삭제하는 것은 위험할 수 있어서 허용하지 않을 수 있음
+    // DELETE 요청은 리소스와 관련된 메타데이터를 모두 삭제해야 함
+    // 하지만 디렉토리를 삭제하는 것은 위험할 수 있어서 허용하지 않을 수 있음
     http.getResponse().mStatusCode = CLIENT_ERROR_METHOD_NOT_ALLOWED;
     return CLIENT_ERROR_METHOD_NOT_ALLOWED;
   }
   case PATH_IS_FILE: {
-    //파일 삭제 로직
-    //삭제에 성공하면 200 OK 또는 204 No Content 반환
-    //실패하면 500 Internal Server Error 반환
+    // 파일 삭제 로직
+    // 삭제에 성공하면 200 OK 또는 204 No Content 반환
+    // 실패하면 500 Internal Server Error 반환
     if (/*파일 삭제 성공*/ true) {
       http.getResponse().mStatusCode = SUCCESSFUL_OK;
       return SUCCESSFUL_OK;
@@ -293,7 +285,7 @@ eStatusCode PutHandler::handle(int port, Http &http) {
       return CLIENT_ERROR_NOT_FOUND;
     }
   } else {
-    resolvedPath = uri[0] + alias[0];
+    resolvedPath = alias[0];
   }
 
   // 데이터 처리

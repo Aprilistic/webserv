@@ -29,6 +29,9 @@ public:
   eStatusCode setResponse(int &port);
 
   void ErrorHandle(int port, eStatusCode errorStatus);
+  eStatusCode ReadFile(const std::string &path);
+  eStatusCode WriteFile(const std::string &path);
+
   bool CheckRedirect(int port);
   bool CheckClientMaxBodySize(int port);
   bool CheckLimitExcept(int port);
@@ -46,6 +49,7 @@ private:
   std::string mBuffer;
   Request mRequest;
   Response mResponse;
+  int mFd;
 };
 
 #endif

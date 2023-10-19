@@ -20,7 +20,7 @@ public:
   int mVersionMinor;
   // std::vector<HeaderItem> mHeaders;
   std::multimap<std::string, std::string> mHeaders;
-  std::vector<char> mContent;
+  // std::vector<char> mContent;
   std::string mBody;
   bool mKeepAlive;
 

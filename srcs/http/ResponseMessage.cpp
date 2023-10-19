@@ -53,8 +53,5 @@ void ResponseMessage::setHeaderFields(Response &resp) {
 }
 
 void ResponseMessage::setBody(Response &resp) {
-  for (std::vector<char>::iterator it = resp.mContent.begin();
-       it != resp.mContent.end(); ++it) {
-    mMessage += *it;
-  }
+    mMessage += resp.mBody;
 }
