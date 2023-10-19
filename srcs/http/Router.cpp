@@ -224,14 +224,60 @@ eStatusCode DeleteHandler::handle(int port, Http &http) {
 }
 
 eStatusCode PutHandler::handle(int port, Http &http) {
-  eStatusCode res;
-  http.getResponse().mStatusCode = 200;
+  // 요청 데이터 파싱
+  std::string requestData(http.getRequest().mContent.begin(),
+                          http.getRequest().mContent.end());
 
-  http.getResponse().mBody = "PUT request received with content: " +
-                             std::string(http.getRequest().mContent.begin(),
-                                         http.getRequest().mContent.end());
+  // URI로 리소스 위치 확인
+  Node *location = Common::mConfigMap->GetConfigNode(
+      port, http.getRequest().mHost, http.getRequest().mUri);
+  if (location == NULL) {
+    http.getResponse().mStatusCode = CLIENT_ERROR_NOT_FOUND;
+    return CLIENT_ERROR_NOT_FOUND;
+  }
 
-  return res;
+  // location 정보에서 alias, uri 정보 가져오기
+  std::vector<std::string> uri = location->FindValue(location, "location");
+  std::vector<std::string> alias = location->FindValue(location, "alias");
+
+  // file path 구하기
+  std::string resolvedPath;
+  if (alias.empty()) {
+    if (uri[0] == "/") {
+      // nginx는 404 Not found 반환
+      http.getResponse().mStatusCode = CLIENT_ERROR_NOT_FOUND;
+      return CLIENT_ERROR_NOT_FOUND;
+    }
+  } else {
+    resolvedPath = uri[0] + alias[0];
+  }
+
+  // 데이터 처리
+  switch (http.CheckPathType(resolvedPath)) {
+  case PATH_IS_DIRECTORY: {
+    // PUT에 대한 요청이 들어오면 405 Method Not Allowed 반환할 수 있음
+    http.getResponse().mStatusCode = CLIENT_ERROR_METHOD_NOT_ALLOWED;
+    return CLIENT_ERROR_METHOD_NOT_ALLOWED;
+  }
+  case PATH_IS_FILE: {
+    // 파일에 대한 PUT 요청 처리 (예: 파일에 데이터 추가)
+    // 데이터 처리 후 결과에 따라 상태 코드 설정
+    http.getResponse().mStatusCode =
+        SUCCESSFUL_OK; // 리소스가 성공적으로 수정된 경우
+    http.getResponse().mBody =
+        "Data successfully processed and resource modified at URI: " +
+        http.getRequest().mUri;
+    return SUCCESSFUL_OK;
+  }
+  case PATH_INACCESSIBLE: {
+    http.getResponse().mStatusCode = CLIENT_ERROR_FORBIDDEN;
+    return CLIENT_ERROR_FORBIDDEN;
+  }
+  default: {
+    http.getResponse().mStatusCode = CLIENT_ERROR_NOT_FOUND;
+    return CLIENT_ERROR_NOT_FOUND;
+  }
+  }
 }
 
 eStatusCode CgiHandler::handle(int port, Http &http) {
