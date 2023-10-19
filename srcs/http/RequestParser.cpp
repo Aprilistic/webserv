@@ -49,7 +49,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       break;
     case RequestUriStart:
       if (req.mMethod != "GET" && req.mMethod != "POST" &&
-          req.mMethod != "DELETE") {
+          req.mMethod != "DELETE" && req.mMethod != "PUT") {
         return CLIENT_ERROR_METHOD_NOT_ALLOWED;
       }
       if (isControl(input)) {
