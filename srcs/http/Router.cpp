@@ -126,28 +126,26 @@ eStatusCode GetHandler::handle(int port, Http &http) {
           return SUCCESSFUL_OK;
         } else {
           // autoindex가 off 일때 처리 로직
-          http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND);
+          http.getResponse().mStatusCode = CLIENT_ERROR_NOT_FOUND;
           return CLIENT_ERROR_NOT_FOUND;
         }
       }
       break;
     }
-    // 파일 처리 로직
-    case PATH_IS_FILE:
+    case PATH_IS_FILE: { // 파일 처리 로직
       // 파일 탐색 성공 -> http.getResponse().mStatusCode = SUCCESSFUL_OK
       return SUCCESSFUL_OK;
       // 파일 탐색 실패 -> http.ErrorHandle(port, CLIENT_ERROR_FORBIDDEN); 404;
       break;
-    // 권한 에러
-    case PATH_INACCESSIBLE:
-      http.ErrorHandle(port, CLIENT_ERROR_FORBIDDEN); // 권한에러 403 확인필요
+    }
+    case PATH_INACCESSIBLE: { // 권한에러
+      http.getResponse().mStatusCode = CLIENT_ERROR_FORBIDDEN; // 권한에러 403 확인필요
       return CLIENT_ERROR_FORBIDDEN;
-    // 언노운 타입
-    default:
-      http.ErrorHandle(
-          port,
-          CLIENT_ERROR_NOT_FOUND); // 파일도 디렉토리도 아니면 404 확인필요
+    }
+    default: { // 언노운 파일
+      http.getResponse().mStatusCode = CLIENT_ERROR_NOT_FOUND; // 파일도 디렉토리도 아니면 404 확인필요
       return CLIENT_ERROR_FORBIDDEN;
+    }
     }
   }
 }
