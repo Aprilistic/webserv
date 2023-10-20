@@ -97,8 +97,7 @@ void Connection::readHandler() {
   // 포트가 같은데 둘 다 이름이 없는 경우 localhost로 접근할 때,
   // default_server로 안 가는 문제'
 
-  mHttp.getResponse().mVersionMajor = mHttp.getRequest().mVersionMajor;
-  mHttp.getResponse().mVersionMinor = mHttp.getRequest().mVersionMinor; 
+  mHttp.MakeMandatoryHeaders();
   ResponseMessage responseMessage(mHttp.getResponse());
 
   mSendBuffer = responseMessage.getMessageToVector();

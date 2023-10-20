@@ -26,6 +26,8 @@ public:
 
   unsigned int mStatusCode;
   std::string mStatus;
+
+  std::string mFilename;
 };
 
 #endif

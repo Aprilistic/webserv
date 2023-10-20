@@ -27,16 +27,19 @@ public:
   eStatusCode requestParser(int &port, std::vector<char> &mRecvBuffer);
   eStatusCode priorityHeaders(int &port);
   eStatusCode setResponse(int &port);
+  std::string getFileType();
+  void MakeMandatoryHeaders();
 
   void ErrorHandle(int port, eStatusCode errorStatus);
   eStatusCode ReadFile(const std::string &path);
   eStatusCode WriteFile(const std::string &path);
+  std::string AutoIndex(const std::string &path);
 
   bool CheckRedirect(int port);
   bool CheckClientMaxBodySize(int port);
   bool CheckLimitExcept(int port);
 
-eStatusCode CheckPathType(const std::string& path);
+  eStatusCode CheckPathType(const std::string &path);
 
   void resetRequest(void);
   void resetResponse(void);

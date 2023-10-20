@@ -130,6 +130,7 @@ void Http::ErrorHandle(int port, eStatusCode errorStatus) {
 }
 
 eStatusCode Http::ReadFile(const std::string &path) {
+  getResponse().mFilename = path;
   mFd = open(path.c_str(), O_RDONLY);
 
   if (mFd == -1) {
@@ -156,6 +157,26 @@ eStatusCode Http::ReadFile(const std::string &path) {
 }
 
 // eStatusCode Http::WriteFile(const std::string &path) {}
+std::string Http::AutoIndex(const std::string &path) {
+  DIR *dir = opendir(path.c_str());
+  if (dir == NULL) {
+    return ("");
+  }
+
+  std::string html = "<html><head><title>Index of " + path +
+                     "</title></head><body><h1>Index of " + path +
+                     "</h1><hr><pre>";
+
+  struct dirent *entry;
+  while ((entry = readdir(dir)) != NULL) {
+    html += "<a href=\"" + std::string(entry->d_name) + "\">" +
+            std::string(entry->d_name) + "</a><br>";
+  }
+  html += "</pre><hr></body></html>";
+
+  closedir(dir);
+  return (html);
+}
 
 bool Http::CheckRedirect(int port) {
   Node *location =

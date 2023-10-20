@@ -220,6 +220,8 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
                      0) {
             if (strcasecmp(mHeaderValue.c_str(), "Chunked") == 0)
               mChunked = true;
+          } else if (strcasecmp(mHeaderName.c_str(), "Content-Type") == 0) {
+            req.mContentType = mHeaderValue;
           }
         }
         std::string tmp = mHeaderName;

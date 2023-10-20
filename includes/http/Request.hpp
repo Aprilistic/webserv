@@ -26,6 +26,7 @@ public:
 
   std::string mHost;
   int mContentLength;
+  std::string mContentType;
   bool mKeepAlive;
 };
 
