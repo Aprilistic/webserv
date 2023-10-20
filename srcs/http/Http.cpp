@@ -113,7 +113,7 @@ eStatusCode Http::ReadFile(const std::string &path) {
   return (SUCCESSFUL_OK); // 성공 후 반환값 뭐로 하지?
 }
 
-eStatusCode Http::WriteFile(const std::string &path) {}
+// eStatusCode Http::WriteFile(const std::string &path) {}
 
 bool Http::CheckRedirect(int port) {
   Node *location =

@@ -46,31 +46,24 @@ bool Router::IsCgiRequest(Http &request) {
   return (false);
 }
 
-// ex
 eStatusCode GetHandler::handle(int port, Http &http) {
   Node *location = Common::mConfigMap->GetConfigNode(
       port, http.getRequest().mHost, http.getRequest().mUri);
 
   // NULL 인경우 -> 일치하는 location이 없고 / 도 설정되어 있지 않은 경우
   if (location == NULL) {
-    // 기본 설정에 정의되어 있는 index.html(Welcom nginx)로 처리하거나
-    // 파일 읽기 로직
-    // 404로 처리
     http.getResponse().mStatusCode = CLIENT_ERROR_NOT_FOUND;
     return CLIENT_ERROR_NOT_FOUND; // return 값 고민
   }
 
   std::vector<std::string> uri = location->FindValue(location, "location");
-
   std::vector<std::string> alias = location->FindValue(location, "alias");
 
   // alias가 없는 경우 location 이 / 라면 기본 설정에 정의되어 있는 index.html
   // 그 외의 다른 location의 경우 404
+
   if (alias.empty()) {
-    if (uri[0] == "/")
-      return SUCCESSFUL_OK;
-    // 기본 설정에 정의되어 있는 index.html(Welcom nginx)
-    else {
+    if (uri[0] == "/") {
       http.getResponse().mStatusCode = CLIENT_ERROR_NOT_FOUND;
       return CLIENT_ERROR_NOT_FOUND; // return 값 고민
     }
@@ -79,10 +72,13 @@ eStatusCode GetHandler::handle(int port, Http &http) {
     // resolvedPath = uri(/abc/)+ alias(/var/www/wow) = /var/www/wow/abc/
     // 구한 경로가 디렉토리인지 파일인지 권한에러인지 언노운파일인지 확인하는
     // 로직
-    std::string resolvedPath = alias[0];
+    std::string resolvedPath = http.getRequest().mUri; // /example/index.html
+    size_t pos = resolvedPath.find(uri[0]);            // /example
+    if (pos != std::string::npos) {
+      resolvedPath.replace(pos, uri[0].size(), alias[0]);
+    }
 
     switch (http.CheckPathType(resolvedPath)) {
-    // 디렉토리 처리 로직
     case PATH_IS_DIRECTORY: {
       std::vector<std::string> index = location->FindValue(location, "index");
       bool found = false;
@@ -91,7 +87,7 @@ eStatusCode GetHandler::handle(int port, Http &http) {
       for (size_t i = 0; i < index.size(); i++) {
         // configfile에 index에 있는 파일을 resolvedPath에 붙이면서 파일인지
         // 확인
-        fullPath = resolvedPath + "/" + index[i]; // file
+        fullPath = resolvedPath + index[i]; // file
 
         if (http.CheckPathType(fullPath) == PATH_IS_FILE) {
           found = true;
@@ -101,6 +97,7 @@ eStatusCode GetHandler::handle(int port, Http &http) {
       // 경로에 파일이 있다면
       if (found) {
         // fullPath에 저장된 파일 제공
+        http
         http.getResponse().mStatusCode = SUCCESSFUL_OK;
         return SUCCESSFUL_OK;
       } else {
@@ -121,8 +118,9 @@ eStatusCode GetHandler::handle(int port, Http &http) {
       }
       break;
     }
-    case PATH_IS_FILE: { // 파일 처리 로직
+    case PATH_IS_FILE: {
       // 파일 탐색 성공 -> http.getResponse().mStatusCode = SUCCESSFUL_OK
+      //
       return SUCCESSFUL_OK;
       // 파일 탐색 실패 -> http.ErrorHandle(port, CLIENT_ERROR_FORBIDDEN);
       // 404;
@@ -139,7 +137,9 @@ eStatusCode GetHandler::handle(int port, Http &http) {
       return CLIENT_ERROR_FORBIDDEN;
     }
     }
+    return SUCCESSFUL_OK;
   }
+  return SUCCESSFUL_OK;
 }
 
 eStatusCode PostHandler::handle(int port, Http &http) {

@@ -202,7 +202,8 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
         // }
         if (strcasecmp(mHeaderName.c_str(), "Content-Length") == 0) {
           mContentSize = atoi(mHeaderValue.c_str());
-          resp.mContent.reserve(mContentSize);
+          // resp.mContent.reserve(mContentSize);
+          resp.mBody.reserve(mContentSize);
         } else if (strcasecmp(mHeaderName.c_str(), "Transfer-Encoding") == 0) {
           if (strcasecmp(mHeaderValue.c_str(), "mChunked") == 0)
             mChunked = true;
@@ -266,7 +267,8 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
     }
     case Post:
       --mContentSize;
-      resp.mContent.push_back(input);
+      // resp.mContent.push_back(input);
+      resp.mBody += input;
 
       if (mContentSize == 0) {
         return ParsingCompleted;
@@ -307,7 +309,8 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
       if (input == '\n') {
         mChunkSize = strtol(mChunkSizeStr.c_str(), NULL, 16);
         mChunkSizeStr.clear();
-        resp.mContent.reserve(resp.mContent.size() + mChunkSize);
+        // resp.mContent.reserve(resp.mContent.size() + mChunkSize);
+        resp.mBody.reserve(resp.mBody.size() + mChunkSize);
 
         if (mChunkSize == 0)
           mState = ChunkSizeNewLine_2;
@@ -352,7 +355,8 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
       }
       break;
     case ChunkData:
-      resp.mContent.push_back(input);
+      // resp.mContent.push_back(input);
+      resp.mBody += input;
 
       if (--mChunkSize == 0) {
         mState = ChunkDataNewLine_1;
