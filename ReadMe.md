@@ -1,4 +1,15 @@
-//비동기적 파일 I/O (AIO)를 사용해서 파일을 읽기 전에 kqueue 이벤트 등록
+  // uri에 특정 location이 들어오지 않고, 확장자도 주어지지 않았는데 cgi로
+  // 처리해야한다는 내용이 configfile에 들어있을 수 있는 지 확인 필요
+
+// location 을 찾아갔는데 없으면 root로 가야하고 그것도 없으면 NULL 
+
+
+
+
+
+
+
+<!-- //비동기적 파일 I/O (AIO)를 사용해서 파일을 읽기 전에 kqueue 이벤트 등록
 //읽기 완료되면 kqueue에 알림이 옴
 //response 만들어 보내기
 
@@ -66,4 +77,4 @@ int main() {
     close(fd);
     close(kq);
     return 0;
-}
+} -->
