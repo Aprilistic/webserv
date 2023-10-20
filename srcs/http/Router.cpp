@@ -52,7 +52,6 @@ eStatusCode GetHandler::handle(int port, Http &http) {
 
   // NULL 인경우 -> 일치하는 location이 없고 / 도 설정되어 있지 않은 경우
   if (location == NULL) {
-    http.getResponse().mStatusCode = CLIENT_ERROR_NOT_FOUND;
     return CLIENT_ERROR_NOT_FOUND; // return 값 고민
   }
 
@@ -64,7 +63,6 @@ eStatusCode GetHandler::handle(int port, Http &http) {
 
   if (alias.empty()) {
     if (uri[0] == "/") {
-      http.getResponse().mStatusCode = CLIENT_ERROR_NOT_FOUND;
       return CLIENT_ERROR_NOT_FOUND; // return 값 고민
     }
   } else {
@@ -78,6 +76,7 @@ eStatusCode GetHandler::handle(int port, Http &http) {
       resolvedPath.replace(pos, uri[0].size(), alias[0]);
     }
 
+    eStatusCode test = http.CheckPathType(resolvedPath);
     switch (http.CheckPathType(resolvedPath)) {
     case PATH_IS_DIRECTORY: {
       std::vector<std::string> index = location->FindValue(location, "index");
@@ -88,7 +87,6 @@ eStatusCode GetHandler::handle(int port, Http &http) {
         // configfile에 index에 있는 파일을 resolvedPath에 붙이면서 파일인지
         // 확인
         fullPath = resolvedPath + index[i]; // file
-
         if (http.CheckPathType(fullPath) == PATH_IS_FILE) {
           found = true;
           break;
@@ -97,8 +95,11 @@ eStatusCode GetHandler::handle(int port, Http &http) {
       // 경로에 파일이 있다면
       if (found) {
         // fullPath에 저장된 파일 제공
-        http
-        http.getResponse().mStatusCode = SUCCESSFUL_OK;
+        eStatusCode readStatus = http.ReadFile(fullPath);
+        if (readStatus != SUCCESSFUL_OK) {
+          return (readStatus);
+        }
+
         return SUCCESSFUL_OK;
       } else {
         // 경로에 파일이 없다면
@@ -112,27 +113,25 @@ eStatusCode GetHandler::handle(int port, Http &http) {
           return SUCCESSFUL_OK;
         } else {
           // autoindex가 off 일때 처리 로직
-          http.getResponse().mStatusCode = CLIENT_ERROR_NOT_FOUND;
           return CLIENT_ERROR_NOT_FOUND;
         }
       }
       break;
     }
     case PATH_IS_FILE: {
-      // 파일 탐색 성공 -> http.getResponse().mStatusCode = SUCCESSFUL_OK
-      //
+      eStatusCode readStatus = http.ReadFile(resolvedPath);
+      if (readStatus != SUCCESSFUL_OK) {
+        return (readStatus);
+      }
       return SUCCESSFUL_OK;
-      // 파일 탐색 실패 -> http.ErrorHandle(port, CLIENT_ERROR_FORBIDDEN);
+      // 파일 탐색 실패 -> http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND);
       // 404;
       break;
     }
-    case PATH_INACCESSIBLE: { // 권한에러
-      http.getResponse().mStatusCode = CLIENT_ERROR_FORBIDDEN;
-      // 권한에러 403 확인필요
-      return CLIENT_ERROR_FORBIDDEN;
+    case PATH_INACCESSIBLE: {        // 권한에러
+      return CLIENT_ERROR_FORBIDDEN; // 403??
     }
     default: { // 언노운 파일
-      http.getResponse().mStatusCode = CLIENT_ERROR_NOT_FOUND;
       // 파일도 디렉토리도 아니면 404 확인필요
       return CLIENT_ERROR_FORBIDDEN;
     }
@@ -151,7 +150,6 @@ eStatusCode PostHandler::handle(int port, Http &http) {
   Node *location = Common::mConfigMap->GetConfigNode(
       port, http.getRequest().mHost, http.getRequest().mUri);
   if (location == NULL) {
-    http.getResponse().mStatusCode = CLIENT_ERROR_NOT_FOUND;
     return CLIENT_ERROR_NOT_FOUND;
   }
 
@@ -164,7 +162,6 @@ eStatusCode PostHandler::handle(int port, Http &http) {
   if (alias.empty()) {
     if (uri[0] == "/") {
       // nginx는 404 Not found 반환
-      http.getResponse().mStatusCode = CLIENT_ERROR_NOT_FOUND;
       return CLIENT_ERROR_NOT_FOUND;
     }
   } else {
@@ -176,7 +173,7 @@ eStatusCode PostHandler::handle(int port, Http &http) {
   case PATH_IS_DIRECTORY: {
     // 디렉토리에 대한 POST 요청 처리 (예: 데이터베이스에 데이터 저장)
     // 데이터 처리 후 결과에 따라 상태 코드 설정
-    http.getResponse().mStatusCode = SUCCESSFUL_OK; // 새 리소스가 생성된 경우
+    http.getResponse().mStatusCode = SUCCESSFUL_OK; // 새 리소스가 생성된 경우AA
     http.getResponse().mBody =
         "Data successfully processed and resource created at URI: " +
         http.getRequest().mUri;
@@ -193,11 +190,9 @@ eStatusCode PostHandler::handle(int port, Http &http) {
     return SUCCESSFUL_OK;
   }
   case PATH_INACCESSIBLE: {
-    http.getResponse().mStatusCode = CLIENT_ERROR_FORBIDDEN;
     return CLIENT_ERROR_FORBIDDEN;
   }
   default: {
-    http.getResponse().mStatusCode = CLIENT_ERROR_NOT_FOUND;
     return CLIENT_ERROR_NOT_FOUND;
   }
   }
@@ -208,7 +203,6 @@ eStatusCode DeleteHandler::handle(int port, Http &http) {
   Node *location = Common::mConfigMap->GetConfigNode(
       port, http.getRequest().mHost, http.getRequest().mUri);
   if (location == NULL) {
-    http.getResponse().mStatusCode = CLIENT_ERROR_NOT_FOUND;
     return CLIENT_ERROR_NOT_FOUND;
   }
 
@@ -221,7 +215,6 @@ eStatusCode DeleteHandler::handle(int port, Http &http) {
   if (alias.empty()) {
     if (uri[0] == "/") {
       // 어떤 동작하는지 찾아봐야 함
-      http.getResponse().mStatusCode = CLIENT_ERROR_NOT_FOUND;
       return CLIENT_ERROR_NOT_FOUND;
     }
   } else {
@@ -233,7 +226,6 @@ eStatusCode DeleteHandler::handle(int port, Http &http) {
   case PATH_IS_DIRECTORY: {
     // DELETE 요청은 리소스와 관련된 메타데이터를 모두 삭제해야 함
     // 하지만 디렉토리를 삭제하는 것은 위험할 수 있어서 허용하지 않을 수 있음
-    http.getResponse().mStatusCode = CLIENT_ERROR_METHOD_NOT_ALLOWED;
     return CLIENT_ERROR_METHOD_NOT_ALLOWED;
   }
   case PATH_IS_FILE: {
@@ -244,16 +236,13 @@ eStatusCode DeleteHandler::handle(int port, Http &http) {
       http.getResponse().mStatusCode = SUCCESSFUL_OK;
       return SUCCESSFUL_OK;
     } else {
-      http.getResponse().mStatusCode = SERVER_ERROR_INTERNAL_SERVER_ERROR;
       return SERVER_ERROR_INTERNAL_SERVER_ERROR;
     }
   }
   case PATH_INACCESSIBLE: {
-    http.getResponse().mStatusCode = CLIENT_ERROR_FORBIDDEN;
     return CLIENT_ERROR_FORBIDDEN;
   }
   default: {
-    http.getResponse().mStatusCode = CLIENT_ERROR_NOT_FOUND;
     return CLIENT_ERROR_NOT_FOUND;
   }
   }
@@ -268,7 +257,6 @@ eStatusCode PutHandler::handle(int port, Http &http) {
   Node *location = Common::mConfigMap->GetConfigNode(
       port, http.getRequest().mHost, http.getRequest().mUri);
   if (location == NULL) {
-    http.getResponse().mStatusCode = CLIENT_ERROR_NOT_FOUND;
     return CLIENT_ERROR_NOT_FOUND;
   }
 
@@ -281,7 +269,6 @@ eStatusCode PutHandler::handle(int port, Http &http) {
   if (alias.empty()) {
     if (uri[0] == "/") {
       // nginx는 404 Not found 반환
-      http.getResponse().mStatusCode = CLIENT_ERROR_NOT_FOUND;
       return CLIENT_ERROR_NOT_FOUND;
     }
   } else {
@@ -292,7 +279,6 @@ eStatusCode PutHandler::handle(int port, Http &http) {
   switch (http.CheckPathType(resolvedPath)) {
   case PATH_IS_DIRECTORY: {
     // PUT에 대한 요청이 들어오면 405 Method Not Allowed 반환할 수 있음
-    http.getResponse().mStatusCode = CLIENT_ERROR_METHOD_NOT_ALLOWED;
     return CLIENT_ERROR_METHOD_NOT_ALLOWED;
   }
   case PATH_IS_FILE: {
@@ -306,11 +292,9 @@ eStatusCode PutHandler::handle(int port, Http &http) {
     return SUCCESSFUL_OK;
   }
   case PATH_INACCESSIBLE: {
-    http.getResponse().mStatusCode = CLIENT_ERROR_FORBIDDEN;
     return CLIENT_ERROR_FORBIDDEN;
   }
   default: {
-    http.getResponse().mStatusCode = CLIENT_ERROR_NOT_FOUND;
     return CLIENT_ERROR_NOT_FOUND;
   }
   }
