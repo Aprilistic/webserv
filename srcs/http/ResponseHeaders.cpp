@@ -5,41 +5,41 @@ std::string Http::getFileType() {
     return (getRequest().mContentType);
   } else if (getRequest().mMethod == "PUT" && getResponse().mBody.size() != 0) {
     return (getRequest().mContentType);
-  } else {
-    std::string filepath = getResponse().mFilename;
-    if (filepath == "autoindex") {
-      return ("text/html");
-    }
-    std::string fileType = filepath.substr(filepath.find_last_of(".") + 1);
-
-    if (fileType == "bla") {
-      return ("text/plain");
-    } else if (fileType == "css") {
-      return ("text/css");
-    } else if (fileType == "gif") {
-      return ("image/gif");
-    } else if (fileType == "htm" || fileType == "html") {
-      return ("text/html");
-    } else if (fileType == "ico") {
-      return ("image/x-icon");
-    } else if (fileType == "jpeg" || fileType == "jpg") {
-      return ("image/jpeg");
-    } else if (fileType == "js") {
-      return ("text/javascript");
-    } else if (fileType == "json") {
-      return ("application/json");
-    } else if (fileType == "pdf") {
-      return ("application/pdf");
-    } else if (fileType == "png") {
-      return ("image/png");
-    } else if (fileType == "svg") {
-      return ("image/svg+xml");
-    } else if (fileType == "txt") {
-      return ("text/plain");
-    } else if (fileType == "xml") {
-      return ("text/xml");
-    }
   }
+  std::string filepath = getResponse().mFilename;
+  if (filepath == "autoindex") {
+    return ("text/html");
+  }
+  std::string fileType = filepath.substr(filepath.find_last_of(".") + 1);
+
+  if (fileType == "bla") {
+    return ("text/plain");
+  } else if (fileType == "css") {
+    return ("text/css");
+  } else if (fileType == "gif") {
+    return ("image/gif");
+  } else if (fileType == "htm" || fileType == "html") {
+    return ("text/html");
+  } else if (fileType == "ico") {
+    return ("image/x-icon");
+  } else if (fileType == "jpeg" || fileType == "jpg") {
+    return ("image/jpeg");
+  } else if (fileType == "js") {
+    return ("text/javascript");
+  } else if (fileType == "json") {
+    return ("application/json");
+  } else if (fileType == "pdf") {
+    return ("application/pdf");
+  } else if (fileType == "png") {
+    return ("image/png");
+  } else if (fileType == "svg") {
+    return ("image/svg+xml");
+  } else if (fileType == "txt") {
+    return ("text/plain");
+  } else if (fileType == "xml") {
+    return ("text/xml");
+  }
+  return ("application/octet-stream");
 }
 
 void Http::MakeMandatoryHeaders() {

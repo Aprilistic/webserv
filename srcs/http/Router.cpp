@@ -65,78 +65,77 @@ eStatusCode GetHandler::handle(int port, Http &http) {
     if (uri[0] == "/") {
       return CLIENT_ERROR_NOT_FOUND; // return 값 고민
     }
-  } else {
-    // alias 있는 경우
-    // resolvedPath = uri(/abc/)+ alias(/var/www/wow) = /var/www/wow/abc/
-    // 구한 경로가 디렉토리인지 파일인지 권한에러인지 언노운파일인지 확인하는
-    // 로직
-    std::string resolvedPath = http.getRequest().mUri; // /example/index.html
-    size_t pos = resolvedPath.find(uri[0]);            // /example
-    if (pos != std::string::npos) {
-      resolvedPath.replace(pos, uri[0].size(), alias[0]);
-    }
+  }
+  // alias 있는 경우
+  // resolvedPath = uri(/abc/)+ alias(/var/www/wow) = /var/www/wow/abc/
+  // 구한 경로가 디렉토리인지 파일인지 권한에러인지 언노운파일인지 확인하는
+  // 로직
+  std::string resolvedPath = http.getRequest().mUri; // /example/index.html
+  size_t pos = resolvedPath.find(uri[0]);            // /example
+  if (pos != std::string::npos) {
+    resolvedPath.replace(pos, uri[0].size(), alias[0]);
+  }
 
-    eStatusCode test = http.CheckPathType(resolvedPath);
-    switch (http.CheckPathType(resolvedPath)) {
-    case PATH_IS_DIRECTORY: {
-      std::vector<std::string> index = location->FindValue(location, "index");
-      bool found = false;
-      std::string fullPath;
+  switch (http.CheckPathType(resolvedPath)) {
+  case PATH_IS_DIRECTORY: {
+    std::vector<std::string> index = location->FindValue(location, "index");
+    bool found = false;
+    std::string fullPath;
 
-      for (size_t i = 0; i < index.size(); i++) {
-        // configfile에 index에 있는 파일을 resolvedPath에 붙이면서 파일인지
-        // 확인
-        fullPath = resolvedPath + index[i]; // file
-        if (http.CheckPathType(fullPath) == PATH_IS_FILE) {
-          found = true;
-          break;
-        }
+    for (size_t i = 0; i < index.size(); i++) {
+      // configfile에 index에 있는 파일을 resolvedPath에 붙이면서 파일인지
+      // 확인
+      fullPath = resolvedPath + index[i]; // file
+      if (http.CheckPathType(fullPath) == PATH_IS_FILE) {
+        found = true;
+        break;
       }
-      // 경로에 파일이 있다면
-      if (found) {
-        // fullPath에 저장된 파일 제공
-        eStatusCode readStatus = http.ReadFile(fullPath);
-        if (readStatus != SUCCESSFUL_OK) {
-          return (readStatus);
-        }
-
-        return SUCCESSFUL_OK;
-      } else {
-        // 경로에 파일이 없다면
-        // autoindex 설정 확인
-        std::vector<std::string> autoindex =
-            location->FindValue(location, "autoindex");
-
-        if (autoindex.empty() == false && autoindex[0] == "on") {
-          // autoindex on 일때 처리 로직
-          http.getResponse().mStatusCode = SUCCESSFUL_OK;
-          return SUCCESSFUL_OK;
-        } else {
-          // autoindex가 off 일때 처리 로직
-          return CLIENT_ERROR_NOT_FOUND;
-        }
-      }
-      break;
     }
-    case PATH_IS_FILE: {
-      eStatusCode readStatus = http.ReadFile(resolvedPath);
+    // 경로에 파일이 있다면
+    if (found) {
+      // fullPath에 저장된 파일 제공
+      eStatusCode readStatus = http.ReadFile(fullPath);
       if (readStatus != SUCCESSFUL_OK) {
         return (readStatus);
       }
+
       return SUCCESSFUL_OK;
-      // 파일 탐색 실패 -> http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND);
-      // 404;
-      break;
+    } else {
+      http.getResponse().mFilename = "autoindex";
+      // 경로에 파일이 없다면
+      // autoindex 설정 확인
+      std::vector<std::string> autoindex =
+          location->FindValue(location, "autoindex");
+
+      if (autoindex.empty() == false && autoindex[0] == "on") {
+        // autoindex on 일때 처리 로직
+        http.getResponse().mBody = http.AutoIndex(resolvedPath);
+        http.getResponse().mStatusCode = SUCCESSFUL_OK;
+        return SUCCESSFUL_OK;
+      } else {
+        // autoindex가 off 일때 처리 로직
+        return CLIENT_ERROR_NOT_FOUND;
+      }
     }
-    case PATH_INACCESSIBLE: {        // 권한에러
-      return CLIENT_ERROR_FORBIDDEN; // 403??
-    }
-    default: { // 언노운 파일
-      // 파일도 디렉토리도 아니면 404 확인필요
-      return CLIENT_ERROR_FORBIDDEN;
-    }
+    break;
+  }
+  case PATH_IS_FILE: {
+    eStatusCode readStatus = http.ReadFile(resolvedPath);
+    if (readStatus != SUCCESSFUL_OK) {
+      return (readStatus);
     }
     return SUCCESSFUL_OK;
+    // 파일 탐색 실패 -> http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND);
+    // 404;
+    break;
+  }
+  case PATH_INACCESSIBLE: {        // 권한에러
+    return CLIENT_ERROR_FORBIDDEN; // 403??
+  }
+  default: { // 언노운 파일
+    // 파일도 디렉토리도 아니면 404 확인필요
+    return CLIENT_ERROR_FORBIDDEN;
+  }
   }
   return SUCCESSFUL_OK;
 }
@@ -158,14 +157,17 @@ eStatusCode PostHandler::handle(int port, Http &http) {
   std::vector<std::string> alias = location->FindValue(location, "alias");
 
   // file path 구하기
-  std::string resolvedPath;
   if (alias.empty()) {
     if (uri[0] == "/") {
       // nginx는 404 Not found 반환
       return CLIENT_ERROR_NOT_FOUND;
     }
-  } else {
-    resolvedPath = alias[0];
+  }
+
+  std::string resolvedPath = http.getRequest().mUri; // /example/index.html
+  size_t pos = resolvedPath.find(uri[0]);            // /example
+  if (pos != std::string::npos) {
+    resolvedPath.replace(pos, uri[0].size(), alias[0]);
   }
 
   // 데이터 처리
@@ -211,14 +213,16 @@ eStatusCode DeleteHandler::handle(int port, Http &http) {
   std::vector<std::string> alias = location->FindValue(location, "alias");
 
   // file path 구하기
-  std::string resolvedPath;
   if (alias.empty()) {
     if (uri[0] == "/") {
       // 어떤 동작하는지 찾아봐야 함
       return CLIENT_ERROR_NOT_FOUND;
     }
-  } else {
-    resolvedPath = alias[0];
+  }
+  std::string resolvedPath = http.getRequest().mUri; // /example/index.html
+  size_t pos = resolvedPath.find(uri[0]);            // /example
+  if (pos != std::string::npos) {
+    resolvedPath.replace(pos, uri[0].size(), alias[0]);
   }
 
   // 데이터 삭제
@@ -265,14 +269,16 @@ eStatusCode PutHandler::handle(int port, Http &http) {
   std::vector<std::string> alias = location->FindValue(location, "alias");
 
   // file path 구하기
-  std::string resolvedPath;
   if (alias.empty()) {
     if (uri[0] == "/") {
       // nginx는 404 Not found 반환
       return CLIENT_ERROR_NOT_FOUND;
     }
-  } else {
-    resolvedPath = alias[0];
+  }
+  std::string resolvedPath = http.getRequest().mUri; // /example/index.html
+  size_t pos = resolvedPath.find(uri[0]);            // /example
+  if (pos != std::string::npos) {
+    resolvedPath.replace(pos, uri[0].size(), alias[0]);
   }
 
   // 데이터 처리
