@@ -73,6 +73,9 @@ Node *ConfigMap::PortMap::searchInServerConfig(UriMap *uriConfigs,
   if (uriConfigs->find(uri) != uriConfigs->end()) {
     return (*uriConfigs)[uri];
   }
+  if(uriConfigs->find("/") != uriConfigs->end()) {
+    return (*uriConfigs)["/"];
+  }
   return NULL;
 }
 
