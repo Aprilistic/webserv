@@ -21,7 +21,6 @@ public:
   Http();
   ~Http();
 
-  eStatusCode parseRequest(const std::vector<char> &buffer);
   //   std::vector<char> &parseResponse(Response response);
 
   eStatusCode requestParser(int &port, std::vector<char> &mRecvBuffer);

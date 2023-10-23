@@ -42,11 +42,11 @@ void Connection::EventHandler(struct kevent &currentEvent) {
 eStatusCode Connection::readFromSocket() {
   mRecvBuffer.clear();
 
-  std::string httpBuffer(mHttp.getBuffer());
-  std::vector<char> httpBufferVector(httpBuffer.begin(), httpBuffer.end());
-  mRecvBuffer.insert(mRecvBuffer.end(), httpBufferVector.begin(),
-                     httpBufferVector.end());
-  mHttp.resetBuffer();
+  // std::string httpBuffer(mHttp.getBuffer());
+  // std::vector<char> httpBufferVector(httpBuffer.begin(), httpBuffer.end());
+  // mRecvBuffer.insert(mRecvBuffer.end(), httpBufferVector.begin(),
+  //                    httpBufferVector.end());
+  // mHttp.resetBuffer();
 
   ssize_t bytesRead;
   char tmp[RECV_BUFFER_SIZE];

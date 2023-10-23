@@ -274,9 +274,10 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       if (mChunked) {
         mState = mChunkSize;
       } else if (mContentsize == 0) {
-        if (input == '\n')
+        if (input == '\n') {
+          mRemainingBuffer.assign(begin, end);
           return ParsingCompleted;
-        else
+        } else
           return CLIENT_ERROR_BAD_REQUEST;
       } else {
         mState = Post;
@@ -348,6 +349,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       break;
     case ChunkSizeNewLine_3:
       if (input == '\n') {
+        mRemainingBuffer.assign(begin, end);
         return ParsingCompleted;
       } else {
         return CLIENT_ERROR_BAD_REQUEST;

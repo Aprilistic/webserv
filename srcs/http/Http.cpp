@@ -4,34 +4,23 @@ Http::Http() {}
 
 Http::~Http() {}
 
-eStatusCode Http::parseRequest(const std::vector<char> &buffer) {
-
-  std::string tmp(buffer.begin(), buffer.end());
+eStatusCode Http::requestParser(int &port, std::vector<char> &mRecvBuffer) {
+  std::string tmp(mRecvBuffer.begin(), mRecvBuffer.end());
   mBuffer += tmp;
 
   RequestParser parser;
   eStatusCode result =
       parser.parse(mRequest, mBuffer.c_str(), mBuffer.c_str() + mBuffer.size());
 
-  if (result == ParsingIncompleted) {
-    return ParsingIncompleted;
-  } else if (result == ParsingCompleted) {
+  switch (result) {
+  case (ParsingCompleted):
     mBuffer = parser.getRemainingBuffer();
     return ParsingCompleted;
-  } else {
-    return CLIENT_ERROR_BAD_REQUEST;
-  }
-}
-
-eStatusCode Http::requestParser(int &port, std::vector<char> &mRecvBuffer) {
-  eStatusCode parseStatus = parseRequest(mRecvBuffer);
-  switch (parseStatus) {
-  case (ParsingCompleted):
-    return ParsingCompleted;
   case (ParsingIncompleted):
+    mBuffer.clear();
     return ParsingIncompleted;
   default:
-    return (ErrorHandle(port, parseStatus), ERROR);
+    return (ErrorHandle(port, CLIENT_ERROR_BAD_REQUEST), ERROR);
   }
 }
 
