@@ -12,9 +12,7 @@ std::string Http::getFileType() {
   }
   std::string fileType = filepath.substr(filepath.find_last_of(".") + 1);
 
-  if (fileType == "bla") {
-    return ("text/plain");
-  } else if (fileType == "css") {
+  if (fileType == "css") {
     return ("text/css");
   } else if (fileType == "gif") {
     return ("image/gif");
@@ -70,9 +68,9 @@ void Http::MakeMandatoryHeaders() {
       std::pair<std::string, std::string>("Content-Type", contentType));
 
   // Connection
-  if (getRequest().mHeaders.find("Connection") != getRequest().mHeaders.end()) {
-    getResponse().mHeaders.insert(std::pair<std::string, std::string>(
-        "Connection", getRequest().mHeaders.find("Connection")->second));
+  if (getRequest().mKeepAlive == true) {
+    getResponse().mHeaders.insert(
+        std::pair<std::string, std::string>("Connection", "keep-alive"));
   } else {
     getResponse().mHeaders.insert(
         std::pair<std::string, std::string>("Connection", "close"));
