@@ -11,12 +11,12 @@ class RequestSyntax {
 		RequestSyntax();
 		~RequestSyntax();
 
-		eStatustCode checksyntax(Request &request);
-		eStatustCode method(Request& request); //mMethod
-		eStatustCode requestTarget(Request& request);// mUri
-		eStatustCode httpVersion(Request& request); // mVersionMajor, mVersionMinor
-		eStatustCode headerField(Request& request); // mHeaders<field-name, field-value>
-		eStatustCode messageBody(Request& request); // mContent
+		eStatusCode checksyntax(Request &request);
+		eStatusCode method(Request& request); //mMethod
+		eStatusCode requestTarget(Request& request);// mUri
+		eStatusCode httpVersion(Request& request); // mVersionMajor, mVersionMinor
+		eStatusCode headerField(Request& request); // mHeaders<field-name, field-value>
+		eStatusCode messageBody(Request& request); // mContent
 	private:
 };
 #endif

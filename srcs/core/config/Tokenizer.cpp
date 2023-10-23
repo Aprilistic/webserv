@@ -1,9 +1,8 @@
 #include "Tokenizer.hpp"
 
-std::vector<std::string> Tokenizer::makeTokens(const std::string& path)
-{
-	std::stringstream confBuffer;
-	std::vector<std::string> Tokens;
+std::vector<std::string> Tokenizer::makeTokens(const std::string &path) {
+  std::stringstream confBuffer;
+  std::vector<std::string> Tokens;
 
   openConfFile(path, confBuffer);
   removeComment(confBuffer);
@@ -12,7 +11,8 @@ std::vector<std::string> Tokenizer::makeTokens(const std::string& path)
   return (Tokens);
 }
 
-void Tokenizer::openConfFile(const std::string &path, std::stringstream& outConfBuffer) {
+void Tokenizer::openConfFile(const std::string &path,
+                             std::stringstream &outConfBuffer) {
   std::ifstream confFile(path);
   if (confFile.is_open() == false) {
     throw std::runtime_error("Error: Could not open confFile.");
@@ -25,7 +25,7 @@ void Tokenizer::openConfFile(const std::string &path, std::stringstream& outConf
   }
 }
 
-void Tokenizer::removeComment(std::stringstream& outConfBuffer) {
+void Tokenizer::removeComment(std::stringstream &outConfBuffer) {
   std::stringstream cleanBuffer;
   std::string line;
   int commentPos;
@@ -40,7 +40,7 @@ void Tokenizer::removeComment(std::stringstream& outConfBuffer) {
   outConfBuffer.clear();
 }
 
-void Tokenizer::addBlank(std::stringstream& outConfBuffer) {
+void Tokenizer::addBlank(std::stringstream &outConfBuffer) {
   std::string content;
   content = outConfBuffer.str();
   for (int index = 0; index < content.size(); index++) {
@@ -55,11 +55,15 @@ void Tokenizer::addBlank(std::stringstream& outConfBuffer) {
   outConfBuffer << content;
 }
 
-void Tokenizer::tokenize(std::stringstream& outConfBuffer, std::vector<std::string>& outTokens) {
+void Tokenizer::tokenize(std::stringstream &outConfBuffer,
+                         std::vector<std::string> &outTokens) {
   std::string token;
 
   while (true) {
     outConfBuffer >> token;
+    if (token.find('\"') != std::string::npos) {
+      throw std::runtime_error("Error: find double quote.");
+    }
     if (outConfBuffer.eof() == true) {
       break;
     }

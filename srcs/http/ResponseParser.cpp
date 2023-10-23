@@ -6,7 +6,7 @@ ResponseParser::ResponseParser()
 
 ResponseParser::~ResponseParser() {}
 
-eParseResult ResponseParser::parse(Response &resp, const char *begin,
+eStatusCode ResponseParser::parse(Response &resp, const char *begin,
                                    const char *end) {
   return consume(resp, begin, end);
 }
@@ -20,7 +20,7 @@ bool ResponseParser::checkIfConnection(
   return (item.first == "Connection");
 }
 
-eParseResult ResponseParser::consume(Response &resp, const char *begin,
+eStatusCode ResponseParser::consume(Response &resp, const char *begin,
                                      const char *end) {
   while (begin != end) {
     char input = *begin++;
@@ -202,7 +202,8 @@ eParseResult ResponseParser::consume(Response &resp, const char *begin,
         // }
         if (strcasecmp(mHeaderName.c_str(), "Content-Length") == 0) {
           mContentSize = atoi(mHeaderValue.c_str());
-          resp.mContent.reserve(mContentSize);
+          // resp.mContent.reserve(mContentSize);
+          resp.mBody.reserve(mContentSize);
         } else if (strcasecmp(mHeaderName.c_str(), "Transfer-Encoding") == 0) {
           if (strcasecmp(mHeaderValue.c_str(), "mChunked") == 0)
             mChunked = true;
@@ -266,7 +267,8 @@ eParseResult ResponseParser::consume(Response &resp, const char *begin,
     }
     case Post:
       --mContentSize;
-      resp.mContent.push_back(input);
+      // resp.mContent.push_back(input);
+      resp.mBody += input;
 
       if (mContentSize == 0) {
         return ParsingCompleted;
@@ -307,7 +309,8 @@ eParseResult ResponseParser::consume(Response &resp, const char *begin,
       if (input == '\n') {
         mChunkSize = strtol(mChunkSizeStr.c_str(), NULL, 16);
         mChunkSizeStr.clear();
-        resp.mContent.reserve(resp.mContent.size() + mChunkSize);
+        // resp.mContent.reserve(resp.mContent.size() + mChunkSize);
+        resp.mBody.reserve(resp.mBody.size() + mChunkSize);
 
         if (mChunkSize == 0)
           mState = ChunkSizeNewLine_2;
@@ -352,7 +355,8 @@ eParseResult ResponseParser::consume(Response &resp, const char *begin,
       }
       break;
     case ChunkData:
-      resp.mContent.push_back(input);
+      // resp.mContent.push_back(input);
+      resp.mBody += input;
 
       if (--mChunkSize == 0) {
         mState = ChunkDataNewLine_1;

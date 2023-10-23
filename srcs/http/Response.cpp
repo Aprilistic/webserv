@@ -21,7 +21,6 @@ std::string Response::inspect() const {
     stream << it->first << ": " << it->second << "\n";
   }
 
-  std::string data(mContent.begin(), mContent.end());
-  stream << data << "\n";
+  stream << mBody << "\n";
   return stream.str();
 }

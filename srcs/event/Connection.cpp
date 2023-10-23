@@ -1,6 +1,8 @@
 #include "Connection.hpp"
+#include "Node.hpp"
+#include "Router.hpp"
 
-Connection::Connection(int socket) : mSocket(socket) {
+Connection::Connection(int socket, int port) : mSocket(socket), mPort(port) {
   struct kevent events[2];
 
   mRecvBuffer.reserve(RECV_BUFFER_SIZE);
@@ -37,53 +39,93 @@ void Connection::EventHandler(struct kevent &currentEvent) {
   }
 }
 
-#include "Node.hpp"
-
-void Connection::readHandler() {
+eStatusCode Connection::readFromSocket() {
   mRecvBuffer.clear();
+
+  std::string httpBuffer(mHttp.getBuffer());
+  std::vector<char> httpBufferVector(httpBuffer.begin(), httpBuffer.end());
+  mRecvBuffer.insert(mRecvBuffer.end(), httpBufferVector.begin(),
+                     httpBufferVector.end());
+  mHttp.resetBuffer();
+
   ssize_t bytesRead;
-  bytesRead = recv(mSocket, &mRecvBuffer[0], RECV_BUFFER_SIZE, 0);
+  char tmp[RECV_BUFFER_SIZE];
+  bytesRead = recv(mSocket, tmp, RECV_BUFFER_SIZE, 0);
+  mRecvBuffer.insert(mRecvBuffer.end(), tmp, tmp + bytesRead);
 
   if (bytesRead <= 0) {
     if (bytesRead < 0) {
       // error
+      return (SOCKET_READ_ERROR);
     }
     // disconnection();
-    return;
+    return (SOCKET_DISCONNECTED);
   }
+  return (READ_OK);
+}
 
-  Node *test = Common::mConfigMap->GetConfigNode(80, "localhostt", "/");
+void Connection::readHandler() {
+  eStatusCode state = readFromSocket();
+  switch (state) {
+  case (SOCKET_READ_ERROR):
+    mHttp.ErrorHandle(mPort, state);
+    break;
+  case (SOCKET_DISCONNECTED):
+    /* code */
+    break;
+  case (READ_OK):
+    state = mHttp.requestParser(mPort, mRecvBuffer);
+    if (state == ERROR) {
+      break;
+    } else if (state == ParsingIncompleted) {
+      return;
+    }
+  case (ParsingCompleted):
+    state = mHttp.priorityHeaders(mPort);
+    if (state == REDIRECT || state == ERROR) {
+      break;
+    }
+  case (PRIORITY_HEADER_OK):
+    state = mHttp.setResponse(mPort);
+    if (state == RESPONSE_INCOMPLETED) {
+      return;
+    }
+  default:
+    break;
+  }
+  // 포트가 같은데 둘 다 이름이 없는 경우 localhost로 접근할 때,
+  // default_server로 안 가는 문제'
 
-  std::string str = "alias";
-  std::cout << test->FindValue(test, str)[0] << std::endl;
+  mHttp.MakeMandatoryHeaders();
+  ResponseMessage responseMessage(mHttp.getResponse());
 
-  std::string str1 = "client_max_body_size";
-  std::cout << test->FindValue(test, str1)[0] << std::endl;
-  // if (mHttpParser.parseRequest(mRecvBuffer) == ParsingCompleted)
-  // {
-	// return ;
-  // }
+  std::string test = responseMessage.getMessage();
+  std::cout << test << std::endl;
 
-  // Router router;
+  mSendBuffer = responseMessage.getMessageToVector();
 
-  // IRequestHandler* handler =  router.Routing(mHttpParser.getRequest());
+  // std::string httpResponse = "HTTP/1.1 200 OK\r\n"
+  //                            "Content-Type: text/plain\r\n"
+  //                            "\r\n"
+  //                            "Hello, World!";
 
-  // Response response = handler->handle(mHttpParser.getRequest());
- 
-  // mSendBuffer = mHttpParser.parseResponse(response);
-  
+  // 문자열을 vector<char>에 담기
+  // std::vector<char> responseVec(httpResponse.begin(), httpResponse.end());
+  // mSendBuffer = responseVec;
+  mHttp.resetRequest();
+  mHttp.resetResponse();
 }
 
 void Connection::writeHandler() {
   ssize_t bytesSent = send(mSocket, &mSendBuffer[0], mSendBuffer.size(), 0);
 
+  mSendBuffer.clear();
   if (bytesSent <= 0) {
     if (bytesSent < 0) {
       // error
     }
     return;
   }
-  mHttpParser.resetResponse();
 }
 
 void Connection::timerHandler() {

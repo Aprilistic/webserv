@@ -1,7 +1,21 @@
 #ifndef ENUM_HPP
 #define ENUM_HPP
 
-enum eStatustCode {
+enum eStatusCode {
+  ParsingCompleted = 0,
+  ParsingIncompleted = 1,
+  ParsingError = 2,
+  RESPONSE_INCOMPLETED = 3,
+  SOCKET_READ_ERROR = 4,
+  SOCKET_DISCONNECTED = 5,
+  READ_OK = 6,
+  ERROR = 7,
+  REDIRECT = 8,
+  PRIORITY_HEADER_OK = 9,
+  PATH_INACCESSIBLE = 10,
+  PATH_IS_DIRECTORY = 11,
+  PATH_IS_FILE = 12,
+  PATH_UNKNOWN = 13,
   INFORMATIONAL_CONTINUE = 100,
   INFORMATIONAL_SWITCHING_PROTOCOLS = 101,
   SUCCESSFUL_OK = 200,
@@ -49,8 +63,6 @@ enum eStatustCode {
   SERVER_ERROR_GATEWAY_TIMEOUT = 504,
   SERVER_ERROR_HTTP_VERSION_NOT_SUPPORTED = 505
 };
-
-enum eParseResult { ParsingCompleted, ParsingIncompleted, ParsingError };
 
 enum eState {
   RequestMethodStart,

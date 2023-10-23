@@ -3,7 +3,7 @@
 
 #include "Common.hpp"
 #include "Core.hpp"
-#include "HttpParser.hpp"
+#include "Http.hpp"
 #include "IEventHandler.hpp"
 
 #define RECV_BUFFER_SIZE 4096
@@ -11,11 +11,12 @@
 
 class Connection : public IEventHandler {
 public:
-  Connection(int socket);
+  Connection(int socket, int port);
   ~Connection();
   virtual void EventHandler(struct kevent &currentEvent);
 
 private:
+  eStatusCode readFromSocket();
   void readHandler();
   void writeHandler();
   void timerHandler();
@@ -23,7 +24,8 @@ private:
 
 private:
   int mSocket;
-  HttpParser mHttpParser;
+  int mPort;
+  Http mHttp;
   std::vector<char> mRecvBuffer;
   std::vector<char> mSendBuffer;
 };

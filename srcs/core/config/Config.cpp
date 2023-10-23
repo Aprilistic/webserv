@@ -15,8 +15,7 @@ void Config::MakeConfigTree(const std::string &path) {
   }
 }
 
-void Config::MakeConfigMap()
-{
+void Config::MakeConfigMap() {
   try {
     Common::mConfigMap = new ConfigMap(Common::mConfigTree);
   } catch (std::exception &e) {
@@ -77,7 +76,7 @@ std::map<int, Server *> Config::MakeServerList() {
 void Config::checkErrorPage(std::vector<std::string> &value) {
   if (value.size() < 2) {
     configError("Error: Incorrect number of arguments. At least two arguments "
-              "are required.");
+                "are required.");
   }
   for (std::vector<std::string>::iterator it = value.begin();
        it != value.end() - 1; it++) {
@@ -98,7 +97,7 @@ void Config::checkErrorPage(std::vector<std::string> &value) {
 void Config::checkConnectionMaxBodySize(std::vector<std::string> &value) {
   if (value.size() != 1) {
     configError("Error: Incorrect number of arguments. Exactly one argument is "
-              "required.");
+                "required.");
   }
   int multiplier;
   char lastChar = value[0].back();
@@ -152,7 +151,7 @@ void Config::checkAutoIndex(std::vector<std::string> &value) {
 
   if (value.size() != 1) {
     configError("Error: Incorrect number of arguments. Exactly one argument is "
-              "required.");
+                "required.");
   }
   std::string upperName = value[0];
   std::transform(upperName.begin(), upperName.end(), upperName.begin(),
@@ -167,7 +166,11 @@ void Config::checkListen(std::vector<std::string> &value) {
     configError(
         "Error: No arguments provided. At least one argument is required.");
   }
-
+  if (value.size() == 2) {
+    if (value[1] != "default_server") {
+      configError("Error: hi yim");
+    }
+  }
   size_t pos = value[0].find(':');
   // only IP or only Port
 
@@ -243,8 +246,9 @@ void Config::checkServerName(std::vector<std::string> &value) {
 
 void Config::checkReturn(std::vector<std::string> &value) {
   if (value.size() != 2) {
-    configError("Error: Incorrect number of arguments. Exactly two arguments are "
-              "required.");
+    configError(
+        "Error: Incorrect number of arguments. Exactly two arguments are "
+        "required.");
   }
   std::string firstValue = value[0];
 
@@ -285,8 +289,6 @@ void Config::checkLimitExcept(std::vector<std::string> &value) {
   }
 }
 
-
 void Config::configError(const std::string &msg) {
-  delete (Common::mConfigTree);
   throw std::runtime_error(msg);
 }

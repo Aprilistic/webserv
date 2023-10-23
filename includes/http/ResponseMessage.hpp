@@ -9,11 +9,12 @@
 
 class ResponseMessage {
 public:
-  ResponseMessage();
+  ResponseMessage(Response &resp);
   ~ResponseMessage();
 
   void MakeResponseMessage(Response &resp);
   std::string getMessage() const;
+  std::vector<char> getMessageToVector();
 
 private:
   void setStatusLine(Response &resp);
