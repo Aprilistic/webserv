@@ -8,13 +8,12 @@ eStatusCode Http::requestParser(int &port, std::vector<char> &mRecvBuffer) {
   std::string tmp(mRecvBuffer.begin(), mRecvBuffer.end());
   mBuffer += tmp;
 
-  RequestParser parser;
-  eStatusCode result =
-      parser.parse(mRequest, mBuffer.c_str(), mBuffer.c_str() + mBuffer.size());
+  eStatusCode result = mRequestParser.parse(mRequest, mBuffer.c_str(),
+                                            mBuffer.c_str() + mBuffer.size());
 
   switch (result) {
   case (ParsingCompleted):
-    mBuffer = parser.getRemainingBuffer();
+    mBuffer = mRequestParser.getRemainingBuffer();
     return ParsingCompleted;
   case (ParsingIncompleted):
     mBuffer.clear();
@@ -261,8 +260,8 @@ void Http::resetResponse() { mResponse = Response(); }
 
 void Http::resetBuffer() { mBuffer.clear(); }
 
+void Http::resetRequestParser() { mRequestParser = RequestParser(); }
+
 Request &Http::getRequest() { return mRequest; }
 
 Response &Http::getResponse() { return mResponse; }
-
-std::string Http::getBuffer() { return mBuffer; }

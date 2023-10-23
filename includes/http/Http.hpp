@@ -43,7 +43,7 @@ public:
   void resetRequest(void);
   void resetResponse(void);
   void resetBuffer(void);
-  std::string getBuffer(void);
+  void resetRequestParser(void);
   Request &getRequest(void);
   Response &getResponse(void);
 
@@ -51,6 +51,7 @@ private:
   std::string mBuffer;
   Request mRequest;
   Response mResponse;
+  RequestParser mRequestParser;
   int mFd;
 };
 
