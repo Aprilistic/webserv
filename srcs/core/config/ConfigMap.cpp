@@ -4,7 +4,7 @@ ConfigMap::PortMap::PortMap()
     : mDefaultServer(NULL), mbDefaultServerSet(false) {}
 
 void ConfigMap::PortMap::AddServerConfig(Node *serverNode) {
-  std::string hostname = "localhost"; // Default hostname
+  std::string hostname = ""; // If no hostname specified, use empty string
   if (serverNode->mDirectives.find("server_name") !=
       serverNode->mDirectives.end()) {
     hostname = serverNode->mDirectives["server_name"][0];
