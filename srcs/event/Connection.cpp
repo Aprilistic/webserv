@@ -1,5 +1,6 @@
 #include "Connection.hpp"
 #include "Router.hpp"
+#include "Node.hpp"
 
 Connection::Connection(int socket, int port) : mSocket(socket), mPort(port) {
   struct kevent events[2];
@@ -37,8 +38,6 @@ void Connection::EventHandler(struct kevent &currentEvent) {
     break;
   }
 }
-
-#include "Node.hpp"
 
 eStatusCode Connection::readFromSocket() {
   mRecvBuffer.clear();
