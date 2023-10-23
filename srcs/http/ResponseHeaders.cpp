@@ -57,7 +57,7 @@ void Http::MakeMandatoryHeaders() {
 
   // Server
   getResponse().mHeaders.insert(
-      std::pair<std::string, std::string>("Server", "f**king webserv"));
+      std::pair<std::string, std::string>("Server", "*u*king webserv"));
 
   // Content-Length
   std::string contentLength = std::to_string(getResponse().mBody.size());
