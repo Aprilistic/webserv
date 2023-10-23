@@ -6,7 +6,6 @@
 #include "WebServer.hpp"
 
 Server::Server(int port) : mPort(port) {
-
   mSocket = socket(AF_INET, SOCK_STREAM, 0);
   if (mSocket < 0) {
     // FD limit exceededw

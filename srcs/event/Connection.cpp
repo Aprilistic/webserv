@@ -1,6 +1,6 @@
 #include "Connection.hpp"
-#include "Router.hpp"
 #include "Node.hpp"
+#include "Router.hpp"
 
 Connection::Connection(int socket, int port) : mSocket(socket), mPort(port) {
   struct kevent events[2];
@@ -98,6 +98,9 @@ void Connection::readHandler() {
 
   mHttp.MakeMandatoryHeaders();
   ResponseMessage responseMessage(mHttp.getResponse());
+
+  std::string test = responseMessage.getMessage();
+  std::cout << test << std::endl;
 
   mSendBuffer = responseMessage.getMessageToVector();
 
