@@ -7,6 +7,8 @@ INCLUDES = -I ./includes \
 			-I ./includes/core/config \
 			-I ./includes/event \
 			-I ./includes/http \
+			-I ./includes/http/request \
+			-I ./includes/http/response \
 			-I ./includes/stream
 OBJ_DIR = objs
 
