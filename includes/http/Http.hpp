@@ -7,7 +7,6 @@
 #include "Enum.hpp"
 #include "Request.hpp"
 #include "RequestParser.hpp"
-#include "RequestSyntax.hpp"
 #include "Response.hpp"
 #include "ResponseMessage.hpp"
 #include "ResponseParser.hpp"
