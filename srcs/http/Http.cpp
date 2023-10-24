@@ -8,10 +8,11 @@ eStatusCode Http::requestParser(int &port, std::vector<char> &mRecvBuffer) {
   std::string tmp(mRecvBuffer.begin(), mRecvBuffer.end());
   mBuffer += tmp;
 
-  std::cout << mBuffer << std::endl;
+  // std::cout << mBuffer;
+  // std::cout << RED << "|" << RESET << std::endl;
   eStatusCode result = mRequestParser.Parse(mRequest, mBuffer.c_str(),
                                             mBuffer.c_str() + mBuffer.size());
-  std::cout << CYAN << "result: " << result << RESET << std::endl;
+  // std::cout << CYAN << "result: " << result << RESET << std::endl;
   switch (result) {
   case (PARSING_COMPLETED):
     mBuffer = mRequestParser.GetRemainingBuffer();

@@ -272,7 +272,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       }
 
       if (mChunked) {
-        mState = mChunkSize;
+        mState = ChunkSize;
       } else if (mContentsize == 0) {
         if (input == '\n') {
           mRemainingBuffer.assign(begin, end);
@@ -389,7 +389,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       break;
     case ChunkDataNewLine_2:
       if (input == '\n') {
-        mState = mChunkSize;
+        mState = ChunkSize;
       } else {
         return CLIENT_ERROR_BAD_REQUEST;
       }
