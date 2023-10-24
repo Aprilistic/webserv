@@ -5,16 +5,13 @@
 
 class Http;
 
-enum eHandleStatus {
-	INCOMPLETED = 0,
-	COMPLETED = 1
-};
+enum eHandleStatus { INCOMPLETED = 0, COMPLETED = 1 };
 
-class IRequestHandler
-{
-	public:
-			virtual eStatusCode handle(int port, Http& http) = 0;
-	private:
+class IRequestHandler {
+public:
+  virtual eStatusCode Handle(int port, Http &http) = 0;
+
+private:
 };
 
 #endif

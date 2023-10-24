@@ -22,10 +22,12 @@ public:
 
   //   std::vector<char> &parseResponse(Response response);
 
+  // requestParser와 이름 겹침
   eStatusCode requestParser(int &port, std::vector<char> &mRecvBuffer);
-  eStatusCode priorityHeaders(int &port);
-  eStatusCode setResponse(int &port);
-  std::string getFileType();
+  eStatusCode PriorityHeaders(int &port);
+  eStatusCode SetResponse(int &port);
+  std::string GetFileType();
+
   void MakeMandatoryHeaders();
 
   void ErrorHandle(int port, eStatusCode errorStatus);
@@ -33,18 +35,19 @@ public:
   eStatusCode WriteFile(const std::string &path);
   std::string AutoIndex(const std::string &path);
 
-  bool CheckRedirect(int port);
-  bool CheckClientMaxBodySize(int port);
-  bool CheckLimitExcept(int port);
-
   eStatusCode CheckPathType(const std::string &path);
 
-  void resetRequest(void);
-  void resetResponse(void);
-  void resetBuffer(void);
-  void resetRequestParser(void);
-  Request &getRequest(void);
-  Response &getResponse(void);
+  void ResetRequest(void);
+  void ResetResponse(void);
+  void ResetBuffer(void);
+  void ResetRequestParser(void);
+  Request &GetRequest(void);
+  Response &GetResponse(void);
+
+private:
+  bool checkRedirect(int port);
+  bool checkClientMaxBodySize(int port);
+  bool checkLimitExcept(int port);
 
 private:
   std::string mBuffer;

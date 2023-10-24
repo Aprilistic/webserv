@@ -79,14 +79,14 @@ void Connection::readHandler() {
     }
   case (PARSING_COMPLETED):
     std::cout << GREEN << "==================" << RESET << std::endl;
-    std::cout << mHttp.getRequest().Inspect() << std::endl;
+    std::cout << mHttp.GetRequest().Inspect() << std::endl;
     std::cout << GREEN << "==================" << RESET << std::endl;
-    state = mHttp.priorityHeaders(mPort);
+    state = mHttp.PriorityHeaders(mPort);
     if (state == REDIRECT || state == ERROR) {
       break;
     }
   case (PRIORITY_HEADER_OK):
-    state = mHttp.setResponse(mPort);
+    state = mHttp.SetResponse(mPort);
     if (state == RESPONSE_INCOMPLETED) {
       return;
     }
@@ -97,7 +97,7 @@ void Connection::readHandler() {
   // default_server로 안 가는 문제'
 
   mHttp.MakeMandatoryHeaders();
-  ResponseMessage responseMessage(mHttp.getResponse());
+  ResponseMessage responseMessage(mHttp.GetResponse());
 
   // std::string test = responseMessage.GetMessage();
   // std::cout << test << std::endl;
@@ -112,9 +112,9 @@ void Connection::readHandler() {
   // 문자열을 vector<char>에 담기
   // std::vector<char> responseVec(httpResponse.begin(), httpResponse.end());
   // mSendBuffer = responseVec;
-  mHttp.resetRequest();
-  mHttp.resetResponse();
-  mHttp.resetRequestParser();
+  mHttp.ResetRequest();
+  mHttp.ResetResponse();
+  mHttp.ResetRequestParser();
 }
 
 void Connection::writeHandler() {

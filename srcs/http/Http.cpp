@@ -24,12 +24,12 @@ eStatusCode Http::requestParser(int &port, std::vector<char> &mRecvBuffer) {
   }
 }
 
-eStatusCode Http::priorityHeaders(int &port) {
-  if (CheckRedirect(port))
+eStatusCode Http::PriorityHeaders(int &port) {
+  if (checkRedirect(port))
     return REDIRECT; // redirect path 로  response
-  if (CheckClientMaxBodySize(port) == false)
+  if (checkClientMaxBodySize(port) == false)
     return (ErrorHandle(port, CLIENT_ERROR_CONTENT_TOO_LARGE), ERROR);
-  if (CheckLimitExcept(port) == false)
+  if (checkLimitExcept(port) == false)
     return (ErrorHandle(port, CLIENT_ERROR_METHOD_NOT_ALLOWED), ERROR);
   return PRIORITY_HEADER_OK;
 }
@@ -73,14 +73,14 @@ std::string getStatusMessage(eStatusCode errorStatus) {
   }
 }
 
-eStatusCode Http::setResponse(int &port) {
+eStatusCode Http::SetResponse(int &port) {
   IRequestHandler *handler = Router::Routing(*this);
-  eStatusCode handleStatus = handler->handle(port, *this);
+  eStatusCode handleStatus = handler->Handle(port, *this);
 
   // 나중에 signal 시 처리하기 위해 소멸자에 추가
   //  delete handler;
-  getResponse().mStatusCode = handleStatus;
-  getResponse().mStatus = getStatusMessage(handleStatus);
+  GetResponse().mStatusCode = handleStatus;
+  GetResponse().mStatus = getStatusMessage(handleStatus);
 
   switch (handleStatus) {
   case (SUCCESSFUL_OK):
@@ -120,7 +120,7 @@ void Http::ErrorHandle(int port, eStatusCode errorStatus) {
 }
 
 eStatusCode Http::ReadFile(const std::string &path) {
-  getResponse().mFilename = path;
+  GetResponse().mFilename = path;
   mFd = open(path.c_str(), O_RDONLY);
 
   if (mFd == -1) {
@@ -135,7 +135,7 @@ eStatusCode Http::ReadFile(const std::string &path) {
   char buffer[4096];
   ssize_t readSize;
   while ((readSize = read(mFd, buffer, 4096)) > 0) {
-    getResponse().mBody += std::string(buffer, buffer + readSize);
+    GetResponse().mBody += std::string(buffer, buffer + readSize);
   }
   if (readSize == -1) {
     close(mFd);
@@ -168,7 +168,7 @@ std::string Http::AutoIndex(const std::string &path) {
   return (html);
 }
 
-bool Http::CheckRedirect(int port) {
+bool Http::checkRedirect(int port) {
   Node *location =
       Common::mConfigMap->GetConfigNode(port, mRequest.mHost, mRequest.mUri);
 
@@ -198,7 +198,7 @@ bool Http::CheckRedirect(int port) {
   return (true);
 }
 
-bool Http::CheckClientMaxBodySize(int port) {
+bool Http::checkClientMaxBodySize(int port) {
   Node *location =
       Common::mConfigMap->GetConfigNode(port, mRequest.mHost, mRequest.mUri);
 
@@ -222,7 +222,7 @@ bool Http::CheckClientMaxBodySize(int port) {
   return (true);
 }
 
-bool Http::CheckLimitExcept(int port) {
+bool Http::checkLimitExcept(int port) {
   Node *location =
       Common::mConfigMap->GetConfigNode(port, mRequest.mHost, mRequest.mUri);
 
@@ -256,14 +256,14 @@ eStatusCode Http::CheckPathType(const std::string &path) {
 // {
 // }
 
-void Http::resetRequest() { mRequest = Request(); }
+void Http::ResetRequest() { mRequest = Request(); }
 
-void Http::resetResponse() { mResponse = Response(); }
+void Http::ResetResponse() { mResponse = Response(); }
 
-void Http::resetBuffer() { mBuffer.clear(); }
+void Http::ResetBuffer() { mBuffer.clear(); }
 
-void Http::resetRequestParser() { mRequestParser = RequestParser(); }
+void Http::ResetRequestParser() { mRequestParser = RequestParser(); }
 
-Request &Http::getRequest() { return mRequest; }
+Request &Http::GetRequest() { return mRequest; }
 
-Response &Http::getResponse() { return mResponse; }
+Response &Http::GetResponse() { return mResponse; }

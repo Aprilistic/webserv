@@ -14,13 +14,13 @@ IRequestHandler *Router::Routing(Http &http) {
     return (new CgiHandler());
   }
   //   다른 요청 처리
-  if (http.getRequest().mMethod == "GET") {
+  if (http.GetRequest().mMethod == "GET") {
     return (new GetHandler());
-  } else if (http.getRequest().mMethod == "POST") {
+  } else if (http.GetRequest().mMethod == "POST") {
     return (new PostHandler());
-  } else if (http.getRequest().mMethod == "DELETE") {
+  } else if (http.GetRequest().mMethod == "DELETE") {
     return (new DeleteHandler());
-  } else if (http.getRequest().mMethod == "PUT") {
+  } else if (http.GetRequest().mMethod == "PUT") {
     return (new PutHandler());
   }
   return (NULL);
@@ -28,14 +28,14 @@ IRequestHandler *Router::Routing(Http &http) {
 
 bool Router::IsCgiRequest(Http &request) {
   // uri에  이러한 경로가 있다면 무조건  cgi에서 처리된다는 가정
-  if (request.getRequest().mUri.find("/cgi-bin/") != std::string::npos) {
+  if (request.GetRequest().mUri.find("/cgi-bin/") != std::string::npos) {
     return (true);
   }
 
   // 클라이언트가 확장자를 지정해준 경우 이 파일은 무조건 cgi에서 처리된다는
   // 가정
-  if (request.getRequest().mUri.size() > 4 &&
-      request.getRequest().mUri.substr(request.getRequest().mUri.size() - 4) ==
+  if (request.GetRequest().mUri.size() > 4 &&
+      request.GetRequest().mUri.substr(request.GetRequest().mUri.size() - 4) ==
           ".bla") {
     return (true);
   }
@@ -46,9 +46,9 @@ bool Router::IsCgiRequest(Http &request) {
   return (false);
 }
 
-eStatusCode GetHandler::handle(int port, Http &http) {
+eStatusCode GetHandler::Handle(int port, Http &http) {
   Node *location = Common::mConfigMap->GetConfigNode(
-      port, http.getRequest().mHost, http.getRequest().mUri);
+      port, http.GetRequest().mHost, http.GetRequest().mUri);
 
   // NULL 인경우 -> 일치하는 location이 없고 / 도 설정되어 있지 않은 경우
   if (location == NULL) {
@@ -70,7 +70,7 @@ eStatusCode GetHandler::handle(int port, Http &http) {
   // resolvedPath = uri(/abc/)+ alias(/var/www/wow) = /var/www/wow/abc/
   // 구한 경로가 디렉토리인지 파일인지 권한에러인지 언노운파일인지 확인하는
   // 로직
-  std::string resolvedPath = http.getRequest().mUri; // /example/index.html
+  std::string resolvedPath = http.GetRequest().mUri; // /example/index.html
   size_t pos = resolvedPath.find(uri[0]);            // /example
   if (pos != std::string::npos) {
     resolvedPath.replace(pos, uri[0].size(), alias[0]);
@@ -101,7 +101,7 @@ eStatusCode GetHandler::handle(int port, Http &http) {
 
       return SUCCESSFUL_OK;
     } else {
-      http.getResponse().mFilename = "autoindex";
+      http.GetResponse().mFilename = "autoindex";
       // 경로에 파일이 없다면
       // autoindex 설정 확인
       std::vector<std::string> autoindex =
@@ -109,8 +109,8 @@ eStatusCode GetHandler::handle(int port, Http &http) {
 
       if (autoindex.empty() == false && autoindex[0] == "on") {
         // autoindex on 일때 처리 로직
-        http.getResponse().mBody = http.AutoIndex(resolvedPath);
-        http.getResponse().mStatusCode = SUCCESSFUL_OK;
+        http.GetResponse().mBody = http.AutoIndex(resolvedPath);
+        http.GetResponse().mStatusCode = SUCCESSFUL_OK;
         return SUCCESSFUL_OK;
       } else {
         // autoindex가 off 일때 처리 로직
@@ -140,14 +140,14 @@ eStatusCode GetHandler::handle(int port, Http &http) {
   return SUCCESSFUL_OK;
 }
 
-eStatusCode PostHandler::handle(int port, Http &http) {
+eStatusCode PostHandler::Handle(int port, Http &http) {
   // 요청 데이터 파싱
-  std::string requestData(http.getRequest().mContent.begin(),
-                          http.getRequest().mContent.end());
+  std::string requestData(http.GetRequest().mContent.begin(),
+                          http.GetRequest().mContent.end());
 
   // URI로 리소스 위치 확인
   Node *location = Common::mConfigMap->GetConfigNode(
-      port, http.getRequest().mHost, http.getRequest().mUri);
+      port, http.GetRequest().mHost, http.GetRequest().mUri);
   if (location == NULL) {
     return CLIENT_ERROR_NOT_FOUND;
   }
@@ -164,7 +164,7 @@ eStatusCode PostHandler::handle(int port, Http &http) {
     }
   }
 
-  std::string resolvedPath = http.getRequest().mUri; // /example/index.html
+  std::string resolvedPath = http.GetRequest().mUri; // /example/index.html
   size_t pos = resolvedPath.find(uri[0]);            // /example
   if (pos != std::string::npos) {
     resolvedPath.replace(pos, uri[0].size(), alias[0]);
@@ -175,20 +175,20 @@ eStatusCode PostHandler::handle(int port, Http &http) {
   case PATH_IS_DIRECTORY: {
     // 디렉토리에 대한 POST 요청 처리 (예: 데이터베이스에 데이터 저장)
     // 데이터 처리 후 결과에 따라 상태 코드 설정
-    http.getResponse().mStatusCode = SUCCESSFUL_OK; // 새 리소스가 생성된 경우AA
-    http.getResponse().mBody =
+    http.GetResponse().mStatusCode = SUCCESSFUL_OK; // 새 리소스가 생성된 경우AA
+    http.GetResponse().mBody =
         "Data successfully processed and resource created at URI: " +
-        http.getRequest().mUri;
+        http.GetRequest().mUri;
     return SUCCESSFUL_CREATERD;
   }
   case PATH_IS_FILE: {
     // 파일에 대한 POST 요청 처리 (예: 파일에 데이터 추가)
     // 데이터 처리 후 결과에 따라 상태 코드 설정
-    http.getResponse().mStatusCode =
+    http.GetResponse().mStatusCode =
         SUCCESSFUL_OK; // 리소스가 성공적으로 수정된 경우
-    http.getResponse().mBody =
+    http.GetResponse().mBody =
         "Data successfully processed and resource modified at URI: " +
-        http.getRequest().mUri;
+        http.GetRequest().mUri;
     return SUCCESSFUL_OK;
   }
   case PATH_INACCESSIBLE: {
@@ -200,10 +200,10 @@ eStatusCode PostHandler::handle(int port, Http &http) {
   }
 }
 
-eStatusCode DeleteHandler::handle(int port, Http &http) {
+eStatusCode DeleteHandler::Handle(int port, Http &http) {
   // URI로 리소스 위치 확인
   Node *location = Common::mConfigMap->GetConfigNode(
-      port, http.getRequest().mHost, http.getRequest().mUri);
+      port, http.GetRequest().mHost, http.GetRequest().mUri);
   if (location == NULL) {
     return CLIENT_ERROR_NOT_FOUND;
   }
@@ -219,7 +219,7 @@ eStatusCode DeleteHandler::handle(int port, Http &http) {
       return CLIENT_ERROR_NOT_FOUND;
     }
   }
-  std::string resolvedPath = http.getRequest().mUri; // /example/index.html
+  std::string resolvedPath = http.GetRequest().mUri; // /example/index.html
   size_t pos = resolvedPath.find(uri[0]);            // /example
   if (pos != std::string::npos) {
     resolvedPath.replace(pos, uri[0].size(), alias[0]);
@@ -237,7 +237,7 @@ eStatusCode DeleteHandler::handle(int port, Http &http) {
     // 삭제에 성공하면 200 OK 또는 204 No Content 반환
     // 실패하면 500 Internal Server Error 반환
     if (/*파일 삭제 성공*/ true) {
-      http.getResponse().mStatusCode = SUCCESSFUL_OK;
+      http.GetResponse().mStatusCode = SUCCESSFUL_OK;
       return SUCCESSFUL_OK;
     } else {
       return SERVER_ERROR_INTERNAL_SERVER_ERROR;
@@ -252,14 +252,14 @@ eStatusCode DeleteHandler::handle(int port, Http &http) {
   }
 }
 
-eStatusCode PutHandler::handle(int port, Http &http) {
+eStatusCode PutHandler::Handle(int port, Http &http) {
   // 요청 데이터 파싱
-  std::string requestData(http.getRequest().mContent.begin(),
-                          http.getRequest().mContent.end());
+  std::string requestData(http.GetRequest().mContent.begin(),
+                          http.GetRequest().mContent.end());
 
   // URI로 리소스 위치 확인
   Node *location = Common::mConfigMap->GetConfigNode(
-      port, http.getRequest().mHost, http.getRequest().mUri);
+      port, http.GetRequest().mHost, http.GetRequest().mUri);
   if (location == NULL) {
     return CLIENT_ERROR_NOT_FOUND;
   }
@@ -275,7 +275,7 @@ eStatusCode PutHandler::handle(int port, Http &http) {
       return CLIENT_ERROR_NOT_FOUND;
     }
   }
-  std::string resolvedPath = http.getRequest().mUri; // /example/index.html
+  std::string resolvedPath = http.GetRequest().mUri; // /example/index.html
   size_t pos = resolvedPath.find(uri[0]);            // /example
   if (pos != std::string::npos) {
     resolvedPath.replace(pos, uri[0].size(), alias[0]);
@@ -290,11 +290,11 @@ eStatusCode PutHandler::handle(int port, Http &http) {
   case PATH_IS_FILE: {
     // 파일에 대한 PUT 요청 처리 (예: 파일에 데이터 추가)
     // 데이터 처리 후 결과에 따라 상태 코드 설정
-    http.getResponse().mStatusCode =
+    http.GetResponse().mStatusCode =
         SUCCESSFUL_OK; // 리소스가 성공적으로 수정된 경우
-    http.getResponse().mBody =
+    http.GetResponse().mBody =
         "Data successfully processed and resource modified at URI: " +
-        http.getRequest().mUri;
+        http.GetRequest().mUri;
     return SUCCESSFUL_OK;
   }
   case PATH_INACCESSIBLE: {
@@ -306,13 +306,13 @@ eStatusCode PutHandler::handle(int port, Http &http) {
   }
 }
 
-eStatusCode CgiHandler::handle(int port, Http &http) {
+eStatusCode CgiHandler::Handle(int port, Http &http) {
   eStatusCode res;
 
   res = CLIENT_ERROR_BAD_REQUEST;
-  if (http.getRequest().mMethod == "GET") {
+  if (http.GetRequest().mMethod == "GET") {
 
-  } else if (http.getRequest().mMethod == "POST") {
+  } else if (http.GetRequest().mMethod == "POST") {
   }
 
   return res;
