@@ -13,10 +13,10 @@ OBJ_DIR = objs
 SRCS := $(wildcard srcs/core/*.cpp) \
 		$(wildcard srcs/core/config/*.cpp) \
 		$(wildcard srcs/http/*.cpp) \
+		$(wildcard srcs/http/response/*.cpp) \
+		$(wildcard srcs/http/request/*.cpp) \
 		$(wildcard srcs/*.cpp) \
 		$(wildcard srcs/event/*.cpp)
-# $(wildcard srcs/event/modules/*.cpp)
-# $(wildcard srcs/stream/*.cpp)
 SRCS_DIR := $(dir $(SRCS))
 
 OBJS := $(addprefix $(OBJ_DIR)/, $(notdir $(SRCS:.cpp=.o)))
