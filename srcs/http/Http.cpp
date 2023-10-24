@@ -33,24 +33,6 @@ eStatusCode Http::priorityHeaders(int &port) {
   return PRIORITY_HEADER_OK;
 }
 
-eStatusCode Http::setResponse(int &port) {
-  IRequestHandler *handler = Router::Routing(*this);
-  eStatusCode handleStatus = handler->handle(port, *this);
-
-  // 나중에 signal 시 처리하기 위해 소멸자에 추가
-  //  delete handler;
-
-  switch (handleStatus) {
-  case (SUCCESSFUL_OK):
-  // case (SUCCESSFUL_CREATERD):
-  //   return ; // response
-  // case (SUCCESSFUL_ACCEPTED):
-  //   return; //
-  default:
-    return (ErrorHandle(port, handleStatus), ERROR);
-  }
-}
-
 std::string getStatusMessage(eStatusCode errorStatus) {
   switch (errorStatus) {
   case (SUCCESSFUL_OK):
@@ -90,9 +72,28 @@ std::string getStatusMessage(eStatusCode errorStatus) {
   }
 }
 
+eStatusCode Http::setResponse(int &port) {
+  IRequestHandler *handler = Router::Routing(*this);
+  eStatusCode handleStatus = handler->handle(port, *this);
+
+  // 나중에 signal 시 처리하기 위해 소멸자에 추가
+  //  delete handler;
+  getResponse().mStatusCode = handleStatus;
+  getResponse().mStatus = getStatusMessage(handleStatus);
+
+  switch (handleStatus) {
+  case (SUCCESSFUL_OK):
+    return SUCCESSFUL_OK;
+  case (SUCCESSFUL_CREATERD):
+    return SUCCESSFUL_CREATERD;
+  case (SUCCESSFUL_ACCEPTED):
+    return SUCCESSFUL_ACCEPTED;
+  default:
+    return (ErrorHandle(port, handleStatus), ERROR);
+  }
+}
+
 void Http::ErrorHandle(int port, eStatusCode errorStatus) {
-  getResponse().mStatusCode = errorStatus;
-  getResponse().mStatus = getStatusMessage(errorStatus);
 
   Node *location =
       Common::mConfigMap->GetConfigNode(port, mRequest.mHost, mRequest.mUri);
