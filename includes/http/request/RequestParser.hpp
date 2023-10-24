@@ -8,12 +8,13 @@ public:
   RequestParser();
   ~RequestParser();
 
-  eStatusCode parse(Request &req, const char *begin, const char *end);
-  std::string getRemainingBuffer(void);
+  eStatusCode Parse(Request &req, const char *begin, const char *end);
+  std::string GetRemainingBuffer(void);
 
 private:
   // static bool checkIfConnection(const Request::HeaderItem &item);
-  static bool checkIfConnection(const std::pair<const std::string, std::string> &item);
+  static bool
+  checkIfConnection(const std::pair<const std::string, std::string> &item);
   eStatusCode consume(Request &req, const char *begin, const char *end);
   // Check if a byte is an HTTP character.
   inline bool isChar(int c);

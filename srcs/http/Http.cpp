@@ -9,16 +9,16 @@ eStatusCode Http::requestParser(int &port, std::vector<char> &mRecvBuffer) {
   mBuffer += tmp;
 
   std::cout << mBuffer << std::endl;
-  eStatusCode result = mRequestParser.parse(mRequest, mBuffer.c_str(),
+  eStatusCode result = mRequestParser.Parse(mRequest, mBuffer.c_str(),
                                             mBuffer.c_str() + mBuffer.size());
   std::cout << CYAN << "result: " << result << RESET << std::endl;
   switch (result) {
-  case (ParsingCompleted):
-    mBuffer = mRequestParser.getRemainingBuffer();
-    return ParsingCompleted;
-  case (ParsingIncompleted):
+  case (PARSING_COMPLETED):
+    mBuffer = mRequestParser.GetRemainingBuffer();
+    return PARSING_COMPLETED;
+  case (PARSING_INCOMPLETED):
     mBuffer.clear();
-    return ParsingIncompleted;
+    return PARSING_INCOMPLETED;
   default:
     return (ErrorHandle(port, CLIENT_ERROR_BAD_REQUEST), ERROR);
   }

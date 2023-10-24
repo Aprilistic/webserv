@@ -6,8 +6,8 @@ ResponseParser::ResponseParser()
 
 ResponseParser::~ResponseParser() {}
 
-eStatusCode ResponseParser::parse(Response &resp, const char *begin,
-                                   const char *end) {
+eStatusCode ResponseParser::Parse(Response &resp, const char *begin,
+                                  const char *end) {
   return consume(resp, begin, end);
 }
 
@@ -21,14 +21,14 @@ bool ResponseParser::checkIfConnection(
 }
 
 eStatusCode ResponseParser::consume(Response &resp, const char *begin,
-                                     const char *end) {
+                                    const char *end) {
   while (begin != end) {
     char input = *begin++;
 
     switch (mState) {
     case ResponseStatusStart:
       if (input != 'H') {
-        return ParsingError;
+        return PARSING_ERROR;
       } else {
         mState = ResponseHttpVersion_ht;
       }
@@ -37,21 +37,21 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
       if (input == 'T') {
         mState = ResponseHttpVersion_htt;
       } else {
-        return ParsingError;
+        return PARSING_ERROR;
       }
       break;
     case ResponseHttpVersion_htt:
       if (input == 'T') {
         mState = ResponseHttpVersion_http;
       } else {
-        return ParsingError;
+        return PARSING_ERROR;
       }
       break;
     case ResponseHttpVersion_http:
       if (input == 'P') {
         mState = ResponseHttpVersion_slash;
       } else {
-        return ParsingError;
+        return PARSING_ERROR;
       }
       break;
     case ResponseHttpVersion_slash:
@@ -60,7 +60,7 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
         resp.mVersionMinor = 0;
         mState = ResponseHttpVersion_majorStart;
       } else {
-        return ParsingError;
+        return PARSING_ERROR;
       }
       break;
     case ResponseHttpVersion_majorStart:
@@ -68,7 +68,7 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
         resp.mVersionMajor = input - '0';
         mState = ResponseHttpVersion_major;
       } else {
-        return ParsingError;
+        return PARSING_ERROR;
       }
       break;
     case ResponseHttpVersion_major:
@@ -77,7 +77,7 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
       } else if (isDigit(input)) {
         resp.mVersionMajor = resp.mVersionMajor * 10 + input - '0';
       } else {
-        return ParsingError;
+        return PARSING_ERROR;
       }
       break;
     case ResponseHttpVersion_minorStart:
@@ -85,7 +85,7 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
         resp.mVersionMinor = input - '0';
         mState = ResponseHttpVersion_minor;
       } else {
-        return ParsingError;
+        return PARSING_ERROR;
       }
       break;
     case ResponseHttpVersion_minor:
@@ -95,7 +95,7 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
       } else if (isDigit(input)) {
         resp.mVersionMinor = resp.mVersionMinor * 10 + input - '0';
       } else {
-        return ParsingError;
+        return PARSING_ERROR;
       }
       break;
     case ResponseHttpVersion_statusCodeStart:
@@ -103,7 +103,7 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
         resp.mStatusCode = input - '0';
         mState = ResponseHttpVersion_statusCode;
       } else {
-        return ParsingError;
+        return PARSING_ERROR;
       }
       break;
     case ResponseHttpVersion_statusCode:
@@ -111,11 +111,11 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
         resp.mStatusCode = resp.mStatusCode * 10 + input - '0';
       } else {
         if (resp.mStatusCode < 100 || resp.mStatusCode > 999) {
-          return ParsingError;
+          return PARSING_ERROR;
         } else if (input == ' ') {
           mState = ResponseHttpVersion_statusTextStart;
         } else {
-          return ParsingError;
+          return PARSING_ERROR;
         }
       }
       break;
@@ -124,7 +124,7 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
         resp.mStatus += input;
         mState = ResponseHttpVersion_statusText;
       } else {
-        return ParsingError;
+        return PARSING_ERROR;
       }
       break;
     case ResponseHttpVersion_statusText:
@@ -133,14 +133,14 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
       } else if (isChar(input)) {
         resp.mStatus += input;
       } else {
-        return ParsingError;
+        return PARSING_ERROR;
       }
       break;
     case ResponseHttpVersion_newLine:
       if (input == '\n') {
         mState = HeaderLineStart;
       } else {
-        return ParsingError;
+        return PARSING_ERROR;
       }
       break;
     case HeaderLineStart:
@@ -149,7 +149,7 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
       } else if (!resp.mHeaders.empty() && (input == ' ' || input == '\t')) {
         mState = HeaderLws;
       } else if (!isChar(input) || isControl(input) || isSpecial(input)) {
-        return ParsingError;
+        return PARSING_ERROR;
       } else {
         // resp.mHeaders.push_back(Response::HeaderItem());
         // resp.mHeaders.back().name.reserve(16);
@@ -165,7 +165,7 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
         mState = ExpectingNewline_2;
       } else if (input == ' ' || input == '\t') {
       } else if (isControl(input)) {
-        return ParsingError;
+        return PARSING_ERROR;
       } else {
         mState = HeaderValue;
         // resp.mHeaders.back().value.push_back(input);
@@ -176,7 +176,7 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
       if (input == ':') {
         mState = SpaceBeforeHeaderValue;
       } else if (!isChar(input) || isControl(input) || isSpecial(input)) {
-        return ParsingError;
+        return PARSING_ERROR;
       } else {
         // resp.mHeaders.back().name.push_back(input);
         mHeaderName.push_back(input);
@@ -186,7 +186,7 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
       if (input == ' ') {
         mState = HeaderValue;
       } else {
-        return ParsingError;
+        return PARSING_ERROR;
       }
       break;
     case HeaderValue:
@@ -213,7 +213,7 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
         mHeaderValue.clear();
         mState = ExpectingNewline_2;
       } else if (isControl(input)) {
-        return ParsingError;
+        return PARSING_ERROR;
       } else {
         // resp.mHeaders.back().value.push_back(input);
         mHeaderValue.push_back(input);
@@ -223,7 +223,7 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
       if (input == '\n') {
         mState = HeaderLineStart;
       } else {
-        return ParsingError;
+        return PARSING_ERROR;
       }
       break;
     case ExpectingNewline_3: {
@@ -255,9 +255,9 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
         mState = ChunkSize;
       } else if (mContentSize == 0) {
         if (input == '\n')
-          return ParsingCompleted;
+          return PARSING_COMPLETED;
         else
-          return ParsingError;
+          return PARSING_ERROR;
       }
 
       else {
@@ -271,7 +271,7 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
       resp.mBody += input;
 
       if (mContentSize == 0) {
-        return ParsingCompleted;
+        return PARSING_COMPLETED;
       }
       break;
     case ChunkSize:
@@ -282,7 +282,7 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
       } else if (input == '\r') {
         mState = ChunkSizeNewLine;
       } else {
-        return ParsingError;
+        return PARSING_ERROR;
       }
       break;
     case ChunkExtensionName:
@@ -293,7 +293,7 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
       } else if (input == '\r') {
         mState = ChunkSizeNewLine;
       } else {
-        return ParsingError;
+        return PARSING_ERROR;
       }
       break;
     case ChunkExtensionValue:
@@ -302,7 +302,7 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
       } else if (input == '\r') {
         mState = ChunkSizeNewLine;
       } else {
-        return ParsingError;
+        return PARSING_ERROR;
       }
       break;
     case ChunkSizeNewLine:
@@ -317,7 +317,7 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
         else
           mState = ChunkData;
       } else {
-        return ParsingError;
+        return PARSING_ERROR;
       }
       break;
     case ChunkSizeNewLine_2:
@@ -326,14 +326,14 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
       } else if (isalpha(input)) {
         mState = ChunkTrailerName;
       } else {
-        return ParsingError;
+        return PARSING_ERROR;
       }
       break;
     case ChunkSizeNewLine_3:
       if (input == '\n') {
-        return ParsingCompleted;
+        return PARSING_COMPLETED;
       } else {
-        return ParsingError;
+        return PARSING_ERROR;
       }
       break;
     case ChunkTrailerName:
@@ -342,7 +342,7 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
       } else if (input == ':') {
         mState = ChunkTrailerValue;
       } else {
-        return ParsingError;
+        return PARSING_ERROR;
       }
       break;
     case ChunkTrailerValue:
@@ -351,7 +351,7 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
       } else if (input == '\r') {
         mState = ChunkSizeNewLine;
       } else {
-        return ParsingError;
+        return PARSING_ERROR;
       }
       break;
     case ChunkData:
@@ -366,22 +366,22 @@ eStatusCode ResponseParser::consume(Response &resp, const char *begin,
       if (input == '\r') {
         mState = ChunkDataNewLine_2;
       } else {
-        return ParsingError;
+        return PARSING_ERROR;
       }
       break;
     case ChunkDataNewLine_2:
       if (input == '\n') {
         mState = ChunkSize;
       } else {
-        return ParsingError;
+        return PARSING_ERROR;
       }
       break;
     default:
-      return ParsingError;
+      return PARSING_ERROR;
     }
   }
 
-  return ParsingIncompleted;
+  return PARSING_INCOMPLETED;
 }
 
 inline bool ResponseParser::isChar(int c) { return c >= 0 && c <= 127; }

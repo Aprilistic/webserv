@@ -2,9 +2,9 @@
 #define ENUM_HPP
 
 enum eStatusCode {
-  ParsingCompleted = 0,
-  ParsingIncompleted = 1,
-  ParsingError = 2,
+  PARSING_COMPLETED = 0,
+  PARSING_INCOMPLETED = 1,
+  PARSING_ERROR = 2,
   RESPONSE_INCOMPLETED = 3,
   SOCKET_READ_ERROR = 4,
   SOCKET_DISCONNECTED = 5,

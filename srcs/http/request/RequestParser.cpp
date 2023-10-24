@@ -6,7 +6,7 @@ RequestParser::RequestParser()
 
 RequestParser::~RequestParser() {}
 
-eStatusCode RequestParser::parse(Request &req, const char *begin,
+eStatusCode RequestParser::Parse(Request &req, const char *begin,
                                  const char *end) {
   return consume(req, begin, end);
 }
@@ -26,7 +26,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
     char input = *begin++;
 
     if (input == '\0') {
-      return ParsingIncompleted;
+      return PARSING_INCOMPLETED;
     }
 
     switch (mState) {
@@ -276,7 +276,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       } else if (mContentsize == 0) {
         if (input == '\n') {
           mRemainingBuffer.assign(begin, end);
-          return ParsingCompleted;
+          return PARSING_COMPLETED;
         } else
           return CLIENT_ERROR_BAD_REQUEST;
       } else {
@@ -290,7 +290,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
 
       if (mContentsize == 0) {
         mRemainingBuffer.assign(begin, end);
-        return ParsingCompleted;
+        return PARSING_COMPLETED;
       }
       break;
     case ChunkSize:
@@ -350,7 +350,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
     case ChunkSizeNewLine_3:
       if (input == '\n') {
         mRemainingBuffer.assign(begin, end);
-        return ParsingCompleted;
+        return PARSING_COMPLETED;
       } else {
         return CLIENT_ERROR_BAD_REQUEST;
       }
@@ -399,7 +399,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
     }
   }
 
-  return ParsingIncompleted;
+  return PARSING_INCOMPLETED;
 }
 
 inline bool RequestParser::isChar(int c) { return c >= 0 && c <= 127; }
@@ -440,4 +440,4 @@ inline bool RequestParser::isSpecial(int c) {
 // Check if a byte is a digit.
 inline bool RequestParser::isDigit(int c) { return c >= '0' && c <= '9'; }
 
-std::string RequestParser::getRemainingBuffer() { return mRemainingBuffer; }
+std::string RequestParser::GetRemainingBuffer() { return mRemainingBuffer; }

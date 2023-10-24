@@ -74,12 +74,12 @@ void Connection::readHandler() {
     std::cout << PURPLE << "state: " << state << RESET << std::endl;
     if (state == ERROR) {
       break;
-    } else if (state == ParsingIncompleted) {
+    } else if (state == PARSING_INCOMPLETED) {
       return;
     }
-  case (ParsingCompleted):
+  case (PARSING_COMPLETED):
     std::cout << GREEN << "==================" << RESET << std::endl;
-    std::cout << mHttp.getRequest().inspect() << std::endl;
+    std::cout << mHttp.getRequest().Inspect() << std::endl;
     std::cout << GREEN << "==================" << RESET << std::endl;
     state = mHttp.priorityHeaders(mPort);
     if (state == REDIRECT || state == ERROR) {
@@ -99,10 +99,10 @@ void Connection::readHandler() {
   mHttp.MakeMandatoryHeaders();
   ResponseMessage responseMessage(mHttp.getResponse());
 
-  // std::string test = responseMessage.getMessage();
+  // std::string test = responseMessage.GetMessage();
   // std::cout << test << std::endl;
 
-  mSendBuffer = responseMessage.getMessageToVector();
+  mSendBuffer = responseMessage.GetMessageToVector();
 
   // std::string httpResponse = "HTTP/1.1 200 OK\r\n"
   //                            "Content-Type: text/plain\r\n"

@@ -6,7 +6,7 @@ Request::Request()
 
 Request::~Request() {}
 
-std::string Request::inspect() const {
+std::string Request::Inspect() const {
   std::stringstream stream;
   stream << mMethod << " " << mUri << " HTTP/" << mVersionMajor << "."
          << mVersionMinor << "\n";

@@ -13,8 +13,8 @@ public:
   ~ResponseMessage();
 
   void MakeResponseMessage(Response &resp);
-  std::string getMessage() const;
-  std::vector<char> getMessageToVector();
+  std::string GetMessage() const;
+  std::vector<char> GetMessageToVector();
 
 private:
   void setStatusLine(Response &resp);
