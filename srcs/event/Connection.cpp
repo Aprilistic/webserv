@@ -60,21 +60,27 @@ eStatusCode Connection::readFromSocket() {
 
 void Connection::readHandler() {
   eStatusCode state = readFromSocket();
+
   switch (state) {
   case (SOCKET_READ_ERROR):
     mHttp.ErrorHandle(mPort, state);
     break;
   case (SOCKET_DISCONNECTED):
+    std::cout << RED << "disconnected" << RESET << std::endl;
     /* code */
     break;
   case (READ_OK):
     state = mHttp.requestParser(mPort, mRecvBuffer);
+    std::cout << PURPLE << "state: " << state << RESET << std::endl;
     if (state == ERROR) {
       break;
     } else if (state == ParsingIncompleted) {
       return;
     }
   case (ParsingCompleted):
+    std::cout << GREEN << "==================" << RESET << std::endl;
+    std::cout << mHttp.getRequest().inspect() << std::endl;
+    std::cout << GREEN << "==================" << RESET << std::endl;
     state = mHttp.priorityHeaders(mPort);
     if (state == REDIRECT || state == ERROR) {
       break;
@@ -93,8 +99,8 @@ void Connection::readHandler() {
   mHttp.MakeMandatoryHeaders();
   ResponseMessage responseMessage(mHttp.getResponse());
 
-  std::string test = responseMessage.getMessage();
-  std::cout << test << std::endl;
+  // std::string test = responseMessage.getMessage();
+  // std::cout << test << std::endl;
 
   mSendBuffer = responseMessage.getMessageToVector();
 
