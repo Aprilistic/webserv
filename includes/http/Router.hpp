@@ -12,7 +12,6 @@ class Http;
 class Request;
 class Router {
 public:
-  // static IRequestHandler* Routing(Request& request);
   static IRequestHandler *Routing(Http &http);
   static bool IsCgiRequest(Http &http);
 

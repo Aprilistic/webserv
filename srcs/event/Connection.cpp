@@ -104,14 +104,6 @@ void Connection::readHandler() {
 
   mSendBuffer = responseMessage.GetMessageToVector();
 
-  // std::string httpResponse = "HTTP/1.1 200 OK\r\n"
-  //                            "Content-Type: text/plain\r\n"
-  //                            "\r\n"
-  //                            "Hello, World!";
-
-  // 문자열을 vector<char>에 담기
-  // std::vector<char> responseVec(httpResponse.begin(), httpResponse.end());
-  // mSendBuffer = responseVec;
   mHttp.ResetRequest();
   mHttp.ResetResponse();
   mHttp.ResetRequestParser();

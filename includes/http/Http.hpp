@@ -20,8 +20,6 @@ public:
   Http();
   ~Http();
 
-  //   std::vector<char> &parseResponse(Response response);
-
   // requestParser와 이름 겹침
   eStatusCode requestParser(int &port, std::vector<char> &mRecvBuffer);
   eStatusCode PriorityHeaders(int &port);
