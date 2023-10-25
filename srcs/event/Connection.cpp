@@ -99,8 +99,10 @@ void Connection::readHandler() {
   mHttp.MakeMandatoryHeaders();
   ResponseMessage responseMessage(mHttp.GetResponse());
 
-  // std::string test = responseMessage.GetMessage();
-  // std::cout << test << std::endl;
+  std::cout << CYAN << "==================" << RESET << std::endl;
+  std::string test = responseMessage.GetMessage();
+  std::cout << test << std::endl;
+  std::cout << CYAN << "==================" << RESET << std::endl;
 
   mSendBuffer = responseMessage.GetMessageToVector();
 
