@@ -122,29 +122,20 @@ void Http::ErrorHandle(int port, eStatusCode errorStatus) {
 
 eStatusCode Http::ReadFile(const std::string &path) {
   GetResponse().mFilename = path;
-  mFd = open(path.c_str(), O_RDONLY);
 
-  if (mFd == -1) {
-    if (errno == ENOENT) {
-      return (CLIENT_ERROR_NOT_FOUND);
-    } else if (errno == EACCES) {
-      return (CLIENT_ERROR_FORBIDDEN);
+  std::fstream file;
+
+  file.open(path.c_str(), std::ios::in);
+  if (file.is_open()) {
+    std::string line;
+    while (std::getline(file, line)) {
+      GetResponse().mBody += line;
     }
+    file.close();
+    return (SUCCESSFUL_OK);
+  } else {
+    return (CLIENT_ERROR_NOT_FOUND);
   }
-  // fcntl(mFd, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
-
-  char buffer[4096];
-  ssize_t readSize;
-  while ((readSize = read(mFd, buffer, 4096)) > 0) {
-    GetResponse().mBody += std::string(buffer, buffer + readSize);
-  }
-  if (readSize == -1) {
-    close(mFd);
-    return (SERVER_ERROR_INTERNAL_SERVER_ERROR);
-  }
-
-  close(mFd);
-  return (SUCCESSFUL_OK); // 성공 후 반환값 뭐로 하지?
 }
 
 // eStatusCode Http::WriteFile(const std::string &path) {}
@@ -252,10 +243,6 @@ eStatusCode Http::CheckPathType(const std::string &path) {
   }
   // 링크 등등)
 }
-
-// std::vector<char>& Http::parseResponse(Response response)
-// {
-// }
 
 void Http::ResetRequest() { mRequest = Request(); }
 
