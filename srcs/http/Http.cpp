@@ -101,6 +101,9 @@ eStatusCode Http::SetResponse(int &port) {
 
 void Http::ErrorHandle(int port, eStatusCode errorStatus) {
 
+  GetResponse().mStatusCode = errorStatus;
+  GetResponse().mStatus = GetStatusMessage(errorStatus);
+
   Node *location =
       Common::mConfigMap->GetConfigNode(port, mRequest.mHost, mRequest.mUri);
 
@@ -260,6 +263,10 @@ bool Http::checkLimitExcept(int port) {
                   mRequest.mMethod) == limitExceptValue.end()) {
       return (false);
     }
+  }
+  if (mRequest.mMethod == "PUT" || mRequest.mMethod == "POST" ||
+      mRequest.mMethod == "HEAD") {
+    return (false);
   }
   return (true);
 }
