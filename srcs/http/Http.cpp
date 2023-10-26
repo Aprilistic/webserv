@@ -1,5 +1,7 @@
 #include "Http.hpp"
 
+int Http::mFileID = 0;
+
 Http::Http() {}
 
 Http::~Http() {}
@@ -35,10 +37,12 @@ eStatusCode Http::PriorityHeaders(int &port) {
   return PRIORITY_HEADER_OK;
 }
 
-std::string getStatusMessage(eStatusCode errorStatus) {
+std::string Http::GetStatusMessage(eStatusCode errorStatus) {
   switch (errorStatus) {
   case (SUCCESSFUL_OK):
     return ("OK");
+  case (SUCCESSFUL_CREATERD):
+    return ("Created");
   case (SUCCESSFUL_ACCEPTED):
     return ("Accepted");
   case (SUCCESSFUL_NO_CONTENT):
@@ -81,7 +85,7 @@ eStatusCode Http::SetResponse(int &port) {
   // 나중에 signal 시 처리하기 위해 소멸자에 추가
   //  delete handler;
   GetResponse().mStatusCode = handleStatus;
-  GetResponse().mStatus = getStatusMessage(handleStatus);
+  GetResponse().mStatus = GetStatusMessage(handleStatus);
 
   switch (handleStatus) {
   case (SUCCESSFUL_OK):
@@ -138,7 +142,38 @@ eStatusCode Http::ReadFile(const std::string &path) {
   }
 }
 
-// eStatusCode Http::WriteFile(const std::string &path) {}
+eStatusCode Http::WriteFile(std::string &path, std::string &data,
+                            eStatusCode pathType, bool append) {
+  if (pathType == PATH_IS_DIRECTORY) {
+    std::stringstream ss;
+    ss << path << mFileID;
+
+    path = ss.str();
+  }
+
+  if (append) {
+    std::fstream file;
+    file.open(path.c_str(), std::ios::app);
+    if (file.is_open()) {
+      file << data;
+      file.close();
+      return (SUCCESSFUL_OK);
+    } else {
+      return (CLIENT_ERROR_NOT_FOUND);
+    }
+  } else {
+    std::fstream file;
+    file.open(path.c_str(), std::ios::out);
+    if (file.is_open()) {
+      file << data;
+      file.close();
+      return (SUCCESSFUL_CREATERD);
+    } else {
+      return (CLIENT_ERROR_NOT_FOUND);
+    }
+  }
+}
+
 std::string Http::AutoIndex(const std::string &path) {
   DIR *dir = opendir(path.c_str());
   if (dir == NULL) {

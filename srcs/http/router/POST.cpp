@@ -18,6 +18,7 @@ eStatusCode PostHandler::Handle(int port, Http &http) {
     std::cout << "400 Bad Request" << std::endl;
     return CLIENT_ERROR_BAD_REQUEST;
   }
+
   // URI로 리소스 위치 확인
   Node *location = Common::mConfigMap->GetConfigNode(
       port, http.GetRequest().mHost, http.GetRequest().mUri);
@@ -47,21 +48,18 @@ eStatusCode PostHandler::Handle(int port, Http &http) {
   switch (http.CheckPathType(resolvedPath)) {
   case PATH_IS_DIRECTORY: {
     // 디렉토리에 대한 POST 요청 처리 (예: 데이터베이스에 데이터 저장)
+    eStatusCode writeStatus =
+        http.WriteFile(resolvedPath, requestData, PATH_IS_DIRECTORY);
     // 데이터 처리 후 결과에 따라 상태 코드 설정
-    http.GetResponse().mStatusCode = SUCCESSFUL_OK; // 새 리소스가 생성된 경우AA
-    http.GetResponse().mBody =
-        "Data successfully processed and resource created at URI: " +
-        http.GetRequest().mUri;
-    return SUCCESSFUL_CREATERD;
+    http.GetResponse().mStatusCode = writeStatus; // 새 리소스가 생성된 경우AA
+    http.GetResponse().mStatus = http.GetStatusMessage(writeStatus);
+    return writeStatus;
   }
   case PATH_IS_FILE: {
     // 파일에 대한 POST 요청 처리 (예: 파일에 데이터 추가)
     // 데이터 처리 후 결과에 따라 상태 코드 설정
     http.GetResponse().mStatusCode =
         SUCCESSFUL_OK; // 리소스가 성공적으로 수정된 경우
-    http.GetResponse().mBody =
-        "Data successfully processed and resource modified at URI: " +
-        http.GetRequest().mUri;
     return SUCCESSFUL_OK;
   }
   case PATH_INACCESSIBLE: {

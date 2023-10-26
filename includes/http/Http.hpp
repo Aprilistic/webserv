@@ -24,13 +24,15 @@ public:
   eStatusCode requestParser(int &port, std::vector<char> &mRecvBuffer);
   eStatusCode PriorityHeaders(int &port);
   eStatusCode SetResponse(int &port);
+  std::string GetStatusMessage(eStatusCode errorStatus);
   std::string GetFileType();
 
   void MakeMandatoryHeaders();
 
   void ErrorHandle(int port, eStatusCode errorStatus);
   eStatusCode ReadFile(const std::string &path);
-  eStatusCode WriteFile(const std::string &path);
+  eStatusCode WriteFile(std::string &path, std::string &data,
+                        eStatusCode pathType, bool append = false);
   std::string AutoIndex(const std::string &path);
 
   eStatusCode CheckPathType(const std::string &path);
@@ -53,6 +55,7 @@ private:
   Response mResponse;
   RequestParser mRequestParser;
   int mFd;
+  static int mFileID;
 };
 
 #endif
