@@ -1,5 +1,7 @@
 #include "WebServer.hpp"
 
+extern char **environ;
+
 void ExitHandler(void) { system("leaks webserv"); }
 
 int main(int argc, char **argv) {

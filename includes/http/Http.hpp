@@ -26,6 +26,7 @@ public:
   eStatusCode SetResponse(int &port);
   std::string GetStatusMessage(eStatusCode errorStatus);
   std::string GetFileType();
+  std::vector<char> GetCGIbufferToVector();
 
   void MakeMandatoryHeaders();
 
@@ -41,6 +42,8 @@ public:
   void ResetResponse(void);
   void ResetBuffer(void);
   void ResetRequestParser(void);
+  void ResetCGIbuffer(void);
+  void SetCGIbuffer(std::string &CGIResponseMessage);
   Request &GetRequest(void);
   Response &GetResponse(void);
 
@@ -51,6 +54,7 @@ private:
 
 private:
   std::string mBuffer;
+  std::string mCGIbuffer;
   Request mRequest;
   Response mResponse;
   RequestParser mRequestParser;

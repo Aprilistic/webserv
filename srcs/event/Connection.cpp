@@ -87,9 +87,10 @@ void Connection::readHandler() {
     }
   case (PRIORITY_HEADER_OK):
     state = mHttp.SetResponse(mPort);
-    if (state == RESPONSE_INCOMPLETED) {
-      return;
-    }
+  case (CGI):
+    mSendBuffer = mHttp.GetCGIbufferToVector();
+    mHttp.ResetCGIbuffer();
+    return ;
   default:
     break;
   }
