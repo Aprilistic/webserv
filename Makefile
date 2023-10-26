@@ -17,6 +17,7 @@ SRCS := $(wildcard srcs/core/*.cpp) \
 		$(wildcard srcs/http/*.cpp) \
 		$(wildcard srcs/http/response/*.cpp) \
 		$(wildcard srcs/http/request/*.cpp) \
+		$(wildcard srcs/http/router/*.cpp) \
 		$(wildcard srcs/*.cpp) \
 		$(wildcard srcs/event/*.cpp)
 SRCS_DIR := $(dir $(SRCS))

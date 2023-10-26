@@ -71,7 +71,7 @@ void Connection::readHandler() {
     break;
   case (READ_OK):
     state = mHttp.requestParser(mPort, mRecvBuffer);
-    std::cout << PURPLE << "state: " << state << RESET << std::endl;
+    // std::cout << PURPLE << "state: " << state << RESET << std::endl;
     if (state == ERROR) {
       break;
     } else if (state == PARSING_INCOMPLETED) {
