@@ -14,6 +14,8 @@
 #include "IRequestHandler.hpp"
 #include "Router.hpp"
 
+#define DEFAULT_ERROR_PAGE_PATH "/Users/hyeoan/webserv/www/error/error.html"
+
 class IRequestHandler;
 class Http {
 public:

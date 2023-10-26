@@ -124,7 +124,8 @@ void Http::ErrorHandle(int port, eStatusCode errorStatus) {
       }
     }
   }
-  // default error page responsㄷ
+  ReadFile(DEFAULT_ERROR_PAGE_PATH);
+  // default error page respons
 }
 
 eStatusCode Http::ReadFile(const std::string &path) {

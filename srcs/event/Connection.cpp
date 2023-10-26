@@ -50,10 +50,10 @@ eStatusCode Connection::readFromSocket() {
   if (bytesRead <= 0) {
     if (bytesRead < 0) {
       // error
-      return (SOCKET_READ_ERROR);
+      return (SERVER_ERROR_INTERNAL_SERVER_ERROR);
     }
     // disconnection();
-    return (SOCKET_DISCONNECTED);
+    return (SERVER_SERVICE_UNAVAILABLE);
   }
   return (READ_OK);
 }
@@ -67,7 +67,7 @@ void Connection::readHandler() {
     break;
   case (SOCKET_DISCONNECTED):
     std::cout << RED << "disconnected" << RESET << std::endl;
-    /* code */
+    mHttp.ErrorHandle(mPort, state);
     break;
   case (READ_OK):
     state = mHttp.setOneRequest(mPort, mRecvBuffer);
