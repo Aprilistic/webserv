@@ -21,7 +21,7 @@ public:
   ~Http();
 
   // requestParser와 이름 겹침
-  eStatusCode requestParser(int &port, std::vector<char> &mRecvBuffer);
+  eStatusCode setOneRequest(int &port, std::vector<char> &mRecvBuffer);
   eStatusCode PriorityHeaders(int &port);
   eStatusCode SetResponse(int &port);
   std::string GetStatusMessage(eStatusCode errorStatus);

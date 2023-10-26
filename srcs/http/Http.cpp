@@ -6,7 +6,7 @@ Http::Http() {}
 
 Http::~Http() {}
 
-eStatusCode Http::requestParser(int &port, std::vector<char> &mRecvBuffer) {
+eStatusCode Http::setOneRequest(int &port, std::vector<char> &mRecvBuffer) {
   std::string tmp(mRecvBuffer.begin(), mRecvBuffer.end());
   mBuffer += tmp;
 

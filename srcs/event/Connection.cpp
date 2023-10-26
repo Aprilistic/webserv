@@ -70,7 +70,7 @@ void Connection::readHandler() {
     /* code */
     break;
   case (READ_OK):
-    state = mHttp.requestParser(mPort, mRecvBuffer);
+    state = mHttp.setOneRequest(mPort, mRecvBuffer);
     // std::cout << PURPLE << "state: " << state << RESET << std::endl;
     if (state == ERROR) {
       break;
