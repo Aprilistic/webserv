@@ -10,9 +10,10 @@ Router::~Router() {}
 
 IRequestHandler *Router::Routing(Http &http) {
   // CGI 처리
-  if (IsCgiRequest(http)) {
-    return (new CgiHandler());
-  }
+  // if (IsCgiRequest(http) == 0) {
+  //   std::cout << RED << "CGI" << RESET << std::endl;
+  //   return (new CgiHandler());
+  // }
   //   다른 요청 처리
   if (http.GetRequest().mMethod == "GET") {
     return (new GetHandler());

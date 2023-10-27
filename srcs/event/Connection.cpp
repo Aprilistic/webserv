@@ -87,10 +87,10 @@ void Connection::readHandler() {
     }
   case (PRIORITY_HEADER_OK):
     state = mHttp.SetResponse(mPort);
-  case (CGI):
-    mSendBuffer = mHttp.GetCGIbufferToVector();
-    mHttp.ResetCGIbuffer();
-    return ;
+  // case (CGI):
+  //   mSendBuffer = mHttp.GetCGIbufferToVector();
+  //   mHttp.ResetCGIbuffer();
+  //   return ;
   default:
     break;
   }
