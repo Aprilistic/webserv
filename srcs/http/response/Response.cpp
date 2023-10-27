@@ -5,7 +5,7 @@ Response::Response()
 
 Response::~Response() {}
 
-std::string Response::inspect() const {
+std::string Response::Inspect() const {
   std::stringstream stream;
   stream << "HTTP/" << mVersionMajor << "." << mVersionMinor << " "
          << mStatusCode << " " << mStatus << "\n";

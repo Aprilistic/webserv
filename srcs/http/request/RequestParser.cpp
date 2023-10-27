@@ -6,7 +6,7 @@ RequestParser::RequestParser()
 
 RequestParser::~RequestParser() {}
 
-eStatusCode RequestParser::parse(Request &req, const char *begin,
+eStatusCode RequestParser::Parse(Request &req, const char *begin,
                                  const char *end) {
   return consume(req, begin, end);
 }
@@ -26,7 +26,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
     char input = *begin++;
 
     if (input == '\0') {
-      return ParsingIncompleted;
+      return PARSING_INCOMPLETED;
     }
 
     switch (mState) {
@@ -49,7 +49,8 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       break;
     case RequestUriStart:
       if (req.mMethod != "GET" && req.mMethod != "POST" &&
-          req.mMethod != "DELETE" && req.mMethod != "PUT") {
+          req.mMethod != "DELETE" && req.mMethod != "PUT" &&
+          req.mMethod != "HEAD") {
         return CLIENT_ERROR_METHOD_NOT_ALLOWED;
       }
       if (isControl(input)) {
@@ -272,11 +273,12 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       }
 
       if (mChunked) {
-        mState = mChunkSize;
+        mState = ChunkSize;
       } else if (mContentsize == 0) {
-        if (input == '\n')
-          return ParsingCompleted;
-        else
+        if (input == '\n') {
+          mRemainingBuffer.assign(begin, end);
+          return PARSING_COMPLETED;
+        } else
           return CLIENT_ERROR_BAD_REQUEST;
       } else {
         mState = Post;
@@ -289,7 +291,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
 
       if (mContentsize == 0) {
         mRemainingBuffer.assign(begin, end);
-        return ParsingCompleted;
+        return PARSING_COMPLETED;
       }
       break;
     case ChunkSize:
@@ -348,7 +350,8 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       break;
     case ChunkSizeNewLine_3:
       if (input == '\n') {
-        return ParsingCompleted;
+        mRemainingBuffer.assign(begin, end);
+        return PARSING_COMPLETED;
       } else {
         return CLIENT_ERROR_BAD_REQUEST;
       }
@@ -387,7 +390,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       break;
     case ChunkDataNewLine_2:
       if (input == '\n') {
-        mState = mChunkSize;
+        mState = ChunkSize;
       } else {
         return CLIENT_ERROR_BAD_REQUEST;
       }
@@ -397,7 +400,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
     }
   }
 
-  return ParsingIncompleted;
+  return PARSING_INCOMPLETED;
 }
 
 inline bool RequestParser::isChar(int c) { return c >= 0 && c <= 127; }
@@ -438,4 +441,4 @@ inline bool RequestParser::isSpecial(int c) {
 // Check if a byte is a digit.
 inline bool RequestParser::isDigit(int c) { return c >= '0' && c <= '9'; }
 
-std::string RequestParser::getRemainingBuffer() { return mRemainingBuffer; }
+std::string RequestParser::GetRemainingBuffer() { return mRemainingBuffer; }

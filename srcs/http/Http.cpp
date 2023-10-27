@@ -1,72 +1,48 @@
 #include "Http.hpp"
 
+int Http::mFileID = 0;
+
 Http::Http() {}
 
 Http::~Http() {}
 
-eStatusCode Http::parseRequest(const std::vector<char> &buffer) {
-
-  std::string tmp(buffer.begin(), buffer.end());
+eStatusCode Http::setOneRequest(int &port, std::vector<char> &mRecvBuffer) {
+  std::string tmp(mRecvBuffer.begin(), mRecvBuffer.end());
   mBuffer += tmp;
 
-  RequestParser parser;
-  eStatusCode result =
-      parser.parse(mRequest, mBuffer.c_str(), mBuffer.c_str() + mBuffer.size());
-
-  if (result == ParsingIncompleted) {
-    return ParsingIncompleted;
-  } else if (result == ParsingCompleted) {
-    mBuffer = parser.getRemainingBuffer();
-    return ParsingCompleted;
-  } else {
-    return CLIENT_ERROR_BAD_REQUEST;
-  }
-}
-
-eStatusCode Http::requestParser(int &port, std::vector<char> &mRecvBuffer) {
-  eStatusCode parseStatus = parseRequest(mRecvBuffer);
-  switch (parseStatus) {
-  case (ParsingCompleted):
-    return ParsingCompleted;
-  case (ParsingIncompleted):
-    return ParsingIncompleted;
+  // std::cout << mBuffer;
+  // std::cout << RED << "|" << RESET << std::endl;
+  eStatusCode result = mRequestParser.Parse(mRequest, mBuffer.c_str(),
+                                            mBuffer.c_str() + mBuffer.size());
+  // std::cout << CYAN << "result: " << result << RESET << std::endl;
+  switch (result) {
+  case (PARSING_COMPLETED):
+    mBuffer = mRequestParser.GetRemainingBuffer();
+    return PARSING_COMPLETED;
+  case (PARSING_INCOMPLETED):
+    mBuffer.clear();
+    return PARSING_INCOMPLETED;
   default:
-    return (ErrorHandle(port, parseStatus), ERROR);
+    return (ErrorHandle(port, CLIENT_ERROR_BAD_REQUEST), ERROR);
   }
 }
 
-eStatusCode Http::priorityHeaders(int &port) {
-  if (CheckRedirect(port))
+eStatusCode Http::PriorityHeaders(int &port) {
+  if (checkRedirect(port))
     return REDIRECT; // redirect path 로  response
-  if (CheckClientMaxBodySize(port) == false)
+  if (checkClientMaxBodySize(port) == false)
     return (ErrorHandle(port, CLIENT_ERROR_CONTENT_TOO_LARGE), ERROR);
-  if (CheckLimitExcept(port) == false)
+  if (checkLimitExcept(port) == false)
     return (ErrorHandle(port, CLIENT_ERROR_METHOD_NOT_ALLOWED), ERROR);
   return PRIORITY_HEADER_OK;
 }
 
-eStatusCode Http::setResponse(int &port) {
-  IRequestHandler *handler = Router::Routing(*this);
-  eStatusCode handleStatus = handler->handle(port, *this);
-
-  // 나중에 signal 시 처리하기 위해 소멸자에 추가
-  //  delete handler;
-
-  switch (handleStatus) {
-  case (SUCCESSFUL_OK):
-  // case (SUCCESSFUL_CREATERD):
-  //   return ; // response
-  // case (SUCCESSFUL_ACCEPTED):
-  //   return; //
-  default:
-    return (ErrorHandle(port, handleStatus), ERROR);
-  }
-}
-
-std::string getStatusMessage(eStatusCode errorStatus) {
+std::string Http::GetStatusMessage(eStatusCode errorStatus) {
   switch (errorStatus) {
   case (SUCCESSFUL_OK):
     return ("OK");
+  case (SUCCESSFUL_CREATERD):
+    return ("Created");
   case (SUCCESSFUL_ACCEPTED):
     return ("Accepted");
   case (SUCCESSFUL_NO_CONTENT):
@@ -102,9 +78,34 @@ std::string getStatusMessage(eStatusCode errorStatus) {
   }
 }
 
+eStatusCode Http::SetResponse(int &port) {
+  IRequestHandler *handler = Router::Routing(*this);
+  eStatusCode handleStatus = handler->Handle(port, *this);
+
+  // 나중에 signal 시 처리하기 위해 소멸자에 추가
+  //  delete handler;
+  if (handleStatus == CGI) {
+    return (CGI);
+  }
+  GetResponse().mStatusCode = handleStatus;
+  GetResponse().mStatus = GetStatusMessage(handleStatus);
+
+  switch (handleStatus) {
+  case (SUCCESSFUL_OK):
+    return SUCCESSFUL_OK;
+  case (SUCCESSFUL_CREATERD):
+    return SUCCESSFUL_CREATERD;
+  case (SUCCESSFUL_ACCEPTED):
+    return SUCCESSFUL_ACCEPTED;
+  default:
+    return (ErrorHandle(port, handleStatus), ERROR);
+  }
+}
+
 void Http::ErrorHandle(int port, eStatusCode errorStatus) {
-  getResponse().mStatusCode = errorStatus;
-  getResponse().mStatus = getStatusMessage(errorStatus);
+
+  GetResponse().mStatusCode = errorStatus;
+  GetResponse().mStatus = GetStatusMessage(errorStatus);
 
   Node *location =
       Common::mConfigMap->GetConfigNode(port, mRequest.mHost, mRequest.mUri);
@@ -126,37 +127,60 @@ void Http::ErrorHandle(int port, eStatusCode errorStatus) {
       }
     }
   }
-  // default error page responsㄷ
+  ReadFile(DEFAULT_ERROR_PAGE_PATH);
+  // default error page respons
 }
 
 eStatusCode Http::ReadFile(const std::string &path) {
-  getResponse().mFilename = path;
-  mFd = open(path.c_str(), O_RDONLY);
+  GetResponse().mFilename = path;
 
-  if (mFd == -1) {
-    if (errno == ENOENT) {
-      return (CLIENT_ERROR_NOT_FOUND);
-    } else if (errno == EACCES) {
-      return (CLIENT_ERROR_FORBIDDEN);
+  std::fstream file;
+
+  file.open(path.c_str(), std::ios::in);
+  if (file.is_open()) {
+    std::string line;
+    while (std::getline(file, line)) {
+      GetResponse().mBody += line;
     }
+    file.close();
+    return (SUCCESSFUL_OK);
+  } else {
+    return (CLIENT_ERROR_NOT_FOUND);
   }
-  // fcntl(mFd, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
-
-  char buffer[4096];
-  ssize_t readSize;
-  while ((readSize = read(mFd, buffer, 4096)) > 0) {
-    getResponse().mBody += std::string(buffer, buffer + readSize);
-  }
-  if (readSize == -1) {
-    close(mFd);
-    return (SERVER_ERROR_INTERNAL_SERVER_ERROR);
-  }
-
-  close(mFd);
-  return (SUCCESSFUL_OK); // 성공 후 반환값 뭐로 하지?
 }
 
-// eStatusCode Http::WriteFile(const std::string &path) {}
+eStatusCode Http::WriteFile(std::string &path, std::string &data,
+                            eStatusCode pathType, bool append) {
+  if (pathType == PATH_IS_DIRECTORY) {
+    std::stringstream ss;
+    ss << path << mFileID;
+
+    path = ss.str();
+  }
+
+  if (append) {
+    std::fstream file;
+    file.open(path.c_str(), std::ios::app);
+    if (file.is_open()) {
+      file << data;
+      file.close();
+      return (SUCCESSFUL_OK);
+    } else {
+      return (CLIENT_ERROR_NOT_FOUND);
+    }
+  } else {
+    std::fstream file;
+    file.open(path.c_str(), std::ios::out);
+    if (file.is_open()) {
+      file << data;
+      file.close();
+      return (SUCCESSFUL_CREATERD);
+    } else {
+      return (CLIENT_ERROR_NOT_FOUND);
+    }
+  }
+}
+
 std::string Http::AutoIndex(const std::string &path) {
   DIR *dir = opendir(path.c_str());
   if (dir == NULL) {
@@ -178,7 +202,7 @@ std::string Http::AutoIndex(const std::string &path) {
   return (html);
 }
 
-bool Http::CheckRedirect(int port) {
+bool Http::checkRedirect(int port) {
   Node *location =
       Common::mConfigMap->GetConfigNode(port, mRequest.mHost, mRequest.mUri);
 
@@ -208,7 +232,7 @@ bool Http::CheckRedirect(int port) {
   return (true);
 }
 
-bool Http::CheckClientMaxBodySize(int port) {
+bool Http::checkClientMaxBodySize(int port) {
   Node *location =
       Common::mConfigMap->GetConfigNode(port, mRequest.mHost, mRequest.mUri);
 
@@ -232,7 +256,7 @@ bool Http::CheckClientMaxBodySize(int port) {
   return (true);
 }
 
-bool Http::CheckLimitExcept(int port) {
+bool Http::checkLimitExcept(int port) {
   Node *location =
       Common::mConfigMap->GetConfigNode(port, mRequest.mHost, mRequest.mUri);
 
@@ -243,6 +267,10 @@ bool Http::CheckLimitExcept(int port) {
                   mRequest.mMethod) == limitExceptValue.end()) {
       return (false);
     }
+  }
+  if (mRequest.mMethod == "PUT" || mRequest.mMethod == "POST" ||
+      mRequest.mMethod == "HEAD") {
+    return (false);
   }
   return (true);
 }
@@ -262,18 +290,27 @@ eStatusCode Http::CheckPathType(const std::string &path) {
   // 링크 등등)
 }
 
-// std::vector<char>& Http::parseResponse(Response response)
-// {
-// }
+std::vector<char> Http::GetCGIbufferToVector() {
+  std::vector<char> message;
+  for (std::string::iterator it = mCGIbuffer.begin(); it != mCGIbuffer.end();
+       ++it) {
+    message.push_back(*it);
+  }
+  return message;
+}
 
-void Http::resetRequest() { mRequest = Request(); }
+void Http::ResetRequest() { mRequest = Request(); }
 
-void Http::resetResponse() { mResponse = Response(); }
+void Http::ResetResponse() { mResponse = Response(); }
 
-void Http::resetBuffer() { mBuffer.clear(); }
+void Http::ResetBuffer() { mBuffer.clear(); }
 
-Request &Http::getRequest() { return mRequest; }
+void Http::ResetCGIbuffer() { mCGIbuffer.clear(); }
 
-Response &Http::getResponse() { return mResponse; }
+void Http::ResetRequestParser() { mRequestParser = RequestParser(); }
 
-std::string Http::getBuffer() { return mBuffer; }
+void Http::SetCGIbuffer(std::string &CGIResponseMessage) { mCGIbuffer = CGIResponseMessage; }
+
+Request &Http::GetRequest() { return mRequest; }
+
+Response &Http::GetResponse() { return mResponse; }

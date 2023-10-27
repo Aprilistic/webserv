@@ -13,7 +13,7 @@ public:
   //   std::string value;
   // };
 
-  std::string inspect() const;
+  std::string Inspect() const;
 
 public:
   int mVersionMajor;

@@ -7,7 +7,6 @@
 #include "Enum.hpp"
 #include "Request.hpp"
 #include "RequestParser.hpp"
-#include "RequestSyntax.hpp"
 #include "Response.hpp"
 #include "ResponseMessage.hpp"
 #include "ResponseParser.hpp"
@@ -15,44 +14,54 @@
 #include "IRequestHandler.hpp"
 #include "Router.hpp"
 
+#define DEFAULT_ERROR_PAGE_PATH "/Users/hyeoan/webserv/www/error/error.html"
+
 class IRequestHandler;
 class Http {
 public:
   Http();
   ~Http();
 
-  eStatusCode parseRequest(const std::vector<char> &buffer);
-  //   std::vector<char> &parseResponse(Response response);
+  // requestParser와 이름 겹침
+  eStatusCode setOneRequest(int &port, std::vector<char> &mRecvBuffer);
+  eStatusCode PriorityHeaders(int &port);
+  eStatusCode SetResponse(int &port);
+  std::string GetStatusMessage(eStatusCode errorStatus);
+  std::string GetFileType();
+  std::vector<char> GetCGIbufferToVector();
 
-  eStatusCode requestParser(int &port, std::vector<char> &mRecvBuffer);
-  eStatusCode priorityHeaders(int &port);
-  eStatusCode setResponse(int &port);
-  std::string getFileType();
   void MakeMandatoryHeaders();
 
   void ErrorHandle(int port, eStatusCode errorStatus);
   eStatusCode ReadFile(const std::string &path);
-  eStatusCode WriteFile(const std::string &path);
+  eStatusCode WriteFile(std::string &path, std::string &data,
+                        eStatusCode pathType, bool append = false);
   std::string AutoIndex(const std::string &path);
-
-  bool CheckRedirect(int port);
-  bool CheckClientMaxBodySize(int port);
-  bool CheckLimitExcept(int port);
 
   eStatusCode CheckPathType(const std::string &path);
 
-  void resetRequest(void);
-  void resetResponse(void);
-  void resetBuffer(void);
-  std::string getBuffer(void);
-  Request &getRequest(void);
-  Response &getResponse(void);
+  void ResetRequest(void);
+  void ResetResponse(void);
+  void ResetBuffer(void);
+  void ResetRequestParser(void);
+  void ResetCGIbuffer(void);
+  void SetCGIbuffer(std::string &CGIResponseMessage);
+  Request &GetRequest(void);
+  Response &GetResponse(void);
+
+private:
+  bool checkRedirect(int port);
+  bool checkClientMaxBodySize(int port);
+  bool checkLimitExcept(int port);
 
 private:
   std::string mBuffer;
+  std::string mCGIbuffer;
   Request mRequest;
   Response mResponse;
+  RequestParser mRequestParser;
   int mFd;
+  static int mFileID;
 };
 
 #endif

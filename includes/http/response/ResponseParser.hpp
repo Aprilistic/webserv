@@ -9,11 +9,12 @@ public:
   ResponseParser();
   ~ResponseParser();
 
-  eStatusCode parse(Response &resp, const char *begin, const char *end);
+  eStatusCode Parse(Response &resp, const char *begin, const char *end);
 
 private:
   // static bool checkIfConnection(const Response::HeaderItem &item);
-  static bool checkIfConnection(const std::pair<const std::string, std::string> &item);
+  static bool
+  checkIfConnection(const std::pair<const std::string, std::string> &item);
   eStatusCode consume(Response &resp, const char *begin, const char *end);
   // Check if a byte is an HTTP character.
   inline bool isChar(int c);

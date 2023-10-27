@@ -1,12 +1,12 @@
 #include "Http.hpp"
 
-std::string Http::getFileType() {
-  if (getRequest().mMethod == "POST") {
-    return (getRequest().mContentType);
-  } else if (getRequest().mMethod == "PUT" && getResponse().mBody.size() != 0) {
-    return (getRequest().mContentType);
+std::string Http::GetFileType() {
+  if (GetRequest().mMethod == "POST") {
+    return (GetRequest().mContentType);
+  } else if (GetRequest().mMethod == "PUT" && GetResponse().mBody.size() != 0) {
+    return (GetRequest().mContentType);
   }
-  std::string filepath = getResponse().mFilename;
+  std::string filepath = GetResponse().mFilename;
   if (filepath == "autoindex") {
     return ("text/html");
   }
@@ -42,37 +42,37 @@ std::string Http::getFileType() {
 
 void Http::MakeMandatoryHeaders() {
   // Server Version
-  getResponse().mVersionMajor = getRequest().mVersionMajor;
-  getResponse().mVersionMinor = getRequest().mVersionMinor;
+  GetResponse().mVersionMajor = GetRequest().mVersionMajor;
+  GetResponse().mVersionMinor = GetRequest().mVersionMinor;
 
   // Date
   time_t now = time(0);
   struct tm *timeinfo = localtime(&now);
   char buf[80];
   strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S GMT", timeinfo);
-  getResponse().mHeaders.insert(
+  GetResponse().mHeaders.insert(
       std::pair<std::string, std::string>("Date", buf));
 
   // Server
-  getResponse().mHeaders.insert(
+  GetResponse().mHeaders.insert(
       std::pair<std::string, std::string>("Server", "*u*king webserv"));
 
   // Content-Length
-  std::string contentLength = std::to_string(getResponse().mBody.size());
-  getResponse().mHeaders.insert(
+  std::string contentLength = std::to_string(GetResponse().mBody.size());
+  GetResponse().mHeaders.insert(
       std::pair<std::string, std::string>("Content-Length", contentLength));
 
   // Content-Type
-  std::string contentType = getFileType();
-  getResponse().mHeaders.insert(
+  std::string contentType = GetFileType();
+  GetResponse().mHeaders.insert(
       std::pair<std::string, std::string>("Content-Type", contentType));
 
   // Connection
-  if (getRequest().mKeepAlive == true) {
-    getResponse().mHeaders.insert(
+  if (GetRequest().mKeepAlive == true) {
+    GetResponse().mHeaders.insert(
         std::pair<std::string, std::string>("Connection", "keep-alive"));
   } else {
-    getResponse().mHeaders.insert(
+    GetResponse().mHeaders.insert(
         std::pair<std::string, std::string>("Connection", "close"));
   }
 }

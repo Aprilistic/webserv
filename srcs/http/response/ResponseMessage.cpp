@@ -11,9 +11,9 @@ void ResponseMessage::MakeResponseMessage(Response &resp) {
   setBody(resp);
 }
 
-std::string ResponseMessage::getMessage() const { return mMessage; }
+std::string ResponseMessage::GetMessage() const { return mMessage; }
 
-std::vector<char> ResponseMessage::getMessageToVector() {
+std::vector<char> ResponseMessage::GetMessageToVector() {
   std::vector<char> message;
   for (std::string::iterator it = mMessage.begin(); it != mMessage.end();
        ++it) {
@@ -52,6 +52,4 @@ void ResponseMessage::setHeaderFields(Response &resp) {
   }
 }
 
-void ResponseMessage::setBody(Response &resp) {
-    mMessage += resp.mBody;
-}
+void ResponseMessage::setBody(Response &resp) { mMessage += resp.mBody; }

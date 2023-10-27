@@ -42,12 +42,6 @@ void Connection::EventHandler(struct kevent &currentEvent) {
 eStatusCode Connection::readFromSocket() {
   mRecvBuffer.clear();
 
-  std::string httpBuffer(mHttp.getBuffer());
-  std::vector<char> httpBufferVector(httpBuffer.begin(), httpBuffer.end());
-  mRecvBuffer.insert(mRecvBuffer.end(), httpBufferVector.begin(),
-                     httpBufferVector.end());
-  mHttp.resetBuffer();
-
   ssize_t bytesRead;
   char tmp[RECV_BUFFER_SIZE];
   bytesRead = recv(mSocket, tmp, RECV_BUFFER_SIZE, 0);
@@ -56,40 +50,47 @@ eStatusCode Connection::readFromSocket() {
   if (bytesRead <= 0) {
     if (bytesRead < 0) {
       // error
-      return (SOCKET_READ_ERROR);
+      return (SERVER_ERROR_INTERNAL_SERVER_ERROR);
     }
     // disconnection();
-    return (SOCKET_DISCONNECTED);
+    return (SERVER_SERVICE_UNAVAILABLE);
   }
   return (READ_OK);
 }
 
 void Connection::readHandler() {
   eStatusCode state = readFromSocket();
+
   switch (state) {
   case (SOCKET_READ_ERROR):
     mHttp.ErrorHandle(mPort, state);
     break;
   case (SOCKET_DISCONNECTED):
-    /* code */
+    std::cout << RED << "disconnected" << RESET << std::endl;
+    mHttp.ErrorHandle(mPort, state);
     break;
   case (READ_OK):
-    state = mHttp.requestParser(mPort, mRecvBuffer);
+    state = mHttp.setOneRequest(mPort, mRecvBuffer);
+    // std::cout << PURPLE << "state: " << state << RESET << std::endl;
     if (state == ERROR) {
       break;
-    } else if (state == ParsingIncompleted) {
+    } else if (state == PARSING_INCOMPLETED) {
       return;
     }
-  case (ParsingCompleted):
-    state = mHttp.priorityHeaders(mPort);
+  case (PARSING_COMPLETED):
+    std::cout << GREEN << "==================" << RESET << std::endl;
+    std::cout << mHttp.GetRequest().Inspect() << std::endl;
+    std::cout << GREEN << "==================" << RESET << std::endl;
+    state = mHttp.PriorityHeaders(mPort);
     if (state == REDIRECT || state == ERROR) {
       break;
     }
   case (PRIORITY_HEADER_OK):
-    state = mHttp.setResponse(mPort);
-    if (state == RESPONSE_INCOMPLETED) {
-      return;
-    }
+    state = mHttp.SetResponse(mPort);
+  case (CGI):
+    mSendBuffer = mHttp.GetCGIbufferToVector();
+    mHttp.ResetCGIbuffer();
+    return ;
   default:
     break;
   }
@@ -97,23 +98,18 @@ void Connection::readHandler() {
   // default_server로 안 가는 문제'
 
   mHttp.MakeMandatoryHeaders();
-  ResponseMessage responseMessage(mHttp.getResponse());
+  ResponseMessage responseMessage(mHttp.GetResponse());
 
-  std::string test = responseMessage.getMessage();
+  std::cout << CYAN << "==================" << RESET << std::endl;
+  std::string test = responseMessage.GetMessage();
   std::cout << test << std::endl;
+  std::cout << CYAN << "==================" << RESET << std::endl;
 
-  mSendBuffer = responseMessage.getMessageToVector();
+  mSendBuffer = responseMessage.GetMessageToVector();
 
-  // std::string httpResponse = "HTTP/1.1 200 OK\r\n"
-  //                            "Content-Type: text/plain\r\n"
-  //                            "\r\n"
-  //                            "Hello, World!";
-
-  // 문자열을 vector<char>에 담기
-  // std::vector<char> responseVec(httpResponse.begin(), httpResponse.end());
-  // mSendBuffer = responseVec;
-  mHttp.resetRequest();
-  mHttp.resetResponse();
+  mHttp.ResetRequest();
+  mHttp.ResetResponse();
+  mHttp.ResetRequestParser();
 }
 
 void Connection::writeHandler() {
