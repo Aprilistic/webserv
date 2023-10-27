@@ -59,6 +59,15 @@ eStatusCode Connection::readFromSocket() {
 }
 
 void Connection::readHandler() {
+  // readSocket
+  // validation
+
+  //1. immediately response
+  //2. response after http request
+  //3. response after cgi
+
+
+
   eStatusCode state = readFromSocket();
 
   switch (state) {

@@ -127,7 +127,7 @@ void Http::ErrorHandle(int port, eStatusCode errorStatus) {
       }
     }
   }
-  ReadFile(DEFAULT_ERROR_PAGE_PATH);
+  // ReadFile(DEFAULT_ERROR_PAGE_PATH);
   // default error page respons
 }
 
@@ -278,6 +278,7 @@ bool Http::checkLimitExcept(int port) {
 eStatusCode Http::CheckPathType(const std::string &path) {
   struct stat info;
   // stat(path.c_str(), &info);
+  std::cout << PURPLE << path << RESET << std::endl;
   if (stat(path.c_str(), &info) != 0) {
     if (errno == ENOENT) {
       return (PATH_NOT_FOUND);
