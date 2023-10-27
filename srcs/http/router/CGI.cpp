@@ -22,11 +22,36 @@ bool Router::IsCgiRequest(Http &request) {
   return (false);
 }
 
-void setAllEnv(Http &http) {
-  setenv("REQUEST_METHOD", http.GetRequest().mMethod.c_str(), 1);
-  setenv("CONTENT_TYPE", http.GetRequest().mContentType.c_str(), 1);
-  // setenv("CONTENT_LENGTH", (http.GetRequest().mContentLength), 1);
+void setAllEnv(int port, Http &http) {
+  Request tmp = http.GetRequest();
+  std::stringstream ss;
 
+  // REQUEST_METHOD: 클라이언트의 요청 방식(GET, POST, HEAD 등).
+  setenv("REQUEST_METHOD", tmp.mMethod.c_str(), 1);
+
+  // QUERY_STRING: URL에서 '?' 뒤에 오는 쿼리 문자열.
+  std::size_t pos = tmp.mUri.find("?");
+  if (pos != std::string::npos) {
+    const char *query = &tmp.mUri[pos + 1];
+    setenv("QUERY_STRING", query, 1);
+  } else {
+    setenv("QUERY_STRING", "", 1);
+  }
+
+  // CONTENT_TYPE: 요청 본문의 MIME 타입, 주로 POST 요청에서 사용됩니다.
+  setenv("CONTENT_TYPE", tmp.mContentType.c_str(), 1);
+
+  // CONTENT_LENGTH: 요청 본문의 길이.
+  ss << http.GetRequest().mContentLength;
+  setenv("CONTENT_LENGTH", ss.str().c_str(), 1);
+
+  // SCRIPT_NAME: 실행되는 CGI 스크립트의 이름.
+  const char *pwd = getenv("PWD");
+  std::string path_str = std::string(pwd) + "modules/python/python.py";
+  setenv("SCRIPT_NAME", path_str.c_str(), 1);
+
+  // REQUEST_URI: 클라이언트가 요청한 URI.
+  setenv("REQUEST_URI", tmp.mUri.c_str(), 1);
 }
 
 eStatusCode CgiHandler::Handle(int port, Http &http) {
@@ -48,7 +73,7 @@ eStatusCode CgiHandler::Handle(int port, Http &http) {
     dup2(pipe_fd[1], STDOUT_FILENO); // Redirect stdout to write end of the pipe
 
     // Set environment variables
-    setAllEnv(http);
+    setAllEnv(port, http);
 
     // Execute Python script
     const char *pwd = getenv("PWD");
@@ -56,13 +81,14 @@ eStatusCode CgiHandler::Handle(int port, Http &http) {
       // PWD 환경 변수가 없습니다. 적절한 오류 처리를 수행합니다.
       exit(EXIT_FAILURE);
     }
-    std::string path_str = std::string(pwd) + "modules/python.py";
+    std::string path_str = std::string(pwd) + "modules/python/python.py";
     execve(path_str.c_str(), nullptr, environ);
     // perror("execve");
     return (http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR), ERROR);
   } else {             // Parent Process
     close(pipe_fd[1]); // Close write end of the pipe
-    wait(nullptr);     // Wait for child process to finish
+    int status;
+    waitpid(pid, &status, 0);     // Wait for child process to finish
 
     char buffer[2048];
     ssize_t bytes_read = read(pipe_fd[0], buffer, sizeof(buffer) - 1);
@@ -77,6 +103,9 @@ eStatusCode CgiHandler::Handle(int port, Http &http) {
     std::string strbuffer = buffer;
     http.SetCGIbuffer(strbuffer);
   }
+
+  return (CGI);
+}
 
   return (CGI);
 }
