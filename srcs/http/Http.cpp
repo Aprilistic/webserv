@@ -84,6 +84,9 @@ eStatusCode Http::SetResponse(int &port) {
 
   // 나중에 signal 시 처리하기 위해 소멸자에 추가
   //  delete handler;
+  if (handleStatus == CGI) {
+    return (CGI);
+  }
   GetResponse().mStatusCode = handleStatus;
   GetResponse().mStatus = GetStatusMessage(handleStatus);
 
@@ -287,13 +290,26 @@ eStatusCode Http::CheckPathType(const std::string &path) {
   // 링크 등등)
 }
 
+std::vector<char> Http::GetCGIbufferToVector() {
+  std::vector<char> message;
+  for (std::string::iterator it = mCGIbuffer.begin(); it != mCGIbuffer.end();
+       ++it) {
+    message.push_back(*it);
+  }
+  return message;
+}
+
 void Http::ResetRequest() { mRequest = Request(); }
 
 void Http::ResetResponse() { mResponse = Response(); }
 
 void Http::ResetBuffer() { mBuffer.clear(); }
 
+void Http::ResetCGIbuffer() { mCGIbuffer.clear(); }
+
 void Http::ResetRequestParser() { mRequestParser = RequestParser(); }
+
+void Http::SetCGIbuffer(std::string &CGIResponseMessage) { mCGIbuffer = CGIResponseMessage; }
 
 Request &Http::GetRequest() { return mRequest; }
 
