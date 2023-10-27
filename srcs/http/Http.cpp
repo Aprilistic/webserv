@@ -279,6 +279,9 @@ eStatusCode Http::CheckPathType(const std::string &path) {
   struct stat info;
   // stat(path.c_str(), &info);
   if (stat(path.c_str(), &info) != 0) {
+    if (errno == ENOENT) {
+      return (PATH_NOT_FOUND);
+    }
     return (PATH_INACCESSIBLE); // 권한 에러 Cannot access path
   } else if (info.st_mode & S_IFDIR) {
     return (PATH_IS_DIRECTORY); // 디렉토리 Directory
@@ -309,7 +312,9 @@ void Http::ResetCGIbuffer() { mCGIbuffer.clear(); }
 
 void Http::ResetRequestParser() { mRequestParser = RequestParser(); }
 
-void Http::SetCGIbuffer(std::string &CGIResponseMessage) { mCGIbuffer = CGIResponseMessage; }
+void Http::SetCGIbuffer(std::string &CGIResponseMessage) {
+  mCGIbuffer = CGIResponseMessage;
+}
 
 Request &Http::GetRequest() { return mRequest; }
 

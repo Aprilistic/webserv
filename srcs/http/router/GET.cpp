@@ -86,6 +86,9 @@ eStatusCode GetHandler::Handle(int port, Http &http) {
   case PATH_INACCESSIBLE: {        // 권한에러
     return CLIENT_ERROR_FORBIDDEN; // 403??
   }
+  case PATH_NOT_FOUND: {
+    return CLIENT_ERROR_NOT_FOUND;
+  }
   default: { // 언노운 파일
     // 파일도 디렉토리도 아니면 404 확인필요
     return CLIENT_ERROR_FORBIDDEN;

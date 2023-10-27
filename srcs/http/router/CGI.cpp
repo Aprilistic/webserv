@@ -88,7 +88,7 @@ eStatusCode CgiHandler::Handle(int port, Http &http) {
   } else {             // Parent Process
     close(pipe_fd[1]); // Close write end of the pipe
     int status;
-    waitpid(pid, &status, 0);     // Wait for child process to finish
+    waitpid(pid, &status, 0); // Wait for child process to finish
 
     char buffer[2048];
     ssize_t bytes_read = read(pipe_fd[0], buffer, sizeof(buffer) - 1);
@@ -103,9 +103,6 @@ eStatusCode CgiHandler::Handle(int port, Http &http) {
     std::string strbuffer = buffer;
     http.SetCGIbuffer(strbuffer);
   }
-
-  return (CGI);
-}
 
   return (CGI);
 }
