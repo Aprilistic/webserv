@@ -59,14 +59,6 @@ eStatusCode Connection::readFromSocket() {
 }
 
 void Connection::readHandler() {
-  // readSocket
-  // validation
-
-  //1. immediately response
-  //2. response after http request
-  //3. response after cgi
-
-
 
   eStatusCode state = readFromSocket();
 
@@ -75,49 +67,26 @@ void Connection::readHandler() {
     mHttp.ErrorHandle(mPort, state);
     break;
   case (SOCKET_DISCONNECTED):
-    std::cout << RED << "disconnected" << RESET << std::endl;
     mHttp.ErrorHandle(mPort, state);
     break;
   case (READ_OK):
     state = mHttp.setOneRequest(mPort, mRecvBuffer);
-    // std::cout << PURPLE << "state: " << state << RESET << std::endl;
     if (state == ERROR) {
       break;
     } else if (state == PARSING_INCOMPLETED) {
       return;
     }
   case (PARSING_COMPLETED):
-    std::cout << GREEN << "==================" << RESET << std::endl;
-    std::cout << mHttp.GetRequest().Inspect() << std::endl;
-    std::cout << GREEN << "==================" << RESET << std::endl;
     state = mHttp.PriorityHeaders(mPort);
     if (state == REDIRECT || state == ERROR) {
       break;
     }
   case (PRIORITY_HEADER_OK):
     state = mHttp.SetResponse(mPort);
-  // case (CGI):
-  //   mSendBuffer = mHttp.GetCGIbufferToVector();
-  //   mHttp.ResetCGIbuffer();
-  //   return ;
   default:
     break;
   }
-  // 포트가 같은데 둘 다 이름이 없는 경우 localhost로 접근할 때,
-  // default_server로 안 가는 문제'
 
-  mHttp.MakeMandatoryHeaders();
-  ResponseMessage responseMessage(mHttp.GetResponse());
-
-  std::cout << CYAN << "==================" << RESET << std::endl;
-  std::string test = responseMessage.GetMessage();
-  std::cout << test << std::endl;
-  std::cout << CYAN << "==================" << RESET << std::endl;
-
-  mSendBuffer = responseMessage.GetMessageToVector();
-
-  mHttp.ResetRequest();
-  mHttp.ResetResponse();
   mHttp.ResetRequestParser();
 }
 

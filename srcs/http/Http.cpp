@@ -10,11 +10,8 @@ eStatusCode Http::setOneRequest(int &port, std::vector<char> &mRecvBuffer) {
   std::string tmp(mRecvBuffer.begin(), mRecvBuffer.end());
   mBuffer += tmp;
 
-  // std::cout << mBuffer;
-  // std::cout << RED << "|" << RESET << std::endl;
   eStatusCode result = mRequestParser.Parse(mRequest, mBuffer.c_str(),
                                             mBuffer.c_str() + mBuffer.size());
-  // std::cout << CYAN << "result: " << result << RESET << std::endl;
   switch (result) {
   case (PARSING_COMPLETED):
     mBuffer = mRequestParser.GetRemainingBuffer();
@@ -127,8 +124,8 @@ void Http::ErrorHandle(int port, eStatusCode errorStatus) {
       }
     }
   }
-  // ReadFile(DEFAULT_ERROR_PAGE_PATH);
   // default error page respons
+  // ReadFile(DEFAULT_ERROR_PAGE_PATH);
 }
 
 eStatusCode Http::ReadFile(const std::string &path) {
@@ -277,8 +274,7 @@ bool Http::checkLimitExcept(int port) {
 
 eStatusCode Http::CheckPathType(const std::string &path) {
   struct stat info;
-  // stat(path.c_str(), &info);
-  std::cout << PURPLE << path << RESET << std::endl;
+
   if (stat(path.c_str(), &info) != 0) {
     if (errno == ENOENT) {
       return (PATH_NOT_FOUND);
@@ -291,7 +287,6 @@ eStatusCode Http::CheckPathType(const std::string &path) {
   } else {
     return (PATH_UNKNOWN); // 디렉토리도 파일도 아닌 타입(소켓, 파이프, 심볼릭
   }
-  // 링크 등등)
 }
 
 std::vector<char> Http::GetCGIbufferToVector() {
