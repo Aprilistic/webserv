@@ -49,6 +49,11 @@ public:
   Request &GetRequest(void);
   Response &GetResponse(void);
 
+
+  void SetRequest(eStatusCode state, int port, std::vector<char> &RecvBuffer);
+  void HandleRequestType(int port);
+  void HandleCGIRequest(int port);
+  void HandleHTTPRequest(int port);
 private:
   bool checkRedirect(int port);
   bool checkClientMaxBodySize(int port);
