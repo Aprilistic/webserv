@@ -1,18 +1,17 @@
-#include "Router.hpp"
+#include "CGI.hpp"
 
 extern char **environ;
 
-bool Router::IsCgiRequest(Http &request) {
+bool IsCgiRequest(Request &request) {
   // uri에  이러한 경로가 있다면 무조건  cgi에서 처리된다는 가정
-  if (request.GetRequest().mUri.find("/cgi-bin/") != std::string::npos) {
+  if (request.mUri.find("/cgi-bin/") != std::string::npos) {
     return (true);
   }
 
   // 클라이언트가 확장자를 지정해준 경우 이 파일은 무조건 cgi에서 처리된다는
   // 가정
-  if (request.GetRequest().mUri.size() > 4 &&
-      request.GetRequest().mUri.substr(request.GetRequest().mUri.size() - 4) ==
-          ".bla") {
+  if (request.mUri.size() > 4 &&
+      request.mUri.substr(request.mUri.size() - 4) == ".bla") {
     return (true);
   }
 
@@ -54,18 +53,18 @@ void setAllEnv(int port, Http &http) {
   setenv("REQUEST_URI", tmp.mUri.c_str(), 1);
 }
 
-eStatusCode CgiHandler::Handle(int port, Http &http) {
+void CGIHandle(int port, Http &http) {
 
   int pipe_fd[2];
   if (pipe(pipe_fd) == -1) {
     // perror("pipe");
-    return (http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR), ERROR);
+    http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR);
   }
 
   pid_t pid = fork();
   if (pid == -1) {
     // perror("fork");
-    return (http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR), ERROR);
+    http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR);
   }
 
   if (pid == 0) {                    // Child Process
@@ -84,7 +83,7 @@ eStatusCode CgiHandler::Handle(int port, Http &http) {
     std::string path_str = std::string(pwd) + "modules/python/python.py";
     execve(path_str.c_str(), nullptr, environ);
     // perror("execve");
-    return (http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR), ERROR);
+    http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR);
   } else {             // Parent Process
     close(pipe_fd[1]); // Close write end of the pipe
     int status;
@@ -94,15 +93,10 @@ eStatusCode CgiHandler::Handle(int port, Http &http) {
     ssize_t bytes_read = read(pipe_fd[0], buffer, sizeof(buffer) - 1);
     if (bytes_read == -1) {
       // perror("read");
-      return (http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR),
-              ERROR);
+      http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR);
     }
 
     buffer[bytes_read] = '\0'; // Null-terminate the string
     // std::cout << "CGI Output:\n" << buffer << std::endl;
-    std::string strbuffer = buffer;
-    http.SetCGIbuffer(strbuffer);
   }
-
-  return (CGI);
 }

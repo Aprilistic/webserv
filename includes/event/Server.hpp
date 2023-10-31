@@ -28,7 +28,7 @@ private:
 public:
   int mSocket;
   // std::map<int, Connection *> mConnection;
-  std::map<int, SharedPtr<Connection>> mConnection;
+  std::map<int, SharedPtr<Connection> > mConnection;
 private:
   struct sockaddr_in mAddr;
   int mPort;
