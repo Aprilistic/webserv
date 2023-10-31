@@ -27,10 +27,9 @@ private:
 
 public:
   int mSocket;
-  // std::map<std::string, Node *> mLocationHashMap;
-  std::map<int, Connection *> mConnection;
+  // std::map<int, Connection *> mConnection;
+  std::map<int, SharedPtr<Connection>> mConnection;
 private:
-  // Node *mServerNode;  //May not need this
   struct sockaddr_in mAddr;
   int mPort;
 };

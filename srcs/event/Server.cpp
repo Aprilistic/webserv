@@ -58,11 +58,7 @@ Server::~Server() {
   kevent(Common::mKqueue, events, 2, NULL, 0, NULL);
 
   // Close the socket
-  for (std::map<int, Connection *>::iterator it = mConnection.begin();
-       it != mConnection.end(); ++it) {
-    delete it->second;
-  }
-
+  mConnection.clear();
   close(mSocket);
 }
 
@@ -94,7 +90,8 @@ void Server::readHandler() {
   if (socket == -1) {
     // error
   }
-  mConnection[socket] = new Connection(socket, mPort);
+
+  mConnection[socket] = SharedPtr<Connection>(new Connection(socket, mPort));
 }
 
 void Server::writeHandler() {}
