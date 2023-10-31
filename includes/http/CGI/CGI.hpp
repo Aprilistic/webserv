@@ -6,6 +6,6 @@
 class Http;
 
 bool IsCgiRequest(Request &request);
-eStatusCode CGIHandle(int port, Http &http);
+void CGIHandle(int port, Http &http);
 
 #endif
