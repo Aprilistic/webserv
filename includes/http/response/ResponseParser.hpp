@@ -16,18 +16,19 @@ public:
   ~ResponseParser();
 
   std::string MakeResponseMessage(Http& http, eStatusCode state);
-  // void MakeResponseMessage(Response &resp);
   
   std::string GetMessage() const;
   std::vector<char> GetMessageToVector();
 
 private:
-  //Set Response message base RFC
-  void makeMandatoryHeaders(Http& http);
+  //set mandatory response message
+  void setResponse(Http &http, eStatusCode state);
+  void setStatusLine(Http &http, eStatusCode state);
+  void setMandatoryHeaderFields(Http& http);
   std::string getStatusMessage(eStatusCode errorStatus);
   std::string getFileType(Http& http);
 
-  //Make message
+  //set response message to std::string
   void setMessage(Response &resp);
   void setStatusLine(Response &resp);
   void setHeaderFields(Response &resp);

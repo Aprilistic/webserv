@@ -5,6 +5,62 @@ Response::Response()
 
 Response::~Response() {}
 
+int Response::GetVersionMajor() const { return mVersionMajor; }
+
+int Response::GetVersionMinor() const { return mVersionMinor; }
+
+unsigned int Response::GetStatusCode() const { return mStatusCode; }
+
+std::string Response::GetStatus() const { return mStatus; }
+
+// std::vector<Response::HeaderItem> Response::GetHeaders() const {
+//   return mHeaders;
+// }
+
+std::multimap<std::string, std::string> Response::GetHeaders() const {
+  return mHeaders;
+}
+
+// std::vector<char> Response::GetContent() const { return mContent; }
+
+std::string Response::GetBody() const { return mBody; }
+
+bool Response::GetKeepAlive() const { return mKeepAlive; }
+
+void Response::SetVersionMajor(int versionMajor) {
+  mVersionMajor = versionMajor;
+}
+
+void Response::SetVersionMinor(int versionMinor) {
+  mVersionMinor = versionMinor;
+}
+
+void Response::SetStatusCode(unsigned int statusCode) {
+  mStatusCode = statusCode;
+}
+
+void Response::SetStatus(const std::string &status) { mStatus = status; }
+
+// void Response::SetHeaders(const std::vector<HeaderItem> &headers) {
+
+//   mHeaders = headers;
+
+// }
+
+void Response::SetHeaders(
+    const std::multimap<std::string, std::string> &headers) {
+
+  mHeaders = headers;
+}
+
+// void Response::SetContent(const std::vector<char> &content) {
+//   mContent = content;
+// }
+
+void Response::SetBody(const std::string &body) { mBody = body; }
+
+void Response::SetKeepAlive(bool keepAlive) { mKeepAlive = keepAlive; }
+
 std::string Response::Inspect() const {
   std::stringstream stream;
   stream << "HTTP/" << mVersionMajor << "." << mVersionMinor << " "
