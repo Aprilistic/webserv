@@ -1,38 +1,45 @@
 #ifndef RESPONSEPARSER_HPP
 #define RESPONSEPARSER_HPP
 
+#include "Core.hpp"
+#include "Http.hpp"
 #include "Enum.hpp"
-#include "Response.hpp"
+
+#define CRLF "\r\n"
+#define SP " "
 
 class ResponseParser {
 public:
   ResponseParser();
   ~ResponseParser();
 
-  eStatusCode Parse(Response &resp, const char *begin, const char *end);
+  std::string MakeResponseMessage(Http& http, eStatusCode state);
+  // void MakeResponseMessage(Response &resp);
+  
+  std::string GetMessage() const;
+  std::vector<char> GetMessageToVector();
 
 private:
-  // static bool checkIfConnection(const Response::HeaderItem &item);
-  static bool
-  checkIfConnection(const std::pair<const std::string, std::string> &item);
-  eStatusCode consume(Response &resp, const char *begin, const char *end);
-  // Check if a byte is an HTTP character.
-  inline bool isChar(int c);
-  // Check if a byte is an HTTP control character.
-  inline bool isControl(int c);
-  // Check if a byte is defined as an HTTP special character.
-  inline bool isSpecial(int c);
-  // Check if a byte is a digit.
-  inline bool isDigit(int c);
+  //Set Response message base RFC
+  void makeMandatoryHeaders(Http& http);
+  std::string getStatusMessage(eStatusCode errorStatus);
+  std::string getFileType(Http& http);
 
-public:
-  size_t mContentSize;
-  std::string mChunkSizeStr;
-  std::string mHeaderName;
-  std::string mHeaderValue;
-  size_t mChunkSize;
-  bool mChunked;
-  int mState;
+  //Make message
+  void setMessage(Response &resp);
+  void setStatusLine(Response &resp);
+  void setHeaderFields(Response &resp);
+  void setBody(Response &resp);
+private:
+  std::string mMessage;
 };
 
+// 1. Response Headers
+// http/1.1 200 OK
+// Headers: asjd;fja;sdf
+// Headers: asjd;fja;sdf
+// Headers: asjd;fja;sdf
+// bodyu
+// 2. Make message
+// 
 #endif

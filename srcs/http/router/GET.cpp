@@ -1,5 +1,26 @@
 #include "Router.hpp"
 
+std::string GetHandler::autoIndex(const std::string &path) {
+  DIR *dir = opendir(path.c_str());
+  if (dir == NULL) {
+    return ("");
+  }
+
+  std::string html = "<html><head><title>Index of " + path +
+                     "</title></head><body><h1>Index of " + path +
+                     "</h1><hr><pre>";
+
+  struct dirent *entry;
+  while ((entry = readdir(dir)) != NULL) {
+    html += "<a href=\"" + std::string(entry->d_name) + "\">" +
+            std::string(entry->d_name) + "</a><br>";
+  }
+  html += "</pre><hr></body></html>";
+
+  closedir(dir);
+  return (html);
+}
+
 eStatusCode GetHandler::Handle(int port, Http &http) {
   Node *location = Common::mConfigMap->GetConfigNode(
       port, http.GetRequest().mHost, http.GetRequest().mUri);
@@ -63,7 +84,7 @@ eStatusCode GetHandler::Handle(int port, Http &http) {
 
       if (autoindex.empty() == false && autoindex[0] == "on") {
         // autoindex on 일때 처리 로직
-        http.GetResponse().mBody = http.AutoIndex(resolvedPath);
+        http.GetResponse().mBody = autoIndex(resolvedPath);
         http.GetResponse().mStatusCode = SUCCESSFUL_OK;
         return SUCCESSFUL_OK;
       } else {

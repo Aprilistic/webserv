@@ -8,7 +8,6 @@
 #include "Request.hpp"
 #include "RequestParser.hpp"
 #include "Response.hpp"
-#include "ResponseMessage.hpp"
 #include "ResponseParser.hpp"
 
 #include "IRequestHandler.hpp"
@@ -23,27 +22,16 @@ public:
   Http();
   ~Http();
 
-  // requestParser와 이름 겹침
-  eStatusCode setOneRequest(int &port, std::vector<char> &mRecvBuffer);
   eStatusCode PriorityHeaders(int &port);
-  eStatusCode SetResponse(int &port);
-  std::string GetStatusMessage(eStatusCode errorStatus);
-  std::string GetFileType();
-  std::vector<char> GetCGIbufferToVector();
-
-  void MakeMandatoryHeaders();
 
   void ErrorHandle(int port, eStatusCode errorStatus);
   eStatusCode ReadFile(const std::string &path);
   eStatusCode WriteFile(std::string &path, std::string &data,
                         eStatusCode pathType, bool append = false);
-  std::string AutoIndex(const std::string &path);
 
   eStatusCode CheckPathType(const std::string &path);
 
-  void ResetRequest(void);
-  void ResetResponse(void);
-  void ResetRequestParser(void);
+  void ResetAll(void);
   void ResetBuffer(void);
   Request &GetRequest(void);
   Response &GetResponse(void);
@@ -54,6 +42,9 @@ public:
   void HandleCGIRequest(int port);
   void HandleHTTPRequest(int port);
 private:
+  void ResetRequest(void);
+  void ResetResponse(void);
+  void ResetRequestParser(void);
   bool checkRedirect(int port);
   bool checkClientMaxBodySize(int port);
   bool checkLimitExcept(int port);
@@ -63,6 +54,7 @@ private:
   Request mRequest;
   Response mResponse;
   RequestParser mRequestParser;
+  ResponseParser mResponseParser;
   int mFd;
   static int mFileID;
 };

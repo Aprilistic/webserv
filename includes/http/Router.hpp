@@ -24,6 +24,9 @@ private:
 class GetHandler : public IRequestHandler {
 public:
   virtual eStatusCode Handle(int port, Http &http);
+
+private:
+  std::string autoIndex(const std::string &path);
 };
 
 class PostHandler : public IRequestHandler {
@@ -33,7 +36,7 @@ public:
 
 class DeleteHandler : public IRequestHandler {
 public:
-  virtual eStatusCode Handle(int port, Http &http);
+  virtual void Handle(int port, Http &http);
 };
 
 class PutHandler : public IRequestHandler {
