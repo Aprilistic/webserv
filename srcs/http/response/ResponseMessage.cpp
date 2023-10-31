@@ -7,7 +7,9 @@ ResponseParser::~ResponseParser() {}
 
 std::string ResponseParser::MakeResponseMessage(Http& http, eStatusCode state)
 {
-  makeMandatoryHeaders(http);
+  //set mandatory response message
+  setResponse(http, state);
+  //set response message to std::string
   setMessage(http.GetResponse());
   return GetMessage();
 }
