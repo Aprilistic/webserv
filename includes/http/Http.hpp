@@ -13,6 +13,7 @@
 
 #include "IRequestHandler.hpp"
 #include "Router.hpp"
+#include "CGI.hpp"
 
 #define DEFAULT_ERROR_PAGE_PATH "/Users/euiclee/webserv/www/error/error.html"
 
@@ -42,10 +43,8 @@ public:
 
   void ResetRequest(void);
   void ResetResponse(void);
-  void ResetBuffer(void);
   void ResetRequestParser(void);
-  void ResetCGIbuffer(void);
-  void SetCGIbuffer(std::string &CGIResponseMessage);
+  void ResetBuffer(void);
   Request &GetRequest(void);
   Response &GetResponse(void);
 
@@ -61,7 +60,6 @@ private:
 
 private:
   std::string mBuffer;
-  std::string mCGIbuffer;
   Request mRequest;
   Response mResponse;
   RequestParser mRequestParser;

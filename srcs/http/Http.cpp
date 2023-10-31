@@ -289,28 +289,13 @@ eStatusCode Http::CheckPathType(const std::string &path) {
   }
 }
 
-std::vector<char> Http::GetCGIbufferToVector() {
-  std::vector<char> message;
-  for (std::string::iterator it = mCGIbuffer.begin(); it != mCGIbuffer.end();
-       ++it) {
-    message.push_back(*it);
-  }
-  return message;
-}
-
 void Http::ResetRequest() { mRequest = Request(); }
 
 void Http::ResetResponse() { mResponse = Response(); }
 
 void Http::ResetBuffer() { mBuffer.clear(); }
 
-void Http::ResetCGIbuffer() { mCGIbuffer.clear(); }
-
 void Http::ResetRequestParser() { mRequestParser = RequestParser(); }
-
-void Http::SetCGIbuffer(std::string &CGIResponseMessage) {
-  mCGIbuffer = CGIResponseMessage;
-}
 
 Request &Http::GetRequest() { return mRequest; }
 
@@ -329,8 +314,10 @@ void Http::SetRequest(eStatusCode state, int port, std::vector<char> &RecvBuffer
 
 	eStatusCode ParseState = mRequestParser.Parse(mRequest, mBuffer.c_str(), mBuffer.c_str() + mBuffer.size());
 	
-	if (ParseState == PARSING_ERROR)
+	if (ParseState == PARSING_ERROR){
 		ErrorHandle(port, ParseState);
+    mBuffer.clear();
+  }
 	else if (ParseState == PARSING_INCOMPLETED)
 	{
 		mBuffer.clear();
@@ -346,7 +333,7 @@ void Http::SetRequest(eStatusCode state, int port, std::vector<char> &RecvBuffer
 
 void Http::HandleRequestType(int port) 
 {
-	if (GetRequest().mUri.find("/cgi-bin") != std::string::npos)
+	if (IsCgiRequest(GetRequest()))
 	{
 		HandleCGIRequest(port);
 	}
@@ -358,6 +345,7 @@ void Http::HandleRequestType(int port)
 
 void Http::HandleCGIRequest(int port)
 {
+  CGIHandle(port, *this);
 	// CGI logic
 }
 

@@ -13,7 +13,6 @@ class Request;
 class Router {
 public:
   static IRequestHandler *Routing(Http &http);
-  static bool IsCgiRequest(Http &http);
 
 private:
   Router();
@@ -41,9 +40,4 @@ class PutHandler : public IRequestHandler {
 public:
   virtual eStatusCode Handle(int port, Http &http);
 };
-class CgiHandler : public IRequestHandler {
-public:
-  virtual eStatusCode Handle(int port, Http &http);
-};
-
 #endif

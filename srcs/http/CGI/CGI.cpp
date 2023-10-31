@@ -1,18 +1,17 @@
-#include "Router.hpp"
+#include "CGI.hpp"
 
 extern char **environ;
 
-bool Router::IsCgiRequest(Http &request) {
+bool IsCgiRequest(Request &request) {
   // uri에  이러한 경로가 있다면 무조건  cgi에서 처리된다는 가정
-  if (request.GetRequest().mUri.find("/cgi-bin/") != std::string::npos) {
+  if (request.mUri.find("/cgi-bin/") != std::string::npos) {
     return (true);
   }
 
   // 클라이언트가 확장자를 지정해준 경우 이 파일은 무조건 cgi에서 처리된다는
   // 가정
-  if (request.GetRequest().mUri.size() > 4 &&
-      request.GetRequest().mUri.substr(request.GetRequest().mUri.size() - 4) ==
-          ".bla") {
+  if (request.mUri.size() > 4 &&
+      request.mUri.substr(request.mUri.size() - 4) == ".bla") {
     return (true);
   }
 
@@ -54,7 +53,7 @@ void setAllEnv(int port, Http &http) {
   setenv("REQUEST_URI", tmp.mUri.c_str(), 1);
 }
 
-eStatusCode CgiHandler::Handle(int port, Http &http) {
+eStatusCode CGIHandle(int port, Http &http) {
 
   int pipe_fd[2];
   if (pipe(pipe_fd) == -1) {
@@ -100,8 +99,6 @@ eStatusCode CgiHandler::Handle(int port, Http &http) {
 
     buffer[bytes_read] = '\0'; // Null-terminate the string
     // std::cout << "CGI Output:\n" << buffer << std::endl;
-    std::string strbuffer = buffer;
-    http.SetCGIbuffer(strbuffer);
   }
 
   return (CGI);
