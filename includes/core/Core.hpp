@@ -35,6 +35,8 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include "Shared_ptr.hpp"
+
 // color
 #define RED "\033[1;31m"
 #define GREEN "\033[1;32m"

@@ -1,8 +1,6 @@
 #ifndef HTTP_SHARED_PTR_HPP
 #define HTTP_SHARED_PTR_HPP
 
-#include "Core.hpp"
-
 template <typename T> class SharedPtr {
 private:
   T *ptr;
