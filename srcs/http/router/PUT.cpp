@@ -1,6 +1,6 @@
 #include "Router.hpp"
 
-eStatusCode PutHandler::Handle(int port, Http &http) {
+void PutHandler::Handle(int port, Http &http) {
   // 요청 데이터 파싱
   std::string requestData(http.GetRequest().mContent.begin(),
                           http.GetRequest().mContent.end());
@@ -9,7 +9,7 @@ eStatusCode PutHandler::Handle(int port, Http &http) {
   Node *location = Common::mConfigMap->GetConfigNode(
       port, http.GetRequest().mHost, http.GetRequest().mUri);
   if (location == NULL) {
-    return CLIENT_ERROR_NOT_FOUND;
+    return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
   }
 
   // location 정보에서 alias, uri 정보 가져오기
@@ -20,7 +20,7 @@ eStatusCode PutHandler::Handle(int port, Http &http) {
   if (alias.empty()) {
     if (uri[0] == "/") {
       // nginx는 404 Not found 반환
-      return CLIENT_ERROR_NOT_FOUND;
+      return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
     }
   }
   std::string resolvedPath = http.GetRequest().mUri; // /example/index.html
@@ -33,23 +33,28 @@ eStatusCode PutHandler::Handle(int port, Http &http) {
   switch (http.CheckPathType(resolvedPath)) {
   case PATH_IS_DIRECTORY: {
     // PUT에 대한 요청이 들어오면 405 Method Not Allowed 반환할 수 있음
-    return CLIENT_ERROR_METHOD_NOT_ALLOWED;
+    return (http.ErrorHandle(port, CLIENT_ERROR_METHOD_NOT_ALLOWED));
   }
-  case PATH_IS_FILE: {
+    case PATH_IS_FILE: {
     // 파일에 대한 PUT 요청 처리 (예: 파일에 데이터 추가)
     // 데이터 처리 후 결과에 따라 상태 코드 설정
-    http.GetResponse().mStatusCode =
-        SUCCESSFUL_OK; // 리소스가 성공적으로 수정된 경우
     http.GetResponse().mBody =
         "Data successfully processed and resource modified at URI: " +
         http.GetRequest().mUri;
-    return SUCCESSFUL_OK;
+    break ;
   }
   case PATH_INACCESSIBLE: {
-    return CLIENT_ERROR_FORBIDDEN;
+    return (http.ErrorHandle(port, CLIENT_ERROR_FORBIDDEN));
+  }
+  case PATH_NOT_FOUND: {
+    return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
   }
   default: {
-    return CLIENT_ERROR_NOT_FOUND;
+    return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
   }
   }
+
+  std::string message =
+      http.GetResponseParser().MakeResponseMessage(http, SUCCESSFUL_OK);
+  // send message
 }

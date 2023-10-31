@@ -8,6 +8,8 @@
 #define CRLF "\r\n"
 #define SP " "
 
+class Http;
+
 class ResponseParser {
 public:
   ResponseParser();

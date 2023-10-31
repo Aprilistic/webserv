@@ -9,7 +9,6 @@
 #include "RequestParser.hpp"
 #include "Response.hpp"
 #include "ResponseParser.hpp"
-
 #include "IRequestHandler.hpp"
 #include "Router.hpp"
 #include "CGI.hpp"
@@ -17,6 +16,7 @@
 #define DEFAULT_ERROR_PAGE_PATH "/Users/euiclee/webserv/www/error/error.html"
 
 class IRequestHandler;
+
 class Http {
 public:
   Http();
@@ -35,6 +35,7 @@ public:
   void ResetBuffer(void);
   Request &GetRequest(void);
   Response &GetResponse(void);
+  ResponseParser &GetResponseParser(void);
 
 
   void SetRequest(eStatusCode state, int port, std::vector<char> &RecvBuffer);

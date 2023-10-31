@@ -202,6 +202,8 @@ Request &Http::GetRequest() { return mRequest; }
 
 Response &Http::GetResponse() { return mResponse; }
 
+ResponseParser &Http::GetResponseParser() { return mResponseParser; }
+
 void Http::SetRequest(eStatusCode state, int port,
                       std::vector<char> &RecvBuffer) {
   if (state == SOCKET_DISCONNECTED)

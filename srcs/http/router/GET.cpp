@@ -1,33 +1,12 @@
 #include "Router.hpp"
 
-std::string GetHandler::autoIndex(const std::string &path) {
-  DIR *dir = opendir(path.c_str());
-  if (dir == NULL) {
-    return ("");
-  }
-
-  std::string html = "<html><head><title>Index of " + path +
-                     "</title></head><body><h1>Index of " + path +
-                     "</h1><hr><pre>";
-
-  struct dirent *entry;
-  while ((entry = readdir(dir)) != NULL) {
-    html += "<a href=\"" + std::string(entry->d_name) + "\">" +
-            std::string(entry->d_name) + "</a><br>";
-  }
-  html += "</pre><hr></body></html>";
-
-  closedir(dir);
-  return (html);
-}
-
-eStatusCode GetHandler::Handle(int port, Http &http) {
+void GetHandler::Handle(int port, Http &http) {
   Node *location = Common::mConfigMap->GetConfigNode(
       port, http.GetRequest().mHost, http.GetRequest().mUri);
 
   // NULL 인경우 -> 일치하는 location이 없고 / 도 설정되어 있지 않은 경우
   if (location == NULL) {
-    return CLIENT_ERROR_NOT_FOUND; // return 값 고민
+    return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
   }
 
   std::vector<std::string> uri = location->FindValue(location, "location");
@@ -38,7 +17,7 @@ eStatusCode GetHandler::Handle(int port, Http &http) {
 
   if (alias.empty()) {
     if (uri[0] == "/") {
-      return CLIENT_ERROR_NOT_FOUND; // return 값 고민
+      return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
     }
   }
   // alias 있는 경우
@@ -48,6 +27,7 @@ eStatusCode GetHandler::Handle(int port, Http &http) {
   std::string resolvedPath = http.GetRequest().mUri; // /example/index.html
   size_t pos = resolvedPath.find(uri[0]);            // /example
   if (pos != std::string::npos) {
+    // resolvedPath = alias + uri
     resolvedPath.replace(pos, uri[0].size(), alias[0]);
   }
 
@@ -71,10 +51,10 @@ eStatusCode GetHandler::Handle(int port, Http &http) {
       // fullPath에 저장된 파일 제공
       eStatusCode readStatus = http.ReadFile(fullPath);
       if (readStatus != SUCCESSFUL_OK) {
-        return (readStatus);
+        return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
       }
 
-      return SUCCESSFUL_OK;
+      break ;
     } else {
       http.GetResponse().mFilename = "autoindex";
       // 경로에 파일이 없다면
@@ -86,10 +66,10 @@ eStatusCode GetHandler::Handle(int port, Http &http) {
         // autoindex on 일때 처리 로직
         http.GetResponse().mBody = autoIndex(resolvedPath);
         http.GetResponse().mStatusCode = SUCCESSFUL_OK;
-        return SUCCESSFUL_OK;
+        break ;
       } else {
         // autoindex가 off 일때 처리 로직
-        return CLIENT_ERROR_NOT_FOUND;
+        return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
       }
     }
     break;
@@ -97,23 +77,46 @@ eStatusCode GetHandler::Handle(int port, Http &http) {
   case PATH_IS_FILE: {
     eStatusCode readStatus = http.ReadFile(resolvedPath);
     if (readStatus != SUCCESSFUL_OK) {
-      return (readStatus);
+      return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
     }
-    return SUCCESSFUL_OK;
     // 파일 탐색 실패 -> http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND);
     // 404;
     break;
   }
-  case PATH_INACCESSIBLE: {        // 권한에러
-    return CLIENT_ERROR_FORBIDDEN; // 403??
+  case PATH_INACCESSIBLE: { // 권한에러
+    return (http.ErrorHandle(port, CLIENT_ERROR_FORBIDDEN));
   }
   case PATH_NOT_FOUND: {
-    return CLIENT_ERROR_NOT_FOUND;
+    return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
   }
   default: { // 언노운 파일
-    // 파일도 디렉토리도 아니면 404 확인필요
-    return CLIENT_ERROR_FORBIDDEN;
+             // 파일도 디렉토리도 아니면 404 확인필요
+    return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
   }
   }
-  return SUCCESSFUL_OK;
+
+  std::string message = http.GetResponseParser().MakeResponseMessage(http, SUCCESSFUL_OK);
+  // send message
+}
+
+
+std::string GetHandler::autoIndex(const std::string &path) {
+  DIR *dir = opendir(path.c_str());
+  if (dir == NULL) {
+    return ("");
+  }
+
+  std::string html = "<html><head><title>Index of " + path +
+                     "</title></head><body><h1>Index of " + path +
+                     "</h1><hr><pre>";
+
+  struct dirent *entry;
+  while ((entry = readdir(dir)) != NULL) {
+    html += "<a href=\"" + std::string(entry->d_name) + "\">" +
+            std::string(entry->d_name) + "</a><br>";
+  }
+  html += "</pre><hr></body></html>";
+
+  closedir(dir);
+  return (html);
 }
