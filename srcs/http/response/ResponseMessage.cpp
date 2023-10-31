@@ -1,4 +1,5 @@
 #include "ResponseParser.hpp"
+#include "Http.hpp"
 
 ResponseParser::ResponseParser() {}
 

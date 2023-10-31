@@ -1,4 +1,5 @@
 #include "ResponseParser.hpp"
+#include "Http.hpp"
 
 std::string ResponseParser::getFileType(Http& http) {
   if (http.GetRequest().mMethod == "POST") {

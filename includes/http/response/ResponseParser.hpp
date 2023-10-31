@@ -2,13 +2,13 @@
 #define RESPONSEPARSER_HPP
 
 #include "Core.hpp"
-#include "Http.hpp"
 #include "Enum.hpp"
 
 #define CRLF "\r\n"
 #define SP " "
 
 class Http;
+class Response;
 
 class ResponseParser {
 public:
@@ -36,12 +36,4 @@ private:
   std::string mMessage;
 };
 
-// 1. Response Headers
-// http/1.1 200 OK
-// Headers: asjd;fja;sdf
-// Headers: asjd;fja;sdf
-// Headers: asjd;fja;sdf
-// bodyu
-// 2. Make message
-// 
 #endif
