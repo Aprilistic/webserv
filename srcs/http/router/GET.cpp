@@ -1,7 +1,8 @@
 #include "Router.hpp"
 
 void GetHandler::Handle(int port, Http &http, int socket) {
-  
+
+  std::cout << RED << "uri = " << http.GetRequest().mUri << std::endl;
   Node *location = Common::mConfigMap->GetConfigNode(
       port, http.GetRequest().mHost, http.GetRequest().mUri);
 
@@ -27,12 +28,16 @@ void GetHandler::Handle(int port, Http &http, int socket) {
   // 로직
   std::string resolvedPath = http.GetRequest().mUri; // /example/index.html
 
+  std::cout << RED << resolvedPath << RESET << std::endl;
   size_t pos = resolvedPath.find(uri[0]); // /example
   if (pos != std::string::npos) {
     // resolvedPath = alias + uri
+
+    std::cout << RED << resolvedPath << RESET << std::endl;
     resolvedPath.replace(pos, uri[0].size(), alias[0]);
   }
 
+  std::cout << RED << resolvedPath << RESET << std::endl;
   switch (http.CheckPathType(resolvedPath)) {
   case PATH_IS_DIRECTORY: {
     std::vector<std::string> index = location->FindValue(location, "index");
