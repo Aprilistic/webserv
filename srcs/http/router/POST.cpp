@@ -1,6 +1,6 @@
 #include "Router.hpp"
 
-void PostHandler::Handle(int port, Http &http) {
+void PostHandler::Handle(int port, Http &http, int socket) {
   // 요청 데이터 파싱
   std::string requestData(http.GetRequest().mContent.begin(),
                           http.GetRequest().mContent.end());
@@ -16,14 +16,14 @@ void PostHandler::Handle(int port, Http &http) {
   // 데이터가 없는 경우 400 Bad Request 반환
   if (requestData.empty() && isChunked == false) {
     std::cout << "400 Bad Request" << std::endl;
-    return (http.ErrorHandle(port, CLIENT_ERROR_BAD_REQUEST));
+    return (http.ErrorHandle(port, CLIENT_ERROR_BAD_REQUEST, socket));
   }
 
   // URI로 리소스 위치 확인
   Node *location = Common::mConfigMap->GetConfigNode(
       port, http.GetRequest().mHost, http.GetRequest().mUri);
   if (location == NULL) {
-    return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
+    return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
   }
 
   // location 정보에서 alias, uri 정보 가져오기
@@ -34,7 +34,7 @@ void PostHandler::Handle(int port, Http &http) {
   if (alias.empty()) {
     if (uri[0] == "/") {
       // nginx는 404 Not found 반환
-      return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
+      return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
     }
   }
 
@@ -65,13 +65,13 @@ void PostHandler::Handle(int port, Http &http) {
     break ;
   }
   case PATH_INACCESSIBLE: {
-    return (http.ErrorHandle(port, CLIENT_ERROR_FORBIDDEN));
+    return (http.ErrorHandle(port, CLIENT_ERROR_FORBIDDEN, socket));
   }
   case PATH_NOT_FOUND: {
-    return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
+    return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
   }
   default: {
-    return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
+    return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
   }
   }
 

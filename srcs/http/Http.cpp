@@ -1,4 +1,5 @@
 #include "Http.hpp"
+#include "CGI.hpp"
 
 int Http::mFileID = 0;
 
@@ -16,7 +17,7 @@ eStatusCode Http::PriorityHeaders(int &port) {
   return PRIORITY_HEADER_OK;
 }
 
-void Http::ErrorHandle(int port, eStatusCode errorStatus) {
+void Http::ErrorHandle(int port, eStatusCode errorStatus, int socket) {
 
   Node *location =
       Common::mConfigMap->GetConfigNode(port, mRequest.mHost, mRequest.mUri);
@@ -185,18 +186,21 @@ eStatusCode Http::CheckPathType(const std::string &path) {
 }
 
 void Http::ResetAll() {
-  ResetRequest();
-  ResetRequest();
-  ResetRequestParser();
+  resetRequest();
+  resetRequest();
+  resetRequestParser();
+  resetResponseParser();
 }
 
-void Http::ResetRequest() { mRequest = Request(); }
+void Http::resetRequest() { mRequest = Request(); }
 
-void Http::ResetResponse() { mResponse = Response(); }
+void Http::resetResponse() { mResponse = Response(); }
 
 void Http::ResetBuffer() { mBuffer.clear(); }
 
-void Http::ResetRequestParser() { mRequestParser = RequestParser(); }
+void Http::resetRequestParser() { mRequestParser = RequestParser(); }
+
+void Http::resetResponseParser() { mResponseParser = ResponseParser(); }
 
 Request &Http::GetRequest() { return mRequest; }
 
@@ -204,12 +208,12 @@ Response &Http::GetResponse() { return mResponse; }
 
 ResponseParser &Http::GetResponseParser() { return mResponseParser; }
 
-void Http::SetRequest(eStatusCode state, int port,
+void Http::SetRequest(eStatusCode state, int port, int socket,
                       std::vector<char> &RecvBuffer) {
   if (state == SOCKET_DISCONNECTED)
     ; // disconnection();
   else if (state == SOCKET_READ_ERROR)
-    ErrorHandle(port, state);
+    ErrorHandle(port, state, socket);
 
   std::string temp(RecvBuffer.begin(), RecvBuffer.end());
   mBuffer += temp;
@@ -218,43 +222,43 @@ void Http::SetRequest(eStatusCode state, int port,
       mRequest, mBuffer.c_str(), mBuffer.c_str() + mBuffer.size());
 
   if (ParseState == PARSING_ERROR) {
-    ErrorHandle(port, ParseState);
+    ErrorHandle(port, ParseState, socket);
     mBuffer.clear();
   } else if (ParseState == PARSING_INCOMPLETED) {
     mBuffer.clear();
     return;
   } else if (ParseState == PARSING_COMPLETED) {
     mBuffer = mRequestParser.GetRemainingBuffer();
-    HandleRequestType(port);
+    HandleRequestType(port, socket);
   }
 }
 
-void Http::HandleRequestType(int port) {
-  if (IsCgiRequest(GetRequest())) {
-    HandleCGIRequest(port);
-  } else {
-    HandleHTTPRequest(port);
-  }
+void Http::HandleRequestType(int port, int socket) {
+  // if (IsCgiRequest(GetRequest())) {
+  //   HandleCGIRequest(port, socket);
+  // } else {
+    HandleHTTPRequest(port, socket);
+  // }
 }
 
-void Http::HandleCGIRequest(int port) {
-  CGIHandle(port, *this);
+void Http::HandleCGIRequest(int port, int socket) {
+  CGIHandle(port, *this, socket);
   // CGI logic
 }
 
-void Http::HandleHTTPRequest(int port) {
+void Http::HandleHTTPRequest(int port, int socket) {
   // HTTPHandle(port, *this);
   eStatusCode state = PriorityHeaders(port);
   if (state == REDIRECT)
     ; // redirect 처리
   else if (state != PRIORITY_HEADER_OK)
-    ErrorHandle(port, state);
+    ErrorHandle(port, state, socket);
 
   IRequestHandler *method = Router::Routing(*this);
 
   // error 면 this로 가져간 http의 에러 핸들러를 호출하여 알아서 메시지를
   // 작성하도록 구현하기 정상적인 response라도 해당 메소드가 불린 시점에서는 각
   // 메서드에서 요청에 대한 처리를 하는 것을 원칙으로 작성해야할듯
-  method->Handle(port, *this);
+  method->Handle(port, *this, socket);
   // delete(method);
 }

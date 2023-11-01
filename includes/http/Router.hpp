@@ -23,7 +23,7 @@ private:
 
 class GetHandler : public IRequestHandler {
 public:
-  virtual void Handle(int port, Http &http);
+  virtual void Handle(int port, Http &http, int socket);
 
 private:
   std::string autoIndex(const std::string &path);
@@ -31,16 +31,16 @@ private:
 
 class PostHandler : public IRequestHandler {
 public:
-  virtual void Handle(int port, Http &http);
+  virtual void Handle(int port, Http &http, int socket);
 };
 
 class DeleteHandler : public IRequestHandler {
 public:
-  virtual void Handle(int port, Http &http);
+  virtual void Handle(int port, Http &http, int socket);
 };
 
 class PutHandler : public IRequestHandler {
 public:
-  virtual void Handle(int port, Http &http);
+  virtual void Handle(int port, Http &http, int socket);
 };
 #endif

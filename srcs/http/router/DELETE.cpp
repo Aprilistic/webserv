@@ -1,11 +1,11 @@
 #include "Router.hpp"
 
-void DeleteHandler::Handle(int port, Http &http) {
+void DeleteHandler::Handle(int port, Http &http, int socket) {
   // URI로 리소스 위치 확인
   Node *location = Common::mConfigMap->GetConfigNode(
       port, http.GetRequest().mHost, http.GetRequest().mUri);
   if (location == NULL) {
-    return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
+    return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
   }
 
   // location 정보에서 alias, uri 정보 가져오기
@@ -16,7 +16,7 @@ void DeleteHandler::Handle(int port, Http &http) {
   if (alias.empty()) {
     if (uri[0] == "/") {
       // 어떤 동작하는지 찾아봐야 함
-      return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
+      return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
     }
   }
   std::string resolvedPath = http.GetRequest().mUri; // /example/index.html
@@ -30,7 +30,7 @@ void DeleteHandler::Handle(int port, Http &http) {
   case PATH_IS_DIRECTORY: {
     // DELETE 요청은 리소스와 관련된 메타데이터를 모두 삭제해야 함
     // 하지만 디렉토리를 삭제하는 것은 위험할 수 있어서 허용하지 않을 수 있음
-    return (http.ErrorHandle(port, CLIENT_ERROR_METHOD_NOT_ALLOWED));
+    return (http.ErrorHandle(port, CLIENT_ERROR_METHOD_NOT_ALLOWED, socket));
   }
   case PATH_IS_FILE: {
     // 파일 삭제 로직
@@ -39,17 +39,17 @@ void DeleteHandler::Handle(int port, Http &http) {
     if (/*파일 삭제 성공*/ true) {
       return;
     } else {
-      return (http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR));
+      return (http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR, socket));
     }
   }
   case PATH_INACCESSIBLE: {
-    return (http.ErrorHandle(port, CLIENT_ERROR_FORBIDDEN));
+    return (http.ErrorHandle(port, CLIENT_ERROR_FORBIDDEN, socket));
   }
   case PATH_NOT_FOUND: {
-    return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
+    return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
   }
   default: {
-    return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
+    return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
   }
   }
 

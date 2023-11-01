@@ -1,17 +1,17 @@
 #ifndef HTTP_HPP
 #define HTTP_HPP
 
+#include "CGI.hpp"
 #include "Common.hpp"
 #include "ConfigMap.hpp"
 #include "Core.hpp"
 #include "Enum.hpp"
+#include "IRequestHandler.hpp"
 #include "Request.hpp"
 #include "RequestParser.hpp"
 #include "Response.hpp"
 #include "ResponseParser.hpp"
-#include "IRequestHandler.hpp"
 #include "Router.hpp"
-#include "CGI.hpp"
 
 #define DEFAULT_ERROR_PAGE_PATH "/Users/euiclee/webserv/www/error/error.html"
 
@@ -24,7 +24,7 @@ public:
 
   eStatusCode PriorityHeaders(int &port);
 
-  void ErrorHandle(int port, eStatusCode errorStatus);
+  void ErrorHandle(int port, eStatusCode errorStatus, int socket);
   eStatusCode ReadFile(const std::string &path);
   eStatusCode WriteFile(std::string &path, std::string &data,
                         eStatusCode pathType, bool append = false);
@@ -37,15 +37,17 @@ public:
   Response &GetResponse(void);
   ResponseParser &GetResponseParser(void);
 
+  void SetRequest(eStatusCode state, int port, int socket,
+                  std::vector<char> &RecvBuffer);
+  void HandleRequestType(int port, int socket);
+  void HandleCGIRequest(int port, int socket);
+  void HandleHTTPRequest(int port, int socket);
 
-  void SetRequest(eStatusCode state, int port, std::vector<char> &RecvBuffer);
-  void HandleRequestType(int port);
-  void HandleCGIRequest(int port);
-  void HandleHTTPRequest(int port);
 private:
-  void ResetRequest(void);
-  void ResetResponse(void);
-  void ResetRequestParser(void);
+  void resetRequest(void);
+  void resetResponse(void);
+  void resetRequestParser(void);
+  void resetResponseParser(void);
   bool checkRedirect(int port);
   bool checkClientMaxBodySize(int port);
   bool checkLimitExcept(int port);
@@ -56,7 +58,7 @@ private:
   Response mResponse;
   RequestParser mRequestParser;
   ResponseParser mResponseParser;
-  int mFd;
+
   static int mFileID;
 };
 

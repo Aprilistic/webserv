@@ -1,12 +1,12 @@
 #include "Router.hpp"
 
-void GetHandler::Handle(int port, Http &http) {
+void GetHandler::Handle(int port, Http &http, int socket) {
   Node *location = Common::mConfigMap->GetConfigNode(
       port, http.GetRequest().mHost, http.GetRequest().mUri);
 
   // NULL 인경우 -> 일치하는 location이 없고 / 도 설정되어 있지 않은 경우
   if (location == NULL) {
-    return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
+    return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
   }
 
   std::vector<std::string> uri = location->FindValue(location, "location");
@@ -17,7 +17,7 @@ void GetHandler::Handle(int port, Http &http) {
 
   if (alias.empty()) {
     if (uri[0] == "/") {
-      return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
+      return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
     }
   }
   // alias 있는 경우
@@ -51,7 +51,7 @@ void GetHandler::Handle(int port, Http &http) {
       // fullPath에 저장된 파일 제공
       eStatusCode readStatus = http.ReadFile(fullPath);
       if (readStatus != SUCCESSFUL_OK) {
-        return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
+        return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
       }
 
       break ;
@@ -69,7 +69,7 @@ void GetHandler::Handle(int port, Http &http) {
         break ;
       } else {
         // autoindex가 off 일때 처리 로직
-        return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
+        return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
       }
     }
     break;
@@ -77,21 +77,21 @@ void GetHandler::Handle(int port, Http &http) {
   case PATH_IS_FILE: {
     eStatusCode readStatus = http.ReadFile(resolvedPath);
     if (readStatus != SUCCESSFUL_OK) {
-      return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
+      return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
     }
-    // 파일 탐색 실패 -> http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND);
+    // 파일 탐색 실패 -> http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUN, socketD);
     // 404;
     break;
   }
   case PATH_INACCESSIBLE: { // 권한에러
-    return (http.ErrorHandle(port, CLIENT_ERROR_FORBIDDEN));
+    return (http.ErrorHandle(port, CLIENT_ERROR_FORBIDDEN, socket));
   }
   case PATH_NOT_FOUND: {
-    return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
+    return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
   }
   default: { // 언노운 파일
              // 파일도 디렉토리도 아니면 404 확인필요
-    return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND));
+    return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
   }
   }
 
