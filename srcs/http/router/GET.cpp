@@ -2,7 +2,6 @@
 
 void GetHandler::Handle(int port, Http &http, int socket) {
 
-  std::cout << RED << "uri = " << http.GetRequest().mUri << std::endl;
   Node *location = Common::mConfigMap->GetConfigNode(
       port, http.GetRequest().mHost, http.GetRequest().mUri);
 
@@ -28,18 +27,17 @@ void GetHandler::Handle(int port, Http &http, int socket) {
   // 로직
   std::string resolvedPath = http.GetRequest().mUri; // /example/index.html
 
-  std::cout << RED << resolvedPath << RESET << std::endl;
   size_t pos = resolvedPath.find(uri[0]); // /example
   if (pos != std::string::npos) {
     // resolvedPath = alias + uri
 
-    std::cout << RED << resolvedPath << RESET << std::endl;
     resolvedPath.replace(pos, uri[0].size(), alias[0]);
   }
 
-  std::cout << RED << resolvedPath << RESET << std::endl;
   switch (http.CheckPathType(resolvedPath)) {
   case PATH_IS_DIRECTORY: {
+      std::cout << RED << "PATH_IS_DIRECTORY" << RESET << std::endl;
+
     std::vector<std::string> index = location->FindValue(location, "index");
     bool found = false;
     std::string fullPath;
@@ -47,7 +45,7 @@ void GetHandler::Handle(int port, Http &http, int socket) {
     for (size_t i = 0; i < index.size(); i++) {
       // configfile에 index에 있는 파일을 resolvedPath에 붙이면서 파일인지
       // 확인
-      fullPath = resolvedPath + index[i]; // file
+      fullPath = resolvedPath + "/" + index[i]; // file
       if (http.CheckPathType(fullPath) == PATH_IS_FILE) {
         found = true;
         break;
@@ -82,6 +80,7 @@ void GetHandler::Handle(int port, Http &http, int socket) {
     break;
   }
   case PATH_IS_FILE: {
+    std::cout << RED << "PATH_IS_FILE" << RESET << std::endl;
     eStatusCode readStatus = http.ReadFile(resolvedPath);
     if (readStatus != SUCCESSFUL_OK) {
       return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
@@ -91,13 +90,17 @@ void GetHandler::Handle(int port, Http &http, int socket) {
     break;
   }
   case PATH_INACCESSIBLE: { // 권한에러
+      std::cout << RED << "PATH_INACCESSIBLE" << RESET << std::endl;
     return (http.ErrorHandle(port, CLIENT_ERROR_FORBIDDEN, socket));
   }
   case PATH_NOT_FOUND: {
+    std::cout << RED << "PATH_NOT_FOUND" << RESET << std::endl;
     return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
   }
   default: { // 언노운 파일
              // 파일도 디렉토리도 아니면 404 확인필요
+        std::cout << RED << "UNKNOWN" << RESET << std::endl;
+
     return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
   }
   }

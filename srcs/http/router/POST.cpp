@@ -49,6 +49,7 @@ void PostHandler::Handle(int port, Http &http, int socket) {
   eStatusCode status;
   switch (http.CheckPathType(resolvedPath)) {
   case PATH_IS_DIRECTORY: {
+    std::cout << RED << "PATH_IS_DIRECTORY" << RESET << std::endl;
     // 디렉토리에 대한 POST 요청 처리 (예: 데이터베이스에 데이터 저장)
     eStatusCode status =
         http.WriteFile(resolvedPath, requestData, PATH_IS_DIRECTORY);
@@ -58,18 +59,22 @@ void PostHandler::Handle(int port, Http &http, int socket) {
     break ;
   }
   case PATH_IS_FILE: {
+      std::cout << RED << "PATH_IS_FILE" << RESET << std::endl;
     // 파일에 대한 POST 요청 처리 (예: 파일에 데이터 추가)
     // 데이터 처리 후 결과에 따라 상태 코드 설정
     // logic
     break ;
   }
   case PATH_INACCESSIBLE: {
+    std::cout << RED << "PATH_INACCESSIBLE" << RESET << std::endl;
     return (http.ErrorHandle(port, CLIENT_ERROR_FORBIDDEN, socket));
   }
   case PATH_NOT_FOUND: {
+    std::cout << RED << "PATH_NOT_FOUND" << RESET << std::endl;
     return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
   }
   default: {
+    std::cout << RED << "UNKNOWN" << RESET << std::endl;
     return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
   }
   }

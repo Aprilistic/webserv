@@ -28,11 +28,13 @@ void DeleteHandler::Handle(int port, Http &http, int socket) {
   // 데이터 삭제
   switch (http.CheckPathType(resolvedPath)) {
   case PATH_IS_DIRECTORY: {
+    std::cout << RED << "PATH_IS_DIRECTORY" << RESET << std::endl;
     // DELETE 요청은 리소스와 관련된 메타데이터를 모두 삭제해야 함
     // 하지만 디렉토리를 삭제하는 것은 위험할 수 있어서 허용하지 않을 수 있음
     return (http.ErrorHandle(port, CLIENT_ERROR_METHOD_NOT_ALLOWED, socket));
   }
   case PATH_IS_FILE: {
+    std::cout << RED << "PATH_IS_FILE" << RESET << std::endl;
     // 파일 삭제 로직
     // 삭제에 성공하면 200 OK 또는 204 No Content 반환
     // 실패하면 500 Internal Server Error 반환
@@ -43,12 +45,15 @@ void DeleteHandler::Handle(int port, Http &http, int socket) {
     }
   }
   case PATH_INACCESSIBLE: {
+    std::cout << RED << "PATH_INACCESSIBLE" << RESET << std::endl;
     return (http.ErrorHandle(port, CLIENT_ERROR_FORBIDDEN, socket));
   }
   case PATH_NOT_FOUND: {
+    std::cout << RED << "PATH_NOT_FOUND" << RESET << std::endl;
     return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
   }
   default: {
+    std::cout << RED << "UNKNOWN" << RESET << std::endl;
     return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
   }
   }

@@ -32,10 +32,12 @@ void PutHandler::Handle(int port, Http &http, int socket) {
   // 데이터 처리
   switch (http.CheckPathType(resolvedPath)) {
   case PATH_IS_DIRECTORY: {
+    std::cout << RED << "PATH_IS_DIRECTORY" << RESET << std::endl;
     // PUT에 대한 요청이 들어오면 405 Method Not Allowed 반환할 수 있음
     return (http.ErrorHandle(port, CLIENT_ERROR_METHOD_NOT_ALLOWED, socket));
   }
     case PATH_IS_FILE: {
+    std::cout << RED << "PATH_IS_FILE" << RESET << std::endl;
     // 파일에 대한 PUT 요청 처리 (예: 파일에 데이터 추가)
     // 데이터 처리 후 결과에 따라 상태 코드 설정
     http.GetResponse().mBody =
@@ -44,12 +46,15 @@ void PutHandler::Handle(int port, Http &http, int socket) {
     break ;
   }
   case PATH_INACCESSIBLE: {
+    std::cout << RED << "PATH_INACCESSIBLE" << RESET << std::endl;
     return (http.ErrorHandle(port, CLIENT_ERROR_FORBIDDEN, socket));
   }
   case PATH_NOT_FOUND: {
+    std::cout << RED << "PATH_NOT_FOUND" << RESET << std::endl;
     return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
   }
   default: {
+    std::cout << RED << "UNKNOWN" << RESET << std::endl;
     return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
   }
   }
