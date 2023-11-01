@@ -57,4 +57,13 @@ void PutHandler::Handle(int port, Http &http, int socket) {
   std::string message =
       http.GetResponseParser().MakeResponseMessage(http, SUCCESSFUL_OK);
   // send message
+  ssize_t bytesSent = send(socket, message.c_str(), message.size(), 0);
+
+  http.ResetAll();
+  if (bytesSent <= 0) {
+    if (bytesSent < 0) {
+      // error
+    }
+    return;
+  }
 }

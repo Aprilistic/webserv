@@ -43,6 +43,15 @@ void Http::ErrorHandle(int port, eStatusCode errorStatus, int socket) {
   ReadFile(DEFAULT_ERROR_PAGE_PATH);
   std::string message = mResponseParser.MakeResponseMessage(*this, errorStatus);
   // send
+  ssize_t bytesSent = send(socket, message.c_str(), message.size(), 0);
+
+  ResetAll();
+  if (bytesSent <= 0) {
+    if (bytesSent < 0) {
+      // error
+    }
+    return;
+  }
 }
 
 eStatusCode Http::ReadFile(const std::string &path) {
@@ -210,10 +219,12 @@ ResponseParser &Http::GetResponseParser() { return mResponseParser; }
 
 void Http::SetRequest(eStatusCode state, int port, int socket,
                       std::vector<char> &RecvBuffer) {
-  if (state == SOCKET_DISCONNECTED)
-    ; // disconnection();
-  else if (state == SOCKET_READ_ERROR)
+  if (state == SOCKET_DISCONNECTED) {
+    std::cout << RED << "Socket Disconnected" << RESET << std::endl;
+    return; // disconnection();
+  } else if (state == SOCKET_READ_ERROR) {
     ErrorHandle(port, state, socket);
+  }
 
   std::string temp(RecvBuffer.begin(), RecvBuffer.end());
   mBuffer += temp;
@@ -228,6 +239,7 @@ void Http::SetRequest(eStatusCode state, int port, int socket,
     mBuffer.clear();
     return;
   } else if (ParseState == PARSING_COMPLETED) {
+    std::cout << YELLOW << mRequest.Inspect() << RESET << std::endl;
     mBuffer = mRequestParser.GetRemainingBuffer();
     HandleRequestType(port, socket);
   }
@@ -237,7 +249,7 @@ void Http::HandleRequestType(int port, int socket) {
   // if (IsCgiRequest(GetRequest())) {
   //   HandleCGIRequest(port, socket);
   // } else {
-    HandleHTTPRequest(port, socket);
+  HandleHTTPRequest(port, socket);
   // }
 }
 

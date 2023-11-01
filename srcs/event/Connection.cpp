@@ -62,7 +62,7 @@ void Connection::readHandler() {
 
   eStatusCode state = readFromSocket();
 
-  mHttp.ResetAll();
+  // mHttp.ResetAll();
   mHttp.SetRequest(state, mPort, mSocket, mRecvBuffer);
 }
 
