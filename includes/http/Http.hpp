@@ -43,11 +43,9 @@ public:
   void HandleCGIRequest(int port, int socket);
   void HandleHTTPRequest(int port, int socket);
 
+  void SendResponse(eStatusCode state, int port, int socket);
+
 private:
-  void resetRequest(void);
-  void resetResponse(void);
-  void resetRequestParser(void);
-  void resetResponseParser(void);
   bool checkRedirect(int port);
   bool checkClientMaxBodySize(int port);
   bool checkLimitExcept(int port);

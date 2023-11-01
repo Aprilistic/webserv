@@ -15,7 +15,6 @@ void PostHandler::Handle(int port, Http &http, int socket) {
 
   // 데이터가 없는 경우 400 Bad Request 반환
   if (requestData.empty() && isChunked == false) {
-    std::cout << "400 Bad Request" << std::endl;
     return (http.ErrorHandle(port, CLIENT_ERROR_BAD_REQUEST, socket));
   }
 
@@ -75,15 +74,5 @@ void PostHandler::Handle(int port, Http &http, int socket) {
   }
   }
 
-  std::string message = http.GetResponseParser().MakeResponseMessage(http, status);
-  // send message
-  ssize_t bytesSent = send(socket, message.c_str(), message.size(), 0);
-
-  http.ResetAll();
-  if (bytesSent <= 0) {
-    if (bytesSent < 0) {
-      // error
-    }
-    return;
-  }
+  http.SendResponse(status, port, socket);
 }

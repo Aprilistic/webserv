@@ -1,6 +1,7 @@
 #include "Router.hpp"
 
 void GetHandler::Handle(int port, Http &http, int socket) {
+  
   Node *location = Common::mConfigMap->GetConfigNode(
       port, http.GetRequest().mHost, http.GetRequest().mUri);
 
@@ -25,7 +26,8 @@ void GetHandler::Handle(int port, Http &http, int socket) {
   // 구한 경로가 디렉토리인지 파일인지 권한에러인지 언노운파일인지 확인하는
   // 로직
   std::string resolvedPath = http.GetRequest().mUri; // /example/index.html
-  size_t pos = resolvedPath.find(uri[0]);            // /example
+
+  size_t pos = resolvedPath.find(uri[0]); // /example
   if (pos != std::string::npos) {
     // resolvedPath = alias + uri
     resolvedPath.replace(pos, uri[0].size(), alias[0]);
@@ -54,7 +56,7 @@ void GetHandler::Handle(int port, Http &http, int socket) {
         return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
       }
 
-      break ;
+      break;
     } else {
       http.GetResponse().mFilename = "autoindex";
       // 경로에 파일이 없다면
@@ -66,7 +68,7 @@ void GetHandler::Handle(int port, Http &http, int socket) {
         // autoindex on 일때 처리 로직
         http.GetResponse().mBody = autoIndex(resolvedPath);
         http.GetResponse().mStatusCode = SUCCESSFUL_OK;
-        break ;
+        break;
       } else {
         // autoindex가 off 일때 처리 로직
         return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
@@ -95,20 +97,8 @@ void GetHandler::Handle(int port, Http &http, int socket) {
   }
   }
 
-  std::string message = http.GetResponseParser().MakeResponseMessage(http, SUCCESSFUL_OK);
-  // send message
-  std::cout << GREEN << message << RESET << std::endl;
-  ssize_t bytesSent = send(socket, message.c_str(), message.size(), 0);
-
-  http.ResetAll();
-  if (bytesSent <= 0) {
-    if (bytesSent < 0) {
-      // error
-    }
-    return;
-  }
+  http.SendResponse(SUCCESSFUL_OK, port, socket);
 }
-
 
 std::string GetHandler::autoIndex(const std::string &path) {
   DIR *dir = opendir(path.c_str());

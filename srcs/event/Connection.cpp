@@ -62,43 +62,8 @@ void Connection::readHandler() {
 
   eStatusCode state = readFromSocket();
 
-  // mHttp.ResetAll();
   mHttp.SetRequest(state, mPort, mSocket, mRecvBuffer);
 }
-
-// void Connection::readHandler() {
-
-//   eStatusCode state = readFromSocket();
-
-//   mHttp.SetRequest(state, mPort, mRecvBuffer);
-
-//   switch (state) {
-//   case (SOCKET_READ_ERROR):
-//     mHttp.ErrorHandle(mPort, state);
-//     break;
-//   case (SOCKET_DISCONNECTED):
-//     mHttp.ErrorHandle(mPort, state);
-//     break;
-//   case (READ_OK):
-//     state = mHttp.setOneRequest(mPort, mRecvBuffer);
-//     if (state == ERROR) {
-//       break;
-//     } else if (state == PARSING_INCOMPLETED) {
-//       return;
-//     }
-//   case (PARSING_COMPLETED):
-//     state = mHttp.PriorityHeaders(mPort);
-//     if (state == REDIRECT || state == ERROR) {
-//       break;
-//     }
-//   case (PRIORITY_HEADER_OK):
-//     state = mHttp.SetResponse(mPort);
-//   default:
-//     break;
-//   }
-
-//   mHttp.ResetRequestParser();
-// }
 
 void Connection::writeHandler() {
   ssize_t bytesSent = send(mSocket, &mSendBuffer[0], mSendBuffer.size(), 0);

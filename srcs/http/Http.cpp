@@ -8,12 +8,18 @@ Http::Http() {}
 Http::~Http() {}
 
 eStatusCode Http::PriorityHeaders(int &port) {
-  if (checkRedirect(port))
+  if (checkRedirect(port)) {
+    std::cout << RED << "REDIRECT" << RESET << std::endl;
     return REDIRECT; // redirect path 로  response
-  if (checkClientMaxBodySize(port) == false)
+  }
+  if (checkClientMaxBodySize(port) == false) {
+    std::cout << RED << "CLIENT_ERROR_CONTENT_TOO_LARGE" << RESET << std::endl;
     return (CLIENT_ERROR_CONTENT_TOO_LARGE);
-  if (checkLimitExcept(port) == false)
+  }
+  if (checkLimitExcept(port) == false) {
+    std::cout << RED << "CLIENT_ERROR_METHOD_NOT_ALLOWED" << RESET << std::endl;
     return (CLIENT_ERROR_METHOD_NOT_ALLOWED);
+  }
   return PRIORITY_HEADER_OK;
 }
 
@@ -34,6 +40,7 @@ void Http::ErrorHandle(int port, eStatusCode errorStatus, int socket) {
       if (ss >> errorCode && errorCode == errorStatus) {
         errorPagePath = configErrorPageValues.back();
         ReadFile(errorPagePath);
+        SendResponse(errorStatus, port, socket);
         // errorPagePath response
         return;
       }
@@ -41,17 +48,7 @@ void Http::ErrorHandle(int port, eStatusCode errorStatus, int socket) {
   }
   // default error page respons
   ReadFile(DEFAULT_ERROR_PAGE_PATH);
-  std::string message = mResponseParser.MakeResponseMessage(*this, errorStatus);
-  // send
-  ssize_t bytesSent = send(socket, message.c_str(), message.size(), 0);
-
-  ResetAll();
-  if (bytesSent <= 0) {
-    if (bytesSent < 0) {
-      // error
-    }
-    return;
-  }
+  SendResponse(errorStatus, port, socket);
 }
 
 eStatusCode Http::ReadFile(const std::string &path) {
@@ -169,9 +166,8 @@ bool Http::checkLimitExcept(int port) {
                   mRequest.mMethod) == limitExceptValue.end()) {
       return (false);
     }
-  }
-  if (mRequest.mMethod == "PUT" || mRequest.mMethod == "POST" ||
-      mRequest.mMethod == "HEAD") {
+  } else if (mRequest.mMethod == "PUT" || mRequest.mMethod == "POST" ||
+             mRequest.mMethod == "HEAD") {
     return (false);
   }
   return (true);
@@ -195,21 +191,13 @@ eStatusCode Http::CheckPathType(const std::string &path) {
 }
 
 void Http::ResetAll() {
-  resetRequest();
-  resetRequest();
-  resetRequestParser();
-  resetResponseParser();
+  mRequest = Request();
+  mResponse = Response();
+  mRequestParser = RequestParser();
+  mResponseParser = ResponseParser();
 }
 
-void Http::resetRequest() { mRequest = Request(); }
-
-void Http::resetResponse() { mResponse = Response(); }
-
 void Http::ResetBuffer() { mBuffer.clear(); }
-
-void Http::resetRequestParser() { mRequestParser = RequestParser(); }
-
-void Http::resetResponseParser() { mResponseParser = ResponseParser(); }
 
 Request &Http::GetRequest() { return mRequest; }
 
@@ -223,7 +211,7 @@ void Http::SetRequest(eStatusCode state, int port, int socket,
     std::cout << RED << "Socket Disconnected" << RESET << std::endl;
     return; // disconnection();
   } else if (state == SOCKET_READ_ERROR) {
-    ErrorHandle(port, state, socket);
+    return (ErrorHandle(port, state, socket));
   }
 
   std::string temp(RecvBuffer.begin(), RecvBuffer.end());
@@ -233,13 +221,13 @@ void Http::SetRequest(eStatusCode state, int port, int socket,
       mRequest, mBuffer.c_str(), mBuffer.c_str() + mBuffer.size());
 
   if (ParseState == PARSING_ERROR) {
-    ErrorHandle(port, ParseState, socket);
     mBuffer.clear();
+    return (ErrorHandle(port, ParseState, socket));
   } else if (ParseState == PARSING_INCOMPLETED) {
     mBuffer.clear();
     return;
   } else if (ParseState == PARSING_COMPLETED) {
-    std::cout << YELLOW << mRequest.Inspect() << RESET << std::endl;
+    std::cout << CYAN << mRequest.Inspect() << RESET << std::endl;
     mBuffer = mRequestParser.GetRemainingBuffer();
     HandleRequestType(port, socket);
   }
@@ -261,16 +249,35 @@ void Http::HandleCGIRequest(int port, int socket) {
 void Http::HandleHTTPRequest(int port, int socket) {
   // HTTPHandle(port, *this);
   eStatusCode state = PriorityHeaders(port);
-  if (state == REDIRECT)
-    ; // redirect 처리
-  else if (state != PRIORITY_HEADER_OK)
-    ErrorHandle(port, state, socket);
+  if (state == REDIRECT) {
+    std::cout << RED << "REDIRECT" << RESET << std::endl;
+    return; // redirect 처리
+  } else if (state != PRIORITY_HEADER_OK) {
+    std::cout << RED << "PRIORITY_HEADER_ERROR" << RESET << std::endl;
+    return ErrorHandle(port, state, socket);
+  }
 
   IRequestHandler *method = Router::Routing(*this);
 
   // error 면 this로 가져간 http의 에러 핸들러를 호출하여 알아서 메시지를
   // 작성하도록 구현하기 정상적인 response라도 해당 메소드가 불린 시점에서는 각
   // 메서드에서 요청에 대한 처리를 하는 것을 원칙으로 작성해야할듯
+
   method->Handle(port, *this, socket);
   // delete(method);
+}
+
+void Http::SendResponse(eStatusCode state, int port, int socket) {
+  std::string message = mResponseParser.MakeResponseMessage(*this, state);
+  // send message
+  std::cout << GREEN << message << RESET << std::endl;
+  ssize_t bytesSent = send(socket, message.c_str(), message.size(), 0);
+
+  ResetAll();
+  if (bytesSent <= 0) {
+    if (bytesSent < 0) {
+      // error
+    }
+    return;
+  }
 }

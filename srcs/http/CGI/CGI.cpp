@@ -58,13 +58,13 @@ void CGIHandle(int port, Http &http, int socket) {
   int pipe_fd[2];
   if (pipe(pipe_fd) == -1) {
     // perror("pipe");
-    http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR, socket);
+    return (http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR, socket));
   }
 
   pid_t pid = fork();
   if (pid == -1) {
     // perror("fork");
-    http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR, socket);
+    return (http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR, socket));
   }
 
   if (pid == 0) {                    // Child Process
@@ -83,7 +83,7 @@ void CGIHandle(int port, Http &http, int socket) {
     std::string path_str = std::string(pwd) + "modules/python/python.py";
     execve(path_str.c_str(), nullptr, environ);
     // perror("execve");
-    http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR, socket);
+    return (http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR, socket));
   } else {             // Parent Process
     close(pipe_fd[1]); // Close write end of the pipe
     int status;
@@ -93,7 +93,8 @@ void CGIHandle(int port, Http &http, int socket) {
     ssize_t bytes_read = read(pipe_fd[0], buffer, sizeof(buffer) - 1);
     if (bytes_read == -1) {
       // perror("read");
-      http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR, socket);
+      return (
+          http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR, socket));
     }
 
     buffer[bytes_read] = '\0'; // Null-terminate the string
