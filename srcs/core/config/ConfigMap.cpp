@@ -48,10 +48,12 @@ Node *ConfigMap::PortMap::GetConfigNode(const std::string &hostname,
   }
 
   // If not found, search URI in default server config
-  if (&(it->second) != mDefaultServer) {
-    configNode = searchInServerConfig(mDefaultServer, uri);
-    if (configNode != NULL) {
-      return configNode;
+  else {
+    if (&(it->second) != mDefaultServer) {
+      configNode = searchInServerConfig(mDefaultServer, uri);
+      if (configNode != NULL) {
+        return configNode;
+      }
     }
   }
 
@@ -70,14 +72,39 @@ const std::vector<int> ConfigMap::GetPorts() const {
 
 Node *ConfigMap::PortMap::searchInServerConfig(UriMap *uriConfigs,
                                                const std::string &uri) {
-  if (uriConfigs->find(uri) != uriConfigs->end()) { // URI found
-    return (*uriConfigs)[uri];
+  std::string currentUri = uri;
+
+  while (!currentUri.empty()) {
+    if (uriConfigs->find(currentUri) != uriConfigs->end()) {
+      return (*uriConfigs)[currentUri];
+    }
+    size_t lastSlash = currentUri.find_last_of('/');
+    if (lastSlash == std::string::npos) {
+      break; // No more slashes found
+    }
+    if (lastSlash == 0) { // If we're at the root '/'
+      currentUri = "/";
+    } else {
+      currentUri = currentUri.substr(0, lastSlash); // Remove the
+      // segment after the last slash
+    }
   }
-  if (uriConfigs->find("/") != uriConfigs->end()) { // URI not found, search "/"
-    return (*uriConfigs)["/"];
-  }
+  // If we reach here, we've exhausted all possible segments
   return NULL; // URI not found, 404
 }
+
+// Node *ConfigMap::PortMap::searchInServerConfig(UriMap *uriConfigs,
+//                                                const std::string &uri) {
+
+//   if (uriConfigs->find(uri) != uriConfigs->end()) { // URI found
+//     return (*uriConfigs)[uri];
+//   }
+//   if (uriConfigs->find("/") != uriConfigs->end()) { // URI not found,
+//   search"/"
+//     return (*uriConfigs)["/"];
+//   }
+//   return NULL; // URI not found, 404
+// }
 
 ConfigMap::UriMap ConfigMap::PortMap::makeUriMap(Node *serverNode) {
   UriMap uriConfigs;
