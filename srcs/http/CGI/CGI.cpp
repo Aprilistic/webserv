@@ -25,6 +25,9 @@ void setAllEnv(int port, Http &http) {
   Request tmp = http.GetRequest();
   std::stringstream ss;
 
+  //SERVER_PROTOCOL: 클라이언트의 HTTP 프로토콜 버전.
+  setenv("SERVER_PROTOCOL", "HTTP/1.1", 1);
+
   // REQUEST_METHOD: 클라이언트의 요청 방식(GET, POST, HEAD 등).
   setenv("REQUEST_METHOD", tmp.mMethod.c_str(), 1);
 
@@ -46,7 +49,7 @@ void setAllEnv(int port, Http &http) {
 
   // SCRIPT_NAME: 실행되는 CGI 스크립트의 이름.
   const char *pwd = getenv("PWD");
-  std::string path_str = std::string(pwd) + "modules/python/python.py";
+  std::string path_str = std::string(pwd) + "/cgi_tester";
   setenv("SCRIPT_NAME", path_str.c_str(), 1);
 
   // REQUEST_URI: 클라이언트가 요청한 URI.
@@ -80,7 +83,7 @@ void CGIHandle(int port, Http &http, int socket) {
       // PWD 환경 변수가 없습니다. 적절한 오류 처리를 수행합니다.
       exit(EXIT_FAILURE);
     }
-    std::string path_str = std::string(pwd) + "modules/python/python.py";
+    std::string path_str = std::string(pwd) + "/cgi_tester";
     execve(path_str.c_str(), nullptr, environ);
     // perror("execve");
     return (http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR, socket));
@@ -89,7 +92,7 @@ void CGIHandle(int port, Http &http, int socket) {
     int status;
     waitpid(pid, &status, 0); // Wait for child process to finish
 
-    char buffer[2048];
+    char buffer[10000];
     ssize_t bytes_read = read(pipe_fd[0], buffer, sizeof(buffer) - 1);
     if (bytes_read == -1) {
       // perror("read");
@@ -97,7 +100,13 @@ void CGIHandle(int port, Http &http, int socket) {
           http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR, socket));
     }
 
+
     buffer[bytes_read] = '\0'; // Null-terminate the string
     // std::cout << "CGI Output:\n" << buffer << std::endl;
+    std::cout << PURPLE << "CGI Output:\n" << buffer << RESET << std::endl;
+
+    std::string message = &buffer[0];
+    
+    ssize_t bytesSent = send(socket, message.c_str(), message.size(), 0);
   }
 }

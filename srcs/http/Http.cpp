@@ -234,11 +234,12 @@ void Http::SetRequest(eStatusCode state, int port, int socket,
 }
 
 void Http::HandleRequestType(int port, int socket) {
-  // if (IsCgiRequest(GetRequest())) {
-  //   HandleCGIRequest(port, socket);
-  // } else {
+  if (IsCgiRequest(GetRequest())) {
+    std::cout << RED << "CGI" << RESET << std::endl;
+    HandleCGIRequest(port, socket);
+  } else {
   HandleHTTPRequest(port, socket);
-  // }
+  }
 }
 
 void Http::HandleCGIRequest(int port, int socket) {
