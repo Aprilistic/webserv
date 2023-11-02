@@ -10,7 +10,7 @@ INCLUDES = -I ./includes \
 			-I ./includes/http/CGI \
 			-I ./includes/http/request \
 			-I ./includes/http/response \
-			-I ./includes/stream
+			-I ./includes/utils
 OBJ_DIR = objs
 
 SRCS := $(wildcard srcs/core/*.cpp) \
@@ -22,6 +22,7 @@ SRCS := $(wildcard srcs/core/*.cpp) \
 		$(wildcard srcs/http/router/*.cpp) \
 		$(wildcard srcs/*.cpp) \
 		$(wildcard srcs/event/*.cpp)
+		$(wildcard srcs/utils/*.cpp)
 SRCS_DIR := $(dir $(SRCS))
 
 OBJS := $(addprefix $(OBJ_DIR)/, $(notdir $(SRCS:.cpp=.o)))
