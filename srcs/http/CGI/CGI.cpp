@@ -10,8 +10,8 @@ bool IsCgiRequest(Request &request) {
 
   // 클라이언트가 확장자를 지정해준 경우 이 파일은 무조건 cgi에서 처리된다는
   // 가정
-  if (request.mUri.size() > 4 &&
-      request.mUri.substr(request.mUri.size() - 4) == ".bla") {
+  if (request.mUri.find(".bla") != std::string::npos &&
+      request.GetMethod() == "POST") {
     return (true);
   }
 
@@ -48,12 +48,9 @@ void setAllEnv(int port, Http &http, int socket) {
 
   // PATH_INFO: CGI 스크립트에 전달되는 추가적인 경로 정보.
   std::size_t pos = http.GetRequest().mUri.find(".bla");
-  std::cout << RED << http.GetRequest().mUri.substr(pos + 4).c_str() << RESET << std::endl;
-
   if (pos == std::string::npos) {
     setenv("PATH_INFO", "", 1);
-  }
-  else  {
+  } else {
     setenv("PATH_INFO", http.GetRequest().mUri.substr(pos + 4).c_str(), 1);
   }
 
@@ -101,9 +98,6 @@ void setAllEnv(int port, Http &http, int socket) {
 
   // SERVER_SOFTWARE: 서버의 소프트웨어 이름과 버전.
   setenv("SERVER_SOFTWARE", "", 1);
-
-  // SERVER_PROTOCOL: 클라이언트의 HTTP 프로토콜 버전.
-  setenv("SERVER_PROTOCOL", "HTTP/1.1", 1);
 }
 
 void CGIHandle(int port, Http &http, int socket) {
@@ -129,12 +123,12 @@ void CGIHandle(int port, Http &http, int socket) {
 
     // Execute Python script
     const char *pwd = getenv("PWD");
-    if (pwd == nullptr) {
+    if (pwd == NULL) {
       // PWD 환경 변수가 없습니다. 적절한 오류 처리를 수행합니다.
       exit(EXIT_FAILURE);
     }
     std::string path_str = std::string(pwd) + "/cgi_tester";
-    execve(path_str.c_str(), nullptr, environ);
+    execve(path_str.c_str(), NULL, environ);
     // perror("execve");
     return (http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR, socket));
   } else {             // Parent Process
@@ -150,7 +144,7 @@ void CGIHandle(int port, Http &http, int socket) {
           http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR, socket));
     }
 
-    std::cout << PURPLE << "CGI Output:\n" << std::endl;
+    std::cout << PURPLE << "CGI Output:\n" << RESET << std::endl;
     std::cout << PURPLE << buffer << RESET << std::endl;
 
     std::string message = &buffer[0];
