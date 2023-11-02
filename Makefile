@@ -3,26 +3,27 @@ CXXFLAGS = -Wall -Wextra -Werror -MMD -std=c++98
 LDFLAGS = 
 
 INCLUDES = -I ./includes \
+			-I ./includes/utils \
 			-I ./includes/core \
 			-I ./includes/core/config \
 			-I ./includes/event \
 			-I ./includes/http \
 			-I ./includes/http/CGI \
 			-I ./includes/http/request \
-			-I ./includes/http/response \
-			-I ./includes/utils
+			-I ./includes/http/response
 OBJ_DIR = objs
 
-SRCS := $(wildcard srcs/core/*.cpp) \
+SRCS := $(wildcard srcs/*.cpp) \
+		$(wildcard srcs/utils/*.cpp) \
+		$(wildcard srcs/core/*.cpp) \
 		$(wildcard srcs/core/config/*.cpp) \
 		$(wildcard srcs/http/*.cpp) \
 		$(wildcard srcs/http/CGI/*.cpp) \
 		$(wildcard srcs/http/response/*.cpp) \
 		$(wildcard srcs/http/request/*.cpp) \
 		$(wildcard srcs/http/router/*.cpp) \
-		$(wildcard srcs/*.cpp) \
-		$(wildcard srcs/event/*.cpp) \
-		$(wildcard srcs/utils/*.cpp)
+		$(wildcard srcs/event/*.cpp)
+
 SRCS_DIR := $(dir $(SRCS))
 
 OBJS := $(addprefix $(OBJ_DIR)/, $(notdir $(SRCS:.cpp=.o)))

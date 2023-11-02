@@ -36,6 +36,7 @@
 #include <unistd.h>
 
 #include "Shared_ptr.hpp"
+#include "Log.hpp"
 
 // color
 #define RED "\033[1;31m"

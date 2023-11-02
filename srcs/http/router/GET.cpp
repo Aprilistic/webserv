@@ -36,7 +36,6 @@ void GetHandler::Handle(int port, Http &http, int socket) {
 
   switch (http.CheckPathType(resolvedPath)) {
   case PATH_IS_DIRECTORY: {
-      std::cout << RED << "PATH_IS_DIRECTORY" << RESET << std::endl;
 
     std::vector<std::string> index = location->FindValue(location, "index");
     bool found = false;
@@ -80,7 +79,6 @@ void GetHandler::Handle(int port, Http &http, int socket) {
     break;
   }
   case PATH_IS_FILE: {
-    std::cout << RED << "PATH_IS_FILE" << RESET << std::endl;
     eStatusCode readStatus = http.ReadFile(resolvedPath);
     if (readStatus != SUCCESSFUL_OK) {
       return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
@@ -90,17 +88,13 @@ void GetHandler::Handle(int port, Http &http, int socket) {
     break;
   }
   case PATH_INACCESSIBLE: { // 권한에러
-      std::cout << RED << "PATH_INACCESSIBLE" << RESET << std::endl;
     return (http.ErrorHandle(port, CLIENT_ERROR_FORBIDDEN, socket));
   }
   case PATH_NOT_FOUND: {
-    std::cout << RED << "PATH_NOT_FOUND" << RESET << std::endl;
     return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
   }
   default: { // 언노운 파일
              // 파일도 디렉토리도 아니면 404 확인필요
-        std::cout << RED << "UNKNOWN" << RESET << std::endl;
-
     return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
   }
   }
