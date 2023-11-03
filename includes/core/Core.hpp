@@ -35,8 +35,8 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "Shared_ptr.hpp"
 #include "Log.hpp"
+#include "Shared_ptr.hpp"
 
 // color
 #define RED "\033[31m"
