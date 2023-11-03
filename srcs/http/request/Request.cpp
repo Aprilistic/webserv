@@ -23,7 +23,7 @@ std::multimap<std::string, std::string> Request::GetHeaders() const {
   return mHeaders;
 }
 
-// std::vector<char> Request::GetContent() const { return mContent; }
+std::vector<char> Request::GetContent() const { return mContent; }
 
 std::string Request::GetHost() const { return mHost; }
 

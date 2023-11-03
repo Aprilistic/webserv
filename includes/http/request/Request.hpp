@@ -19,7 +19,7 @@ public:
   int GetVersionMinor() const;
   // std::vector<HeaderItem> GetHeaders() const;
   std::multimap<std::string, std::string> GetHeaders() const;
-  // std::vector<char> GetContent() const;
+  std::vector<char> GetContent() const;
   std::string GetHost() const;
   int GetContentLength() const;
   std::string GetContentType() const;

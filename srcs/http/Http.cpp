@@ -13,11 +13,9 @@ eStatusCode Http::PriorityHeaders(int &port) {
     return REDIRECT; // redirect path 로  response
   }
   if (checkClientMaxBodySize(port) == false) {
-    Log(error, etc, "CLIENT_ERROR_CONTENT_TOO_LARGE", *this);
     return (CLIENT_ERROR_CONTENT_TOO_LARGE);
   }
   if (checkLimitExcept(port) == false) {
-    Log(error, etc, "CLIENT_ERROR_METHOD_NOT_ALLOWED", *this);
     return (CLIENT_ERROR_METHOD_NOT_ALLOWED);
   }
   return PRIORITY_HEADER_OK;
@@ -253,7 +251,6 @@ void Http::HandleHTTPRequest(int port, int socket) {
     Log(error, etc, "REDIRECT", *this);
     return; // redirect 처리
   } else if (state != PRIORITY_HEADER_OK) {
-    Log(error, etc, "PRIORITY_HEADER_ERROR", *this);
     return ErrorHandle(port, state, socket);
   }
 
