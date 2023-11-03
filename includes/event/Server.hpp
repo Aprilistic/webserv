@@ -16,22 +16,20 @@ public:
 
 private:
   Server();
-  //   void makeHashMap(Node *curNode);
-  //   void printHashMap(void);
-  //   void deleteLocationConfigHashMap(void);
-  // void makeLocationHashMap(Node *curNode);
-	void readHandler();
-	void writeHandler();
+  void readHandler();
+  void writeHandler();
   void timerHandler();
   void signalHandler();
 
+// Do we need mConnection to be public?
 public:
-  int mSocket;
   // std::map<int, Connection *> mConnection;
   std::map<int, SharedPtr<Connection> > mConnection;
+
 private:
-  struct sockaddr_in mAddr;
+  int mSocket;
   int mPort;
+  struct sockaddr_in mAddr;
 };
 
 #endif
