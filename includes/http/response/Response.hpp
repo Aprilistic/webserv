@@ -8,15 +8,10 @@ public:
   Response();
   ~Response();
 
-  // struct HeaderItem {
-  //   std::string name;
-  //   std::string value;
-  // };
   int GetVersionMajor() const;
   int GetVersionMinor() const;
   unsigned int GetStatusCode() const;
   std::string GetStatus() const;
-  // std::vector<HeaderItem> GetHeaders() const;
   std::multimap<std::string, std::string> GetHeaders() const;
   // std::vector<char> GetContent() const;
   std::string GetBody() const;
@@ -26,7 +21,6 @@ public:
   void SetVersionMinor(int versionMinor);
   void SetStatusCode(unsigned int statusCode);
   void SetStatus(const std::string &status);
-  // void SetHeaders(const std::vector<HeaderItem> &headers);
   void SetHeaders(const std::multimap<std::string, std::string> &headers);
   // void SetContent(const std::vector<char> &content);
   void SetBody(const std::string &body);
@@ -39,7 +33,6 @@ public:
   int mVersionMinor;
   unsigned int mStatusCode;
   std::string mStatus;
-  // std::vector<HeaderItem> mHeaders;
   std::multimap<std::string, std::string> mHeaders;
   // std::vector<char> mContent;
   std::string mBody;

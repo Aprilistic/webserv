@@ -13,10 +13,6 @@ unsigned int Response::GetStatusCode() const { return mStatusCode; }
 
 std::string Response::GetStatus() const { return mStatus; }
 
-// std::vector<Response::HeaderItem> Response::GetHeaders() const {
-//   return mHeaders;
-// }
-
 std::multimap<std::string, std::string> Response::GetHeaders() const {
   return mHeaders;
 }
@@ -41,15 +37,8 @@ void Response::SetStatusCode(unsigned int statusCode) {
 
 void Response::SetStatus(const std::string &status) { mStatus = status; }
 
-// void Response::SetHeaders(const std::vector<HeaderItem> &headers) {
-
-//   mHeaders = headers;
-
-// }
-
 void Response::SetHeaders(
     const std::multimap<std::string, std::string> &headers) {
-
   mHeaders = headers;
 }
 
@@ -66,11 +55,6 @@ std::string Response::Inspect() const {
   stream << "HTTP/" << mVersionMajor << "." << mVersionMinor << " "
          << mStatusCode << " " << mStatus << "\n";
 
-  // for (std::vector<Response::HeaderItem>::const_iterator it =
-  //          mHeaders.begin();
-  //      it != mHeaders.end(); ++it) {
-  //   stream << it->name << ": " << it->value << "\n";
-  // }
   for (std::multimap<std::string, std::string>::const_iterator it =
            mHeaders.begin();
        it != mHeaders.end(); ++it) {
