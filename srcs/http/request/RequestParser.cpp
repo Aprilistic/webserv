@@ -303,10 +303,11 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
         mChunkSizeStr.clear();
         req.mContent.reserve(req.mContent.size() + mChunkSize);
 
-        if (mChunkSize == 0)
+        if (mChunkSize == 0) {
           mState = ChunkSizeNewLine_2;
-        else
+        } else {
           mState = ChunkData;
+        }
       } else {
         return CLIENT_ERROR_BAD_REQUEST;
       }
