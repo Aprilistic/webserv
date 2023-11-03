@@ -14,12 +14,7 @@ int Request::GetVersionMajor() const { return mVersionMajor; }
 
 int Request::GetVersionMinor() const { return mVersionMinor; }
 
-// std::vector<Request::HeaderItem> Request::GetHeaders() const {
-//   return mHeaders;
-// }
-
 std::multimap<std::string, std::string> Request::GetHeaders() const {
-
   return mHeaders;
 }
 
@@ -45,19 +40,15 @@ void Request::SetVersionMinor(int versionMinor) {
   mVersionMinor = versionMinor;
 }
 
-// void Request::SetHeaders(const std::vector<HeaderItem> &headers) {
-//   mHeaders = headers;
-// }
-
 void Request::SetHeaders(
     const std::multimap<std::string, std::string> &headers) {
 
   mHeaders = headers;
 }
 
-// void Request::SetContent(const std::vector<char> &content) {
-//   mContent = content;
-// }
+void Request::SetContent(const std::vector<char> &content) {
+  mContent = content;
+}
 
 void Request::SetHost(const std::string &host) { mHost = host; }
 
@@ -76,11 +67,6 @@ std::string Request::Inspect() const {
   stream << mMethod << " " << mUri << " HTTP/" << mVersionMajor << "."
          << mVersionMinor << "\n";
 
-  // for (std::vector<Request::HeaderItem>::const_iterator it =
-  // mHeaders.begin();
-  //      it != mHeaders.end(); ++it) {
-  //   stream << it->name << ": " << it->value << "\n";
-  // }
   for (std::multimap<std::string, std::string>::const_iterator it =
            mHeaders.begin();
        it != mHeaders.end(); ++it) {
