@@ -25,10 +25,10 @@ private:
 public:
   std::map<std::string, std::vector<std::string> > mDirectives;
   std::vector<Node *> mChildren;
-  int mLevel;
-  Node *mParent;
 
 private:
+  int mLevel;
+  Node *mParent;
 };
 
 #endif
