@@ -7,7 +7,8 @@
 class ConfigMap {
 public:
   typedef std::map<std::string, Node *> UriMap;
-  typedef std::multimap<std::string, UriMap> HostnameMap; // Allows duplicate hostnames
+  typedef std::multimap<std::string, UriMap>
+      HostnameMap; // Allows duplicate hostnames
 
   ConfigMap(Node *configTree);
   Node *GetConfigNode(int port, const std::string &hostname,

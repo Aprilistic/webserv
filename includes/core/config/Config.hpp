@@ -1,10 +1,10 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include "Server.hpp"
-#include "Node.hpp"
-#include "ConfigMap.hpp"
 #include "Common.hpp"
+#include "ConfigMap.hpp"
+#include "Node.hpp"
+#include "Server.hpp"
 
 // class Node;
 class Config {
@@ -12,6 +12,7 @@ public:
   static void MakeConfigTree(const std::string &path);
   static std::map<int, Server *> MakeServerList();
   static void MakeConfigMap();
+
 private:
   Config();
   static void checkSum(Node *configTree);
@@ -29,4 +30,3 @@ private:
 };
 
 #endif
-
