@@ -44,14 +44,6 @@ void ResponseParser::setStatusLine(Response &resp) {
 }
 
 void ResponseParser::setHeaderFields(Response &resp) {
-  // for (std::vector<Response::HeaderItem>::iterator it =
-  // resp.mHeaders.begin();
-  //      it != resp.mHeaders.end(); ++it) {
-  //   mMessage += it->name;
-  //   mMessage += ": ";
-  //   mMessage += it->value;
-  //   mMessage += CRLF;
-  // }
   for (std::multimap<std::string, std::string>::iterator it =
            resp.mHeaders.begin();
        it != resp.mHeaders.end(); ++it) {
