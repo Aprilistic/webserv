@@ -11,8 +11,7 @@ int main(int argc, char **argv) {
   } else if (argc == 2) {
 
   WebServer WebServer(argv[1]);
-  std::cout << "WebServer Run" << std::endl;
-  // WebServer.Run();
+  WebServer.Run();
   } else {
     std::cout << "Usage: ./" << argv[0] << "[config_file]" << std::endl;
   }
