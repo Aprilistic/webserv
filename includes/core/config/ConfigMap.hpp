@@ -24,10 +24,13 @@ private:
     Node *GetConfigNode(const std::string &hostname, const std::string &uri);
 
   private:
+    Node *miniPCRE(UriMap *uriConfigs, const std::string uri);
+    Node *longestMatchedNode(UriMap *uriConfigs, const std::string uri);
     Node *searchInServerConfig(UriMap *uriConfigs, const std::string &uri);
     UriMap makeUriMap(Node *serverNode);
     void addLocationNode(UriMap *uriConfigs, Node *locationNode);
 
+  private:
     HostnameMap mHostnameConfigs;
     UriMap *mDefaultServer; // pointer to default server config
     bool mbDefaultServerSet;

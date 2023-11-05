@@ -70,27 +70,89 @@ const std::vector<int> ConfigMap::GetPorts() const {
   return mPorts;
 }
 
-Node *ConfigMap::PortMap::searchInServerConfig(UriMap *uriConfigs,
-                                               const std::string &uri) {
+Node *ConfigMap::PortMap::miniPCRE(UriMap *uriConfigs, const std::string uri) {
   std::string currentUri = uri;
+  std::string longestMatchedUri = "";
+  Node *longestMatchedNode = NULL;
+
+  for (UriMap::iterator it = uriConfigs->begin(); it != uriConfigs->end();
+       ++it) {
+    std::string configUri = it->first;
+    if (configUri == currentUri) {
+      return it->second;
+    }
+    if (configUri[0] != '~') {
+      continue;
+    } else {
+      configUri = configUri.substr(1, configUri.size());
+    }
+    if (configUri[0] == '*') {
+      configUri = configUri.substr(1, configUri.size());
+      if (currentUri.find(configUri) == 0) {
+        if (configUri.size() > longestMatchedUri.size()) {
+          longestMatchedUri = configUri;
+          longestMatchedNode = it->second;
+        }
+      }
+    } else if (configUri[configUri.size() - 1] == '$') {
+      configUri = configUri.substr(0, configUri.size() - 1);
+      if (currentUri.find(configUri) == currentUri.size() - configUri.size()) {
+        if (configUri.size() > longestMatchedUri.size()) {
+          longestMatchedUri = configUri;
+          longestMatchedNode = it->second;
+        }
+      }
+    }
+  }
+  return longestMatchedNode;
+}
+
+Node *ConfigMap::PortMap::longestMatchedNode(UriMap *uriConfigs,
+                                             const std::string uri) {
+  std::string currentUri = uri;
+  std::string longestMatchedUri = "";
+  Node *longestMatchedNode = NULL;
 
   while (!currentUri.empty()) {
-    if (uriConfigs->find(currentUri) != uriConfigs->end()) {
-      return (*uriConfigs)[currentUri];
+    for (UriMap::iterator it = uriConfigs->begin(); it != uriConfigs->end();
+         ++it) {
+      std::string configUri = it->first;
+      if (configUri == currentUri) {
+        return it->second;
+      }
+      if (currentUri.find(configUri) == 0) {
+        if (configUri.size() > longestMatchedUri.size()) {
+          longestMatchedUri = configUri;
+          longestMatchedNode = it->second;
+        }
+      }
     }
     size_t lastSlash = currentUri.find_last_of('/');
     if (lastSlash == std::string::npos) {
-      break; // No more slashes found
-    }
-    if (lastSlash == 0) { // If we're at the root '/'
-      currentUri = "/";
+      break;
     } else {
-      currentUri = currentUri.substr(0, lastSlash); // Remove the
-      // segment after the last slash
+      currentUri = currentUri.substr(0, lastSlash);
     }
   }
+  return longestMatchedNode;
+}
+
+Node *ConfigMap::PortMap::searchInServerConfig(UriMap *uriConfigs,
+                                               const std::string &uri) {
+  std::string currentUri = uri;
+  Node *locationNode = NULL;
+
+  locationNode = miniPCRE(uriConfigs, uri);
+  if (locationNode != NULL) {
+    return locationNode;
+  }
+
+  locationNode = longestMatchedNode(uriConfigs, uri);
+  if (locationNode != NULL) {
+    return locationNode;
+  }
   // If we reach here, we've exhausted all possible segments
-  return NULL; // URI not found, 404
+  return locationNode; // URI not found, 404
 }
 
 // Node *ConfigMap::PortMap::searchInServerConfig(UriMap *uriConfigs,
