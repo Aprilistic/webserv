@@ -187,6 +187,7 @@ void Node::nodeError(const std::string &msg) {
   throw std::runtime_error(msg);
 }
 
+//if there is no value, return empty vector == segmentation fault
 std::vector<std::string> Node::FindValue(Node *current, std::string key) {
   if (current == NULL) {
     return std::vector<std::string>();
