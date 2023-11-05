@@ -29,6 +29,7 @@
 /* location */
 #define ALIAS (LOCATION_LEVEL | DIRECTIVE)
 #define LIMIT_EXCEPT (LOCATION_LEVEL | DIRECTIVE)
+#define CGI_PASS (LOCATION_LEVEL | DIRECTIVE)
 /* { } ; */
 
 Node::Node(std::vector<std::string> &configTokens,
@@ -110,6 +111,8 @@ int Node::getTokenInfo(std::string token) {
     return (ALIAS);
   } else if (token == "limit_except") {
     return (LIMIT_EXCEPT);
+  } else if (token == "cgi_pass") {
+    return (CGI_PASS);
   }
   return (VALUE);
 }
