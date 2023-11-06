@@ -1,4 +1,5 @@
 #include "CGI.hpp"
+#include "Enum.hpp"
 
 extern char **environ;
 
@@ -15,18 +16,11 @@ bool IsCgiRequest(Http &http, int port) {
   if (cgi_pass.size()) {
     return (true);
   }
-  // if (request.mUri.find("/cgi-bin/") != std::string::npos) {
-  //   return (true);
-  // }
-
-  // if (request.mUri.find(".bla") != std::string::npos &&
-  //     request.GetMethod() == "POST") {
-  //   return (true);
-  // }
   return (false);
 }
 
 void setAllEnv(int port, Http &http, int socket) {
+
   Node *location = Common::mConfigMap->GetConfigNode(
       port, http.GetRequest().mHost, http.GetRequest().mUri,
       http.GetRequest().mMethod);
@@ -52,18 +46,16 @@ void setAllEnv(int port, Http &http, int socket) {
   // GATEWAY_INTERFACE: CGI 스펙의 버전.
   setenv("GATEWAY_INTERFACE", "CGI/1.1", 1);
 
+  // REQUEST_URI
+  setenv("REQUEST_URI", tmp.mUri.c_str(), 1);
+
   // PATH_INFO: CGI 스크립트에 전달되는 추가적인 경로 정보.
-  std::size_t pos = http.GetRequest().mUri.find(".bla");
-  if (pos == std::string::npos) {
-    setenv("PATH_INFO", "", 1);
-  } else {
-    setenv("PATH_INFO", http.GetRequest().mUri.substr(pos + 4).c_str(), 1);
-  }
+  setenv("PATH_INFO", tmp.mUri.c_str(), 1);
 
   // PATH_TRANSLATED: PATH_INFO에 대응하는 실제 파일 경로.
 
   // QUERY_STRING: URL에서 '?' 뒤에 오는 쿼리 문자열.
-  pos = tmp.mUri.find("?");
+  std::size_t pos = tmp.mUri.find("?");
   if (pos != std::string::npos) {
     const char *query = &tmp.mUri[pos + 1];
     setenv("QUERY_STRING", query, 1);
@@ -107,54 +99,68 @@ void setAllEnv(int port, Http &http, int socket) {
 }
 
 void CGIHandle(int port, Http &http, int socket) {
-
-  int pipe_fd[2];
-  if (pipe(pipe_fd) == -1) {
-    // perror("pipe");
-    return (http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR, socket));
+  // 요청 내용을 파일에 쓰기 위한 ofstream 객체 생성
+  std::ofstream requestFile("cgi_request_data.txt",
+                            std::ios::out | std::ios::trunc);
+  if (!requestFile.is_open()) {
+    std::cerr << "Failed to open request temp file." << std::endl;
+    return;
   }
 
+  // 요청 내용을 임시 파일에 쓰기
+  requestFile << http.GetRequest().mContent;
+  requestFile.close(); // 파일 쓰기 완료 후 닫기
+
+  // CGI 스크립트 결과를 받을 파일 생성
+  std::string outputFileName = "cgi_output_data.txt";
+
+  // CGI 스크립트 실행을 위한 프로세스 생성
   pid_t pid = fork();
   if (pid == -1) {
-    // perror("fork");
-    return (http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR, socket));
-  }
-
-  if (pid == 0) {                    // Child Process
-    close(pipe_fd[0]);               // Close read end of the pipe
-    dup2(pipe_fd[1], STDOUT_FILENO); // Redirect stdout to write end of the pipe
-
-    // Set environment variables
+    std::cerr << "Failed to fork." << std::endl;
+    return;
+  } else if (pid == 0) {
+    // 자식 프로세스에서 CGI 스크립트 실행
     setAllEnv(port, http, socket);
 
-    // Execute Python script
+    freopen("cgi_request_data.txt", "r", stdin);
+    freopen(outputFileName.c_str(), "w", stdout);
+
+    // 실행할 스크립트 경로 가져오기
     const char *pwd = getenv("PWD");
-    if (pwd == NULL) {
-      // PWD 환경 변수가 없습니다. 적절한 오류 처리를 수행합니다.
-      exit(EXIT_FAILURE);
-    }
     std::string path_str = std::string(pwd) + "/cgi_tester";
-    execve(path_str.c_str(), NULL, environ);
-    // perror("execve");
-    return (http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR, socket));
-  } else {             // Parent Process
-    close(pipe_fd[1]); // Close write end of the pipe
+    const char *c_path_str =
+        path_str.c_str(); // std::string에서 C 스타일 문자열로 변환
+    char *argv[] = {const_cast<char *>("cgi_tester"), NULL};
+    execve(argv[0], argv, environ);
+    // execve 실패 시
+    exit(EXIT_FAILURE);
+  } else {
+    // 부모 프로세스
     int status;
-    waitpid(pid, &status, 0); // Wait for child process to finish
+    waitpid(pid, &status, 0); // 자식 프로세스가 종료될 때까지 대기
 
-    char buffer[10000];
-    ssize_t bytes_read = read(pipe_fd[0], buffer, sizeof(buffer) - 1);
-    if (bytes_read == -1) {
-      // perror("read");
-      return (
-          http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR, socket));
+    // CGI 스크립트의 출력을 읽기 위한 ifstream 객체 생성
+    std::ifstream responseFile(outputFileName.c_str(), std::ios::in);
+    if (!responseFile.is_open()) {
+      std::cerr << "Failed to open response temp file." << std::endl;
+      return;
     }
 
-    std::cout << PURPLE << "CGI Output:\n" << RESET << std::endl;
-    std::cout << PURPLE << buffer << RESET << std::endl;
+    // 파일 내용을 읽어 응답 객체에 저장
+    std::string response((std::istreambuf_iterator<char>(responseFile)),
+                         std::istreambuf_iterator<char>());
+    // response parsing
+    http.GetResponse().mBody = response;
 
-    std::string message = &buffer[0];
+    // 파일 닫기
+    responseFile.close();
 
-    ssize_t bytesSent = send(socket, message.c_str(), message.size(), 0);
+    // 임시 파일 삭제
+    unlink("cgi_request_data.txt");
+    unlink(outputFileName.c_str());
+
+    // 응답 보내기
+    http.SendResponse(SUCCESSFUL_OK, port, socket);
   }
 }
