@@ -24,6 +24,8 @@ private:
 class GetHandler : public IRequestHandler {
 public:
   virtual void Handle(int port, Http &http, int socket);
+  // test overoading
+  virtual void Handle(Http &http);
 
 private:
   std::string autoIndex(const std::string &path);
@@ -32,15 +34,21 @@ private:
 class PostHandler : public IRequestHandler {
 public:
   virtual void Handle(int port, Http &http, int socket);
+  // test overoading
+  virtual void Handle(Http &http);
 };
 
 class DeleteHandler : public IRequestHandler {
 public:
   virtual void Handle(int port, Http &http, int socket);
+  // test overoading
+  virtual void Handle(Http &http);
 };
 
 class PutHandler : public IRequestHandler {
 public:
   virtual void Handle(int port, Http &http, int socket);
+  // test overoading
+  virtual void Handle(Http &http);
 };
 #endif
