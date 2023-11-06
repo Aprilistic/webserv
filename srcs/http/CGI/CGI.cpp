@@ -151,7 +151,39 @@ void CGIHandle(int port, Http &http, int socket) {
     std::string response((std::istreambuf_iterator<char>(responseFile)),
                          std::istreambuf_iterator<char>());
     // response parsing
-    http.GetResponse().mBody = response;
+    std::map<std::string, std::string> headers;
+    std::string body;
+
+    std::istringstream responseStream(response);
+    std::string line;
+    bool headerSection = true;
+
+    while (std::getline(responseStream, line)) {
+      if (!line.empty() && line.back() == '\r') {
+        line.pop_back();
+      }
+
+      if (line.empty()) {
+        headerSection = false;
+        continue;
+      }
+
+      if (headerSection) {
+        std::size_t pos = line.find(": ");
+        if (pos != std::string::npos) {
+          std::string key = line.substr(0, pos);
+          std::string value = line.substr(pos + 2);
+          headers[key] = value;
+        }
+      } else {
+        body += line + "\n";
+      }
+    }
+    if (!body.empty() && body.back() == '\n') {
+      body.pop_back();
+    }
+
+    http.GetResponse().mBody = body;
 
     // 파일 닫기
     responseFile.close();
