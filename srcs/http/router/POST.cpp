@@ -20,7 +20,8 @@ void PostHandler::Handle(int port, Http &http, int socket) {
 
   // URI로 리소스 위치 확인
   Node *location = Common::mConfigMap->GetConfigNode(
-      port, http.GetRequest().mHost, http.GetRequest().mUri);
+      port, http.GetRequest().mHost, http.GetRequest().mUri,
+      http.GetRequest().mMethod);
   if (location == NULL) {
     return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
   }
@@ -45,7 +46,6 @@ void PostHandler::Handle(int port, Http &http, int socket) {
 
   // 데이터 처리
 
-
   eStatusCode status;
   switch (http.CheckPathType(resolvedPath)) {
   case PATH_IS_DIRECTORY: {
@@ -53,15 +53,15 @@ void PostHandler::Handle(int port, Http &http, int socket) {
     eStatusCode status =
         http.WriteFile(resolvedPath, requestData, PATH_IS_DIRECTORY);
     // 데이터 처리 후 결과에 따라 상태 코드 설정
-    // http.GetResponse().mStatusCode = writeStatus; // 새 리소스가 생성된 경우AA
-    // http.GetResponse().mStatus = http.GetStatusMessage(writeStatus);
-    break ;
+    // http.GetResponse().mStatusCode = writeStatus; // 새 리소스가 생성된
+    // 경우AA http.GetResponse().mStatus = http.GetStatusMessage(writeStatus);
+    break;
   }
   case PATH_IS_FILE: {
     // 파일에 대한 POST 요청 처리 (예: 파일에 데이터 추가)
     // 데이터 처리 후 결과에 따라 상태 코드 설정
     // logic
-    break ;
+    break;
   }
   case PATH_INACCESSIBLE: {
     return (http.ErrorHandle(port, CLIENT_ERROR_FORBIDDEN, socket));

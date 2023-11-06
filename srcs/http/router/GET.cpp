@@ -3,7 +3,8 @@
 void GetHandler::Handle(int port, Http &http, int socket) {
 
   Node *location = Common::mConfigMap->GetConfigNode(
-      port, http.GetRequest().mHost, http.GetRequest().mUri);
+      port, http.GetRequest().mHost, http.GetRequest().mUri,
+      http.GetRequest().mMethod);
 
   // NULL 인경우 -> 일치하는 location이 없고 / 도 설정되어 있지 않은 경우
   if (location == NULL) {

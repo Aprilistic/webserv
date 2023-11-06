@@ -23,8 +23,8 @@ eStatusCode Http::PriorityHeaders(int &port) {
 
 void Http::ErrorHandle(int port, eStatusCode errorStatus, int socket) {
 
-  Node *location =
-      Common::mConfigMap->GetConfigNode(port, mRequest.mHost, mRequest.mUri);
+  Node *location = Common::mConfigMap->GetConfigNode(
+      port, mRequest.mHost, mRequest.mUri, mRequest.mMethod);
 
   std::vector<std::string> configErrorPageValues =
       location->FindValue(location, "error_page");
@@ -100,8 +100,8 @@ eStatusCode Http::WriteFile(std::string &path, std::string &data,
 }
 
 bool Http::checkRedirect(int port) {
-  Node *location =
-      Common::mConfigMap->GetConfigNode(port, mRequest.mHost, mRequest.mUri);
+  Node *location = Common::mConfigMap->GetConfigNode(
+      port, mRequest.mHost, mRequest.mUri, mRequest.mMethod);
 
   int redirectCode;
   std::string redirectPath;
@@ -130,8 +130,8 @@ bool Http::checkRedirect(int port) {
 }
 
 bool Http::checkClientMaxBodySize(int port) {
-  Node *location =
-      Common::mConfigMap->GetConfigNode(port, mRequest.mHost, mRequest.mUri);
+  Node *location = Common::mConfigMap->GetConfigNode(
+      port, mRequest.mHost, mRequest.mUri, mRequest.mMethod);
 
   std::vector<std::string> clientMaxBodySizeValues =
       location->FindValue(location, "client_max_body_size");
@@ -154,8 +154,8 @@ bool Http::checkClientMaxBodySize(int port) {
 }
 
 bool Http::checkLimitExcept(int port) {
-  Node *location =
-      Common::mConfigMap->GetConfigNode(port, mRequest.mHost, mRequest.mUri);
+  Node *location = Common::mConfigMap->GetConfigNode(
+      port, mRequest.mHost, mRequest.mUri, mRequest.mMethod);
 
   std::vector<std::string> limitExceptValue =
       location->FindValue(location, "limit_except"); // 초기화가 필요합니다.

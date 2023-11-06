@@ -7,7 +7,8 @@ void PutHandler::Handle(int port, Http &http, int socket) {
 
   // URI로 리소스 위치 확인
   Node *location = Common::mConfigMap->GetConfigNode(
-      port, http.GetRequest().mHost, http.GetRequest().mUri);
+      port, http.GetRequest().mHost, http.GetRequest().mUri,
+      http.GetRequest().mMethod);
   if (location == NULL) {
     return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
   }
@@ -35,13 +36,13 @@ void PutHandler::Handle(int port, Http &http, int socket) {
     // PUT에 대한 요청이 들어오면 405 Method Not Allowed 반환할 수 있음
     return (http.ErrorHandle(port, CLIENT_ERROR_METHOD_NOT_ALLOWED, socket));
   }
-    case PATH_IS_FILE: {
+  case PATH_IS_FILE: {
     // 파일에 대한 PUT 요청 처리 (예: 파일에 데이터 추가)
     // 데이터 처리 후 결과에 따라 상태 코드 설정
     http.GetResponse().mBody =
         "Data successfully processed and resource modified at URI: " +
         http.GetRequest().mUri;
-    break ;
+    break;
   }
   case PATH_INACCESSIBLE: {
     return (http.ErrorHandle(port, CLIENT_ERROR_FORBIDDEN, socket));

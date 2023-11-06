@@ -35,13 +35,14 @@ void ConfigMap::PortMap::AddServerConfig(Node *serverNode) {
 }
 
 Node *ConfigMap::PortMap::GetConfigNode(const std::string &hostname,
-                                        const std::string &uri) {
+                                        const std::string &uri,
+                                        const std::string &method) {
   Node *configNode = NULL;
 
   // Search URI in hostname config
   HostnameMap::iterator it = mHostnameConfigs.find(hostname);
   if (it != mHostnameConfigs.end()) {
-    configNode = searchInServerConfig(&(it->second), uri);
+    configNode = searchInServerConfig(&(it->second), uri, method);
     if (configNode != NULL) {
       return configNode;
     }
@@ -50,7 +51,7 @@ Node *ConfigMap::PortMap::GetConfigNode(const std::string &hostname,
   // If not found, search URI in default server config
   else {
     if (&(it->second) != mDefaultServer) {
-      configNode = searchInServerConfig(mDefaultServer, uri);
+      configNode = searchInServerConfig(mDefaultServer, uri, method);
       if (configNode != NULL) {
         return configNode;
       }
@@ -70,7 +71,24 @@ const std::vector<int> ConfigMap::GetPorts() const {
   return mPorts;
 }
 
-Node *ConfigMap::PortMap::miniPCRE(UriMap *uriConfigs, const std::string uri) {
+bool checkCGIMethod(const std::string &method, Node *locationNode) {
+  std::vector<std::string> &cgiLimits =
+      locationNode->mDirectives["limit_except"];
+
+  if (cgiLimits.size() == 0) {
+    return true;
+  }
+
+  for (size_t i = 0; i < cgiLimits.size(); i++) {
+    if (cgiLimits[i] == method) {
+      return true;
+    }
+  }
+  return false;
+}
+
+Node *ConfigMap::PortMap::miniPCRE(UriMap *uriConfigs, const std::string uri,
+                                   const std::string &method) {
   std::string currentUri = uri;
   std::string longestMatchedUri = "";
   Node *longestMatchedNode = NULL;
@@ -88,7 +106,8 @@ Node *ConfigMap::PortMap::miniPCRE(UriMap *uriConfigs, const std::string uri) {
     }
     if (configUri[0] == '*') {
       configUri = configUri.substr(1, configUri.size());
-      if (currentUri.find(configUri) == 0) {
+      if (currentUri.find(configUri) == 0 &&
+          checkCGIMethod(method, it->second)) {
         if (configUri.size() > longestMatchedUri.size()) {
           longestMatchedUri = configUri;
           longestMatchedNode = it->second;
@@ -96,7 +115,8 @@ Node *ConfigMap::PortMap::miniPCRE(UriMap *uriConfigs, const std::string uri) {
       }
     } else if (configUri[configUri.size() - 1] == '$') {
       configUri = configUri.substr(0, configUri.size() - 1);
-      if (currentUri.find(configUri) == currentUri.size() - configUri.size()) {
+      if (currentUri.find(configUri) == currentUri.size() - configUri.size() &&
+          checkCGIMethod(method, it->second)) {
         if (configUri.size() > longestMatchedUri.size()) {
           longestMatchedUri = configUri;
           longestMatchedNode = it->second;
@@ -138,11 +158,12 @@ Node *ConfigMap::PortMap::longestMatchedNode(UriMap *uriConfigs,
 }
 
 Node *ConfigMap::PortMap::searchInServerConfig(UriMap *uriConfigs,
-                                               const std::string &uri) {
+                                               const std::string &uri,
+                                               const std::string &method) {
   std::string currentUri = uri;
   Node *locationNode = NULL;
 
-  locationNode = miniPCRE(uriConfigs, uri);
+  locationNode = miniPCRE(uriConfigs, uri, method);
   if (locationNode != NULL) {
     return locationNode;
   }
@@ -204,10 +225,11 @@ ConfigMap::ConfigMap(Node *configTree) {
 }
 
 Node *ConfigMap::GetConfigNode(int port, const std::string &hostname,
-                               const std::string &uri) {
+                               const std::string &uri,
+                               const std::string &method) {
   if (mPortConfigs.find(port) == mPortConfigs.end()) {
     return NULL;
   }
 
-  return mPortConfigs[port].GetConfigNode(hostname, uri);
+  return mPortConfigs[port].GetConfigNode(hostname, uri, method);
 }

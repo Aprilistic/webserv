@@ -23,7 +23,8 @@ bool IsCgiRequest(Request &request) {
 
 void setAllEnv(int port, Http &http, int socket) {
   Node *location = Common::mConfigMap->GetConfigNode(
-      port, http.GetRequest().mHost, http.GetRequest().mUri);
+      port, http.GetRequest().mHost, http.GetRequest().mUri,
+      http.GetRequest().mMethod);
   if (location == NULL) {
     return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
   }

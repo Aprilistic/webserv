@@ -3,7 +3,8 @@
 void DeleteHandler::Handle(int port, Http &http, int socket) {
   // URI로 리소스 위치 확인
   Node *location = Common::mConfigMap->GetConfigNode(
-      port, http.GetRequest().mHost, http.GetRequest().mUri);
+      port, http.GetRequest().mHost, http.GetRequest().mUri,
+      http.GetRequest().mMethod);
   if (location == NULL) {
     return (http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUND, socket));
   }
@@ -39,7 +40,8 @@ void DeleteHandler::Handle(int port, Http &http, int socket) {
     if (/*파일 삭제 성공*/ true) {
       return;
     } else {
-      return (http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR, socket));
+      return (
+          http.ErrorHandle(port, SERVER_ERROR_INTERNAL_SERVER_ERROR, socket));
     }
   }
   case PATH_INACCESSIBLE: {
