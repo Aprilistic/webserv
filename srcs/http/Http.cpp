@@ -215,6 +215,7 @@ void Http::SetRequest(eStatusCode state, int port, int socket,
   std::string temp(RecvBuffer.begin(), RecvBuffer.end());
   mBuffer += temp;
 
+  mRequest.mContent.reserve(100000000);
   eStatusCode ParseState = mRequestParser.Parse(
       mRequest, mBuffer.c_str(), mBuffer.c_str() + mBuffer.size());
 
@@ -233,6 +234,7 @@ void Http::SetRequest(eStatusCode state, int port, int socket,
 
 void Http::HandleRequestType(int port, int socket) {
   if (IsCgiRequest(GetRequest())) {
+    std::cout << GREEN << "CGI Request" << RESET << std::endl;
     HandleCGIRequest(port, socket);
   } else {
     HandleHTTPRequest(port, socket);

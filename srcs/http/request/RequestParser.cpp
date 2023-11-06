@@ -301,7 +301,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       if (input == '\n') {
         mChunkSize = strtol(mChunkSizeStr.c_str(), NULL, 16);
         mChunkSizeStr.clear();
-        req.mContent.reserve(req.mContent.size() + mChunkSize);
+        // req.mContent.reserve(req.mContent.size() + mChunkSize);
 
         if (mChunkSize == 0) {
           mState = ChunkSizeNewLine_2;
