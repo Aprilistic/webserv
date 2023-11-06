@@ -6,7 +6,7 @@
 
 class Http;
 
-bool IsCgiRequest(Request &request);
+bool IsCgiRequest(Http &http, int port);
 void CGIHandle(int port, Http &http, int socket);
 
 #endif

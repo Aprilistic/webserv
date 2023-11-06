@@ -233,8 +233,7 @@ void Http::SetRequest(eStatusCode state, int port, int socket,
 }
 
 void Http::HandleRequestType(int port, int socket) {
-  if (IsCgiRequest(GetRequest())) {
-    std::cout << GREEN << "CGI Request" << RESET << std::endl;
+  if (IsCgiRequest(*this, port)) {
     HandleCGIRequest(port, socket);
   } else {
     HandleHTTPRequest(port, socket);
