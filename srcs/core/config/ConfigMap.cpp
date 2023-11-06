@@ -106,7 +106,7 @@ Node *ConfigMap::PortMap::miniPCRE(UriMap *uriConfigs, const std::string uri,
     }
     if (configUri[0] == '*') {
       configUri = configUri.substr(1, configUri.size());
-      if (currentUri.find(configUri) == 0 &&
+      if (currentUri.find(configUri) != std::string::npos &&
           checkCGIMethod(method, it->second)) {
         if (configUri.size() > longestMatchedUri.size()) {
           longestMatchedUri = configUri;
