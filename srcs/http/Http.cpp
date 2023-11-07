@@ -274,6 +274,7 @@ void Http::SendResponse(eStatusCode state) {
   mSendBufferRef += mResponseParser.MakeResponseMessage(*this, state);
 //   send message
   Log(info, response, "Response", *this);
+  // std::cout << YELLOW << mResponse.Inspect() << RESET << std::endl;
   ssize_t bytesSent = send(mSocket, mSendBufferRef.c_str(), mSendBufferRef.size(), 0);
 
   ResetAll();

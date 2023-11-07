@@ -183,6 +183,23 @@ void CGIHandle(Http &http) {
       body.pop_back();
     }
 
+    // cgi 헤더에서 status code 가져오기
+    std::string statusHeader = headers["Status"];
+    statusHeader = statusHeader.substr(0, statusHeader.find(" "));
+
+    eStatusCode statusCode =
+        static_cast<eStatusCode>(std::atoi(statusHeader.c_str()));
+
+    // headers에서 status 헤더 제거
+    headers.erase("Status");
+
+    // response에 cgi 헤더 추가
+    for (std::map<std::string, std::string>::iterator it = headers.begin();
+         it != headers.end(); ++it) {
+      http.GetResponse().mHeaders.insert(
+          std::pair<std::string, std::string>(it->first, it->second));
+    }
+
     http.GetResponse().mBody = body;
 
     // 파일 닫기
@@ -193,6 +210,6 @@ void CGIHandle(Http &http) {
     unlink(outputFileName.c_str());
 
     // 응답 보내기
-    http.SendResponse(SUCCESSFUL_OK);
+    http.SendResponse(statusCode);
   }
 }

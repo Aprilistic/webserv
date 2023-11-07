@@ -1,5 +1,5 @@
-#include "ResponseParser.hpp"
 #include "Http.hpp"
+#include "ResponseParser.hpp"
 
 void ResponseParser::setResponse(Http &http, eStatusCode state) {
   setStatusLine(http, state);
@@ -57,10 +57,11 @@ std::string ResponseParser::getStatusMessage(eStatusCode errorStatus) {
   }
 }
 
-std::string ResponseParser::getFileType(Http& http) {
+std::string ResponseParser::getFileType(Http &http) {
   if (http.GetRequest().mMethod == "POST") {
     return (http.GetRequest().mContentType);
-  } else if (http.GetRequest().mMethod == "PUT" && http.GetResponse().mBody.size() != 0) {
+  } else if (http.GetRequest().mMethod == "PUT" &&
+             http.GetResponse().mBody.size() != 0) {
     return (http.GetRequest().mContentType);
   }
   std::string filepath = http.GetResponse().mFilename;
@@ -97,7 +98,7 @@ std::string ResponseParser::getFileType(Http& http) {
   return ("application/octet-stream");
 }
 
-void ResponseParser::setMandatoryHeaderFields(Http& http) {
+void ResponseParser::setMandatoryHeaderFields(Http &http) {
   // Date
   time_t now = time(0);
   struct tm *timeinfo = localtime(&now);
@@ -116,9 +117,12 @@ void ResponseParser::setMandatoryHeaderFields(Http& http) {
       std::pair<std::string, std::string>("Content-Length", contentLength));
 
   // Content-Type
-  std::string contentType = getFileType(http);
-  http.GetResponse().mHeaders.insert(
-      std::pair<std::string, std::string>("Content-Type", contentType));
+  if (http.GetResponse().mHeaders.find("Content-Type") ==
+      http.GetResponse().mHeaders.end()) {
+    std::string contentType = getFileType(http);
+    http.GetResponse().mHeaders.insert(
+        std::pair<std::string, std::string>("Content-Type", contentType));
+  }
 
   // Connection
   if (http.GetRequest().mKeepAlive == true) {
