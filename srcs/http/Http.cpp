@@ -4,11 +4,8 @@
 int Http::mFileID = 0;
 // Http::Http() {}
 
-Http::Http(int socket, int port, std::string& sendBuffer)
-: mSocket(socket)
-, mPort(port)
-, mSendBufferRef(sendBuffer)
-{}
+Http::Http(int socket, int port, std::string &sendBuffer)
+    : mSocket(socket), mPort(port), mSendBufferRef(sendBuffer) {}
 
 Http::~Http() {}
 
@@ -28,8 +25,8 @@ eStatusCode Http::PriorityHeaders() {
 
 void Http::ErrorHandle(eStatusCode errorStatus) {
 
-  Node *location =
-      Common::mConfigMap->GetConfigNode(mPort, mRequest.mHost, mRequest.mUri, mRequest.mMethod);
+  Node *location = Common::mConfigMap->GetConfigNode(
+      mPort, mRequest.mHost, mRequest.mUri, mRequest.mMethod);
 
   std::vector<std::string> configErrorPageValues =
       location->FindValue(location, "error_page");
@@ -75,8 +72,12 @@ eStatusCode Http::ReadFile(const std::string &path) {
 eStatusCode Http::WriteFile(std::string &path, std::string &data,
                             eStatusCode pathType, bool append) {
   if (pathType == PATH_IS_DIRECTORY) {
+    // create random file name
+    std::string fileName = "XXX";
+
+    mkstemp(&fileName[0]);
     std::stringstream ss;
-    ss << path << mFileID;
+    ss << path << "/" << fileName;
 
     path = ss.str();
   }
@@ -105,8 +106,8 @@ eStatusCode Http::WriteFile(std::string &path, std::string &data,
 }
 
 bool Http::checkRedirect() {
-  Node *location =
-      Common::mConfigMap->GetConfigNode(mPort, mRequest.mHost, mRequest.mUri, mRequest.mMethod);
+  Node *location = Common::mConfigMap->GetConfigNode(
+      mPort, mRequest.mHost, mRequest.mUri, mRequest.mMethod);
 
   int redirectCode;
   std::string redirectPath;
@@ -159,8 +160,8 @@ bool Http::checkClientMaxBodySize() {
 }
 
 bool Http::checkLimitExcept() {
-  Node *location =
-      Common::mConfigMap->GetConfigNode(mPort, mRequest.mHost, mRequest.mUri, mRequest.mMethod);
+  Node *location = Common::mConfigMap->GetConfigNode(
+      mPort, mRequest.mHost, mRequest.mUri, mRequest.mMethod);
 
   std::vector<std::string> limitExceptValue =
       location->FindValue(location, "limit_except"); // 초기화가 필요합니다.
@@ -208,8 +209,7 @@ Response &Http::GetResponse() { return mResponse; }
 
 ResponseParser &Http::GetResponseParser() { return mResponseParser; }
 
-void Http::SetRequest(eStatusCode state, std::vector<char> &RecvBuffer)
-{
+void Http::SetRequest(eStatusCode state, std::vector<char> &RecvBuffer) {
   if (state == SOCKET_DISCONNECTED) {
     Log(error, etc, "Socket Disconnected", *this);
     return; // disconnection();
@@ -272,34 +272,23 @@ void Http::HandleHTTPRequest() {
 
 void Http::SendResponse(eStatusCode state) {
   mSendBufferRef += mResponseParser.MakeResponseMessage(*this, state);
-//   send message
+  //   send message
   Log(info, response, "Response", *this);
-  // std::cout << YELLOW << mResponse.Inspect() << RESET << std::endl;
-  ssize_t bytesSent = send(mSocket, mSendBufferRef.c_str(), mSendBufferRef.size(), 0);
+  ssize_t bytesSent =
+      send(mSocket, mSendBufferRef.c_str(), mSendBufferRef.size(), 0);
 
   ResetAll();
-	if (bytesSent == -1)
-	{
-		// 에러 처리
-	}
-	else
-	{
-		// bytesSent 만큼 벡터에서 제거
-		mSendBufferRef.erase(mSendBufferRef.begin(), mSendBufferRef.begin() + bytesSent);
-	}	
+  if (bytesSent == -1) {
+    // 에러 처리
+  } else {
+    // bytesSent 만큼 벡터에서 제거
+    mSendBufferRef.erase(mSendBufferRef.begin(),
+                         mSendBufferRef.begin() + bytesSent);
+  }
 }
 
-int Http::GetPort()
-{
-	return (mPort);
-}
+int Http::GetPort() { return (mPort); }
 
-int Http::GetSocket()
-{
-	return (mSocket);
-}
+int Http::GetSocket() { return (mSocket); }
 
-std::string& Http::GetSendBuffer()
-{
-	return (mSendBufferRef);
-}
+std::string &Http::GetSendBuffer() { return (mSendBufferRef); }

@@ -50,8 +50,7 @@ void PostHandler::Handle(Http &http) {
   switch (http.CheckPathType(resolvedPath)) {
   case PATH_IS_DIRECTORY: {
     // 디렉토리에 대한 POST 요청 처리 (예: 데이터베이스에 데이터 저장)
-    eStatusCode status =
-        http.WriteFile(resolvedPath, requestData, PATH_IS_DIRECTORY);
+    status = http.WriteFile(resolvedPath, requestData, PATH_IS_DIRECTORY);
     // 데이터 처리 후 결과에 따라 상태 코드 설정
     // http.GetResponse().mStatusCode = writeStatus; // 새 리소스가 생성된
     // 경우AA http.GetResponse().mStatus = http.GetStatusMessage(writeStatus);
@@ -60,7 +59,7 @@ void PostHandler::Handle(Http &http) {
   case PATH_IS_FILE: {
     // 파일에 대한 POST 요청 처리 (예: 파일에 데이터 추가)
     // 데이터 처리 후 결과에 따라 상태 코드 설정
-    // logic
+    status = http.WriteFile(resolvedPath, requestData, PATH_IS_FILE);
     break;
   }
   case PATH_INACCESSIBLE: {

@@ -278,6 +278,7 @@ void Config::checkLimitExcept(std::vector<std::string> &value) {
   }
   std::vector<std::string> validMethods;
   validMethods.push_back("GET");
+  validMethods.push_back("PUT");
   validMethods.push_back("POST");
   validMethods.push_back("DELETE");
 

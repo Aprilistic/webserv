@@ -96,6 +96,23 @@ void setAllEnv(Http &http) {
 
   // SERVER_SOFTWARE: 서버의 소프트웨어 이름과 버전.
   setenv("SERVER_SOFTWARE", "", 1);
+
+  for (std::map<std::string, std::string>::iterator it = tmp.mHeaders.begin();
+       it != tmp.mHeaders.end(); ++it) {
+    std::string key = it->first;
+    std::string value = it->second;
+
+    // 헤더 이름에 -가 있으면 _로 변경
+    std::replace(key.begin(), key.end(), '-', '_');
+
+    // 헤더 이름을 대문자로 변경
+    std::transform(key.begin(), key.end(), key.begin(), ::toupper);
+
+    if (getenv(key.c_str()) == NULL) {
+      std::string httpEnvKey = "HTTP_" + key;
+      setenv(httpEnvKey.c_str(), value.c_str(), 1);
+    }
+  }
 }
 
 void CGIHandle(Http &http) {
