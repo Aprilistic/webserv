@@ -3,7 +3,8 @@
 #include "Router.hpp"
 
 Connection::Connection(int socket, int port)
-    : mSocket(socket), mPort(port), mHttp(socket, port, mSendBuffer) {
+    : mSocket(socket), mPort(port), mKeepAlive(true), mRemainingRequest(0),
+      mHttp(socket, port, mSendBuffer, mKeepAlive, mRemainingRequest) {
   struct kevent events[2];
 
   mRecvBuffer.reserve(RECV_BUFFER_SIZE);
@@ -15,7 +16,7 @@ Connection::Connection(int socket, int port)
   kevent(Common::mKqueue, events, 2, NULL, 0, NULL);
 }
 
-Connection::~Connection() { close(mSocket); }
+Connection::~Connection() {  }
 
 void Connection::EventHandler(struct kevent &currentEvent) {
   if (currentEvent.flags & EV_ERROR) {
@@ -33,6 +34,9 @@ void Connection::EventHandler(struct kevent &currentEvent) {
     break;
   case EVFILT_SIGNAL:
     signalHandler();
+    break;
+  case EVFILT_PROC:
+    // processHandler();
     break;
   default:
     assert("Connection::EventHandler: default" == 0);
@@ -74,12 +78,18 @@ void Connection::writeHandler() {
 
   if (bytesSent == -1) {
     // 에러 처리
-    
+    disconnect();
   } else {
     // bytesSent 만큼 벡터에서 제거
     mSendBuffer.erase(mSendBuffer.begin(), mSendBuffer.begin() + bytesSent);
   }
-
+  
+  if (mSendBuffer.empty()) {
+    if (mKeepAlive == false && mRemainingRequest == 0) {
+      disconnect();
+      return;
+    }
+  }
 }
 
 void Connection::timerHandler() {
@@ -88,4 +98,8 @@ void Connection::timerHandler() {
 
 void Connection::signalHandler() {
   // error
+}
+
+void Connection::disconnect() {
+  close(mSocket);
 }

@@ -21,13 +21,14 @@ private:
   void writeHandler();
   void timerHandler();
   void signalHandler();
-
+  void disconnect();
 private:
   int mSocket;
   int mPort;
+  bool mKeepAlive;
+  int mRemainingRequest;
   Http mHttp;
   std::vector<char> mRecvBuffer;
-//   std::vector<char> mSendBuffer;
   std::string mSendBuffer;
 };
 

@@ -20,7 +20,7 @@ class IRequestHandler;
 class Http {
 public:
 //   Http();
-  Http(int socket, int port, std::string& sendBuffer);
+  Http(int socket, int port, std::string& sendBuffer, bool& keepAlive, int& remainingRequest);
   ~Http();
 
   eStatusCode ReadFile(const std::string &path);
@@ -61,6 +61,8 @@ private:
   static int mFileID;
   int mPort;
   int mSocket;
+  bool& mKeepAlive;
+  int& mRemainingRequest;
   std::string& mSendBufferRef;
 };
 
