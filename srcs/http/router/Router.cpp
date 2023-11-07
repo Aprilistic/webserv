@@ -25,3 +25,6 @@ IRequestHandler *Router::Routing(Http &http) {
   }
   return (NULL);
 }
+
+
+GetHandler::~GetHandler() {}

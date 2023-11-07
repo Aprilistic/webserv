@@ -23,6 +23,8 @@ private:
 
 class GetHandler : public IRequestHandler {
 public:
+  ~GetHandler();
+
   virtual void Handle(Http &http);
 
 private:
