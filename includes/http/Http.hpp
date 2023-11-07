@@ -23,9 +23,6 @@ public:
   Http(int socket, int port, std::string& sendBuffer);
   ~Http();
 
-  eStatusCode PriorityHeaders(int &port);
-
-  void ErrorHandle(int port, eStatusCode errorStatus, int socket);
   eStatusCode ReadFile(const std::string &path);
   eStatusCode WriteFile(std::string &path, std::string &data,
                         eStatusCode pathType, bool append = false);
@@ -38,16 +35,6 @@ public:
   Response &GetResponse(void);
   ResponseParser &GetResponseParser(void);
 
-  void SetRequest(eStatusCode state, int port, int socket,
-                  std::vector<char> &RecvBuffer);
-  void HandleRequestType(int port, int socket);
-  void HandleCGIRequest(int port, int socket);
-  void HandleHTTPRequest(int port, int socket);
-  void SendResponse(eStatusCode state, int port, int socket);
-
-
-
-  // test overoading
   void ErrorHandle(eStatusCode errorStatus);
   void SetRequest(eStatusCode state, std::vector<char> &RecvBuffer);
   void HandleRequestType(void);
@@ -59,15 +46,6 @@ public:
   eStatusCode PriorityHeaders(void);
   void SendResponse(eStatusCode state);
 
-
-
-
-private:
-  bool checkRedirect(int port);
-  bool checkClientMaxBodySize(int port);
-  bool checkLimitExcept(int port);
-
-// test overoading
 private:
   bool checkRedirect(void);
   bool checkClientMaxBodySize(void);
