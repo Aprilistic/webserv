@@ -35,6 +35,7 @@ public:
   std::string Inspect() const;
 
 public:
+  bool mChunked;
   std::string mMethod;
   std::string mUri;
   int mVersionMajor;

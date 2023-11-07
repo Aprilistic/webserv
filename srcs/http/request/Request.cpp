@@ -1,8 +1,8 @@
 #include "Request.hpp"
 
 Request::Request()
-    : mVersionMajor(0), mVersionMinor(0), mContentLength(0), mKeepAlive(false) {
-}
+    : mChunked(false), mVersionMajor(0), mVersionMinor(0), mContentLength(0),
+      mKeepAlive(false) {}
 
 Request::~Request() {}
 

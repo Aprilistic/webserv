@@ -136,23 +136,29 @@ bool Http::checkRedirect() {
 }
 
 bool Http::checkClientMaxBodySize() {
-  Node *location =
-      Common::mConfigMap->GetConfigNode(mPort, mRequest.mHost, mRequest.mUri, mRequest.mMethod);
+  Node *location = Common::mConfigMap->GetConfigNode(
+      mPort, mRequest.mHost, mRequest.mUri, mRequest.mMethod);
 
   std::vector<std::string> clientMaxBodySizeValues =
       location->FindValue(location, "client_max_body_size");
+  int valueSize =
+      std::atoi(clientMaxBodySizeValues[0].c_str()); // overflow, k,M,G check
 
-  if (clientMaxBodySizeValues.size()) {
-    int valueSize =
-        std::atoi(clientMaxBodySizeValues[0].c_str()); // overflow, k,M,G check
+  if (mRequest.mChunked == true) {
+    if (mRequest.mContent.size() > valueSize) {
+      return (false);
+    }
+  } else {
+    if (clientMaxBodySizeValues.size()) {
 
-    std::multimap<std::string, std::string>::iterator it;
-    it = mRequest.mHeaders.find("Content-Length");
+      std::multimap<std::string, std::string>::iterator it;
+      it = mRequest.mHeaders.find("Content-Length");
 
-    if (it != mRequest.mHeaders.end()) {
-      int contentLength = std::atoi(it->second.c_str());
-      if (contentLength > valueSize) {
-        return (false);
+      if (it != mRequest.mHeaders.end()) {
+        int contentLength = std::atoi(it->second.c_str());
+        if (contentLength > valueSize) {
+          return (false);
+        }
       }
     }
   }
