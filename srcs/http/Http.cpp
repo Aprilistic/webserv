@@ -269,8 +269,8 @@ void Http::HandleHTTPRequest() {
   IRequestHandler *method = Router::Routing(*this);
 
   // error 면 this로 가져간 http의 에러 핸들러를 호출하여 알아서 메시지를
-  // 작성하도록 구현하기 정상적인 response라도 해당 메소드가 불린 시점에서는 각
-  // 메서드에서 요청에 대한 처리를 하는 것을 원칙으로 작성해야할듯
+  // 작성하도록 구현하기 정상적인 response라도 해당 메소드가 불린 시점에서는
+  // 각 메서드에서 요청에 대한 처리를 하는 것을 원칙으로 작성해야할듯
 
   method->Handle(*this);
   // delete(method);
@@ -280,17 +280,8 @@ void Http::SendResponse(eStatusCode state) {
   mSendBufferRef += mResponseParser.MakeResponseMessage(*this, state);
   //   send message
   Log(info, response, "Response", *this);
-  ssize_t bytesSent =
-      send(mSocket, mSendBufferRef.c_str(), mSendBufferRef.size(), 0);
 
   ResetAll();
-  if (bytesSent == -1) {
-    // 에러 처리
-  } else {
-    // bytesSent 만큼 벡터에서 제거
-    mSendBufferRef.erase(mSendBufferRef.begin(),
-                         mSendBufferRef.begin() + bytesSent);
-  }
 }
 
 int Http::GetPort() { return (mPort); }

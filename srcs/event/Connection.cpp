@@ -3,9 +3,7 @@
 #include "Router.hpp"
 
 Connection::Connection(int socket, int port)
-: mSocket(socket)
-, mPort(port)
-, mHttp(socket, port, mSendBuffer) {
+    : mSocket(socket), mPort(port), mHttp(socket, port, mSendBuffer) {
   struct kevent events[2];
 
   mRecvBuffer.reserve(RECV_BUFFER_SIZE);
@@ -55,6 +53,7 @@ eStatusCode Connection::readFromSocket() {
       // error
       return (SERVER_ERROR_INTERNAL_SERVER_ERROR);
     }
+
     // disconnection();
     return (SERVER_SERVICE_UNAVAILABLE);
   }
@@ -65,24 +64,21 @@ void Connection::readHandler() {
 
   eStatusCode state = readFromSocket();
 
-//   mHttp.SetRequest(state, mPort, mSocket, mRecvBuffer);
+  //   mHttp.SetRequest(state, mPort, mSocket, mRecvBuffer);
   mHttp.SetRequest(state, mRecvBuffer);
-
 }
 
-void Connection::writeHandler()
-{
-	ssize_t bytesSent = send(mSocket, mSendBuffer.c_str(), mSendBuffer.size(), 0);	//   mSendBuffer.clear();
+void Connection::writeHandler() {
+  ssize_t bytesSent = send(mSocket, mSendBuffer.c_str(), mSendBuffer.size(),
+                           0); //   mSendBuffer.clear();
 
-	if (bytesSent == -1)
-	{
-		// 에러 처리
-	}
-	else
-	{
-		// bytesSent 만큼 벡터에서 제거
-		mSendBuffer.erase(mSendBuffer.begin(), mSendBuffer.begin() + bytesSent);
-	}	
+  if (bytesSent == -1) {
+    // 에러 처리
+    
+  } else {
+    // bytesSent 만큼 벡터에서 제거
+    mSendBuffer.erase(mSendBuffer.begin(), mSendBuffer.begin() + bytesSent);
+  }
 
 }
 
