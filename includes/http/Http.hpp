@@ -1,67 +1,67 @@
 #ifndef HTTP_HPP
 #define HTTP_HPP
 
+#include "CGI.hpp"
 #include "Common.hpp"
 #include "ConfigMap.hpp"
 #include "Core.hpp"
 #include "Enum.hpp"
+#include "IRequestHandler.hpp"
 #include "Request.hpp"
 #include "RequestParser.hpp"
 #include "Response.hpp"
-#include "ResponseMessage.hpp"
 #include "ResponseParser.hpp"
-
-#include "IRequestHandler.hpp"
 #include "Router.hpp"
 
-#define DEFAULT_ERROR_PAGE_PATH "/Users/hyeoan/webserv/www/error/error.html"
+#define DEFAULT_ERROR_PAGE_PATH "./www/error/error.html"
 
 class IRequestHandler;
+
 class Http {
 public:
-  Http();
+//   Http();
+  Http(int socket, int port, std::string& sendBuffer);
   ~Http();
 
-  // requestParser와 이름 겹침
-  eStatusCode setOneRequest(int &port, std::vector<char> &mRecvBuffer);
-  eStatusCode PriorityHeaders(int &port);
-  eStatusCode SetResponse(int &port);
-  std::string GetStatusMessage(eStatusCode errorStatus);
-  std::string GetFileType();
-  std::vector<char> GetCGIbufferToVector();
-
-  void MakeMandatoryHeaders();
-
-  void ErrorHandle(int port, eStatusCode errorStatus);
   eStatusCode ReadFile(const std::string &path);
   eStatusCode WriteFile(std::string &path, std::string &data,
                         eStatusCode pathType, bool append = false);
-  std::string AutoIndex(const std::string &path);
 
   eStatusCode CheckPathType(const std::string &path);
 
-  void ResetRequest(void);
-  void ResetResponse(void);
+  void ResetAll(void);
   void ResetBuffer(void);
-  void ResetRequestParser(void);
-  void ResetCGIbuffer(void);
-  void SetCGIbuffer(std::string &CGIResponseMessage);
   Request &GetRequest(void);
   Response &GetResponse(void);
+  ResponseParser &GetResponseParser(void);
+
+  void ErrorHandle(eStatusCode errorStatus);
+  void SetRequest(eStatusCode state, std::vector<char> &RecvBuffer);
+  void HandleRequestType(void);
+  void HandleCGIRequest(void);
+  void HandleHTTPRequest(void);
+  int GetPort(void);
+  int GetSocket(void);
+  std::string& GetSendBuffer(void);
+  eStatusCode PriorityHeaders(void);
+  void SendResponse(eStatusCode state);
 
 private:
-  bool checkRedirect(int port);
-  bool checkClientMaxBodySize(int port);
-  bool checkLimitExcept(int port);
+  bool checkRedirect(void);
+  bool checkClientMaxBodySize(void);
+  bool checkLimitExcept(void);
 
 private:
   std::string mBuffer;
-  std::string mCGIbuffer;
   Request mRequest;
   Response mResponse;
   RequestParser mRequestParser;
-  int mFd;
+  ResponseParser mResponseParser;
+
   static int mFileID;
+  int mPort;
+  int mSocket;
+  std::string& mSendBufferRef;
 };
 
 #endif

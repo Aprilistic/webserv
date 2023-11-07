@@ -3,7 +3,7 @@
 
 class IEventHandler {
 public:
-	virtual void EventHandler(struct kevent &currentEvent) = 0;
+  virtual void EventHandler(struct kevent &currentEvent) = 0;
 };
 
 #endif

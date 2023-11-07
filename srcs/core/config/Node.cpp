@@ -29,6 +29,7 @@
 /* location */
 #define ALIAS (LOCATION_LEVEL | DIRECTIVE)
 #define LIMIT_EXCEPT (LOCATION_LEVEL | DIRECTIVE)
+#define CGI_PASS (LOCATION_LEVEL | DIRECTIVE)
 /* { } ; */
 
 Node::Node(std::vector<std::string> &configTokens,
@@ -110,6 +111,8 @@ int Node::getTokenInfo(std::string token) {
     return (ALIAS);
   } else if (token == "limit_except") {
     return (LIMIT_EXCEPT);
+  } else if (token == "cgi_pass") {
+    return (CGI_PASS);
   }
   return (VALUE);
 }
@@ -184,6 +187,7 @@ void Node::nodeError(const std::string &msg) {
   throw std::runtime_error(msg);
 }
 
+//if there is no value, return empty vector == segmentation fault
 std::vector<std::string> Node::FindValue(Node *current, std::string key) {
   if (current == NULL) {
     return std::vector<std::string>();

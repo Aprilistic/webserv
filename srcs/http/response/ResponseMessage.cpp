@@ -1,19 +1,29 @@
-#include "ResponseMessage.hpp"
+#include "ResponseParser.hpp"
+#include "Http.hpp"
 
-ResponseMessage::ResponseMessage(Response &resp) { MakeResponseMessage(resp); }
+ResponseParser::ResponseParser() {}
 
-ResponseMessage::~ResponseMessage() {}
+ResponseParser::~ResponseParser() {}
 
-void ResponseMessage::MakeResponseMessage(Response &resp) {
+std::string ResponseParser::MakeResponseMessage(Http& http, eStatusCode state)
+{
+  //set mandatory response message
+  setResponse(http, state);
+  //set response message to std::string
+  setMessage(http.GetResponse());
+  return GetMessage();
+}
+
+void ResponseParser::setMessage(Response &resp) {
   setStatusLine(resp);
   setHeaderFields(resp);
   mMessage += CRLF;
   setBody(resp);
 }
 
-std::string ResponseMessage::GetMessage() const { return mMessage; }
+std::string ResponseParser::GetMessage() const { return mMessage; }
 
-std::vector<char> ResponseMessage::GetMessageToVector() {
+std::vector<char> ResponseParser::GetMessageToVector() {
   std::vector<char> message;
   for (std::string::iterator it = mMessage.begin(); it != mMessage.end();
        ++it) {
@@ -22,7 +32,7 @@ std::vector<char> ResponseMessage::GetMessageToVector() {
   return message;
 }
 
-void ResponseMessage::setStatusLine(Response &resp) {
+void ResponseParser::setStatusLine(Response &resp) {
   mMessage += "HTTP/";
   mMessage += std::to_string(resp.mVersionMajor);
   mMessage += ".";
@@ -33,15 +43,7 @@ void ResponseMessage::setStatusLine(Response &resp) {
   mMessage += resp.mStatus + CRLF;
 }
 
-void ResponseMessage::setHeaderFields(Response &resp) {
-  // for (std::vector<Response::HeaderItem>::iterator it =
-  // resp.mHeaders.begin();
-  //      it != resp.mHeaders.end(); ++it) {
-  //   mMessage += it->name;
-  //   mMessage += ": ";
-  //   mMessage += it->value;
-  //   mMessage += CRLF;
-  // }
+void ResponseParser::setHeaderFields(Response &resp) {
   for (std::multimap<std::string, std::string>::iterator it =
            resp.mHeaders.begin();
        it != resp.mHeaders.end(); ++it) {
@@ -52,4 +54,4 @@ void ResponseMessage::setHeaderFields(Response &resp) {
   }
 }
 
-void ResponseMessage::setBody(Response &resp) { mMessage += resp.mBody; }
+void ResponseParser::setBody(Response &resp) { mMessage += resp.mBody; }

@@ -2,29 +2,29 @@
 #define WEBSERVER_HPP
 
 #include "Config.hpp"
-#include "Core.hpp"
-#include "Server.hpp"
 #include "Connection.hpp"
+#include "Core.hpp"
 #include "ProgramControl.hpp"
+#include "Server.hpp"
 
 #define MAX_EVENT 1024
 
 class WebServer {
 public:
-	WebServer(const std::string &path);
-	~WebServer(void);
-	void Run(void);
-	bool IsGood(void) const;
+  WebServer(const std::string &path);
+  ~WebServer(void);
+  void Run(void);
+  bool IsGood(void) const;
 
 private:
-	void eventMonitoring(void);
-	
+  void eventMonitoring(void);
+
 private:
-	bool mGood;
-	std::map<int, Server *> mServerList;
-	std::vector<struct kevent> mEventList;
-	
-	ProgramControl mControlInstance;
+  bool mGood;
+  std::map<int, Server *> mServerList;
+  std::vector<struct kevent> mEventList;
+
+  ProgramControl mControlInstance;
 };
 
 #endif

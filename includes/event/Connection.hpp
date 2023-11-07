@@ -27,7 +27,8 @@ private:
   int mPort;
   Http mHttp;
   std::vector<char> mRecvBuffer;
-  std::vector<char> mSendBuffer;
+//   std::vector<char> mSendBuffer;
+  std::string mSendBuffer;
 };
 
 #endif

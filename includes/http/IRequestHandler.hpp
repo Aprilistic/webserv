@@ -9,7 +9,8 @@ enum eHandleStatus { INCOMPLETED = 0, COMPLETED = 1 };
 
 class IRequestHandler {
 public:
-  virtual eStatusCode Handle(int port, Http &http) = 0;
+  virtual void Handle(Http &http) = 0;
+
 private:
 };
 

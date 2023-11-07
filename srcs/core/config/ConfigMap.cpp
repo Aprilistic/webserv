@@ -35,23 +35,26 @@ void ConfigMap::PortMap::AddServerConfig(Node *serverNode) {
 }
 
 Node *ConfigMap::PortMap::GetConfigNode(const std::string &hostname,
-                                        const std::string &uri) {
+                                        const std::string &uri,
+                                        const std::string &method) {
   Node *configNode = NULL;
 
   // Search URI in hostname config
   HostnameMap::iterator it = mHostnameConfigs.find(hostname);
   if (it != mHostnameConfigs.end()) {
-    configNode = searchInServerConfig(&(it->second), uri);
+    configNode = searchInServerConfig(&(it->second), uri, method);
     if (configNode != NULL) {
       return configNode;
     }
   }
 
   // If not found, search URI in default server config
-  if (&(it->second) != mDefaultServer) {
-    configNode = searchInServerConfig(mDefaultServer, uri);
-    if (configNode != NULL) {
-      return configNode;
+  else {
+    if (&(it->second) != mDefaultServer) {
+      configNode = searchInServerConfig(mDefaultServer, uri, method);
+      if (configNode != NULL) {
+        return configNode;
+      }
     }
   }
 
@@ -68,16 +71,123 @@ const std::vector<int> ConfigMap::GetPorts() const {
   return mPorts;
 }
 
-Node *ConfigMap::PortMap::searchInServerConfig(UriMap *uriConfigs,
-                                               const std::string &uri) {
-  if (uriConfigs->find(uri) != uriConfigs->end()) { // URI found
-    return (*uriConfigs)[uri];
+bool checkCGIMethod(const std::string &method, Node *locationNode) {
+  std::vector<std::string> &cgiLimits =
+      locationNode->mDirectives["limit_except"];
+
+  if (cgiLimits.size() == 0) {
+    return true;
   }
-  if (uriConfigs->find("/") != uriConfigs->end()) { // URI not found, search "/"
-    return (*uriConfigs)["/"];
+
+  for (size_t i = 0; i < cgiLimits.size(); i++) {
+    if (cgiLimits[i] == method) {
+      return true;
+    }
   }
-  return NULL; // URI not found, 404
+  return false;
 }
+
+Node *ConfigMap::PortMap::miniPCRE(UriMap *uriConfigs, const std::string uri,
+                                   const std::string &method) {
+  std::string currentUri = uri;
+  std::string longestMatchedUri = "";
+  Node *longestMatchedNode = NULL;
+
+  for (UriMap::iterator it = uriConfigs->begin(); it != uriConfigs->end();
+       ++it) {
+    std::string configUri = it->first;
+    if (configUri == currentUri) {
+      return it->second;
+    }
+    if (configUri[0] != '~') {
+      continue;
+    } else {
+      configUri = configUri.substr(1, configUri.size());
+    }
+    if (configUri[0] == '*') {
+      configUri = configUri.substr(1, configUri.size());
+      if (currentUri.find(configUri) != std::string::npos &&
+          checkCGIMethod(method, it->second)) {
+        if (configUri.size() > longestMatchedUri.size()) {
+          longestMatchedUri = configUri;
+          longestMatchedNode = it->second;
+        }
+      }
+    } else if (configUri[configUri.size() - 1] == '$') {
+      configUri = configUri.substr(0, configUri.size() - 1);
+      if (currentUri.find(configUri) == currentUri.size() - configUri.size() &&
+          checkCGIMethod(method, it->second)) {
+        if (configUri.size() > longestMatchedUri.size()) {
+          longestMatchedUri = configUri;
+          longestMatchedNode = it->second;
+        }
+      }
+    }
+  }
+  return longestMatchedNode;
+}
+
+Node *ConfigMap::PortMap::longestMatchedNode(UriMap *uriConfigs,
+                                             const std::string uri) {
+  std::string currentUri = uri;
+  std::string longestMatchedUri = "";
+  Node *longestMatchedNode = NULL;
+
+  while (!currentUri.empty()) {
+    for (UriMap::iterator it = uriConfigs->begin(); it != uriConfigs->end();
+         ++it) {
+      std::string configUri = it->first;
+      if (configUri == currentUri) {
+        return it->second;
+      }
+      if (currentUri.find(configUri) == 0) {
+        if (configUri.size() > longestMatchedUri.size()) {
+          longestMatchedUri = configUri;
+          longestMatchedNode = it->second;
+        }
+      }
+    }
+    size_t lastSlash = currentUri.find_last_of('/');
+    if (lastSlash == std::string::npos) {
+      break;
+    } else {
+      currentUri = currentUri.substr(0, lastSlash);
+    }
+  }
+  return longestMatchedNode;
+}
+
+Node *ConfigMap::PortMap::searchInServerConfig(UriMap *uriConfigs,
+                                               const std::string &uri,
+                                               const std::string &method) {
+  std::string currentUri = uri;
+  Node *locationNode = NULL;
+
+  locationNode = miniPCRE(uriConfigs, uri, method);
+  if (locationNode != NULL) {
+    return locationNode;
+  }
+
+  locationNode = longestMatchedNode(uriConfigs, uri);
+  if (locationNode != NULL) {
+    return locationNode;
+  }
+  // If we reach here, we've exhausted all possible segments
+  return locationNode; // URI not found, 404
+}
+
+// Node *ConfigMap::PortMap::searchInServerConfig(UriMap *uriConfigs,
+//                                                const std::string &uri) {
+
+//   if (uriConfigs->find(uri) != uriConfigs->end()) { // URI found
+//     return (*uriConfigs)[uri];
+//   }
+//   if (uriConfigs->find("/") != uriConfigs->end()) { // URI not found,
+//   search"/"
+//     return (*uriConfigs)["/"];
+//   }
+//   return NULL; // URI not found, 404
+// }
 
 ConfigMap::UriMap ConfigMap::PortMap::makeUriMap(Node *serverNode) {
   UriMap uriConfigs;
@@ -115,10 +225,11 @@ ConfigMap::ConfigMap(Node *configTree) {
 }
 
 Node *ConfigMap::GetConfigNode(int port, const std::string &hostname,
-                               const std::string &uri) {
+                               const std::string &uri,
+                               const std::string &method) {
   if (mPortConfigs.find(port) == mPortConfigs.end()) {
     return NULL;
   }
 
-  return mPortConfigs[port].GetConfigNode(hostname, uri);
+  return mPortConfigs[port].GetConfigNode(hostname, uri, method);
 }

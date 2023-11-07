@@ -13,7 +13,6 @@ class Request;
 class Router {
 public:
   static IRequestHandler *Routing(Http &http);
-  static bool IsCgiRequest(Http &http);
 
 private:
   Router();
@@ -24,26 +23,24 @@ private:
 
 class GetHandler : public IRequestHandler {
 public:
-  virtual eStatusCode Handle(int port, Http &http);
+  virtual void Handle(Http &http);
+
+private:
+  std::string autoIndex(const std::string &path);
 };
 
 class PostHandler : public IRequestHandler {
 public:
-  virtual eStatusCode Handle(int port, Http &http);
+  virtual void Handle(Http &http);
 };
 
 class DeleteHandler : public IRequestHandler {
 public:
-  virtual eStatusCode Handle(int port, Http &http);
+  virtual void Handle(Http &http);
 };
 
 class PutHandler : public IRequestHandler {
 public:
-  virtual eStatusCode Handle(int port, Http &http);
+  virtual void Handle(Http &http);
 };
-class CgiHandler : public IRequestHandler {
-public:
-  virtual eStatusCode Handle(int port, Http &http);
-};
-
 #endif

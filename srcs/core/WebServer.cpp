@@ -2,9 +2,7 @@
 #include "Config.hpp"
 
 WebServer::WebServer(const std::string &path)
-	: mGood(true) 
-	, mEventList(MAX_EVENT)
-{
+    : mGood(true), mEventList(MAX_EVENT) {
   Common::mKqueue = kqueue();
   if (Common::mKqueue == -1) {
     mGood = false;
@@ -30,13 +28,9 @@ WebServer::WebServer(const std::string &path)
   }
 
   mControlInstance.RegisterTerminationSignals();
-  
 }
 
-bool WebServer::IsGood(void) const
-{
-  return (mGood);
-}
+bool WebServer::IsGood(void) const { return (mGood); }
 
 WebServer::~WebServer(void) {
   int safeExit = 1;
@@ -84,8 +78,8 @@ void WebServer::Run(void) {
 void WebServer::eventMonitoring(void) {
   while (Common::mRunning) {
     mEventList.clear();
-    int newEvent = kevent(Common::mKqueue, NULL, 0, &mEventList[0],
-                          MAX_EVENT, NULL);
+    int newEvent =
+        kevent(Common::mKqueue, NULL, 0, &mEventList[0], MAX_EVENT, NULL);
 
     if (newEvent < 0 && errno == EINTR) {
       return;

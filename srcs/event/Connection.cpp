@@ -2,7 +2,8 @@
 #include "Node.hpp"
 #include "Router.hpp"
 
-Connection::Connection(int socket, int port) : mSocket(socket), mPort(port) {
+Connection::Connection(int socket, int port)
+    : mSocket(socket), mPort(port), mHttp(socket, port, mSendBuffer) {
   struct kevent events[2];
 
   mRecvBuffer.reserve(RECV_BUFFER_SIZE);
@@ -52,6 +53,7 @@ eStatusCode Connection::readFromSocket() {
       // error
       return (SERVER_ERROR_INTERNAL_SERVER_ERROR);
     }
+
     // disconnection();
     return (SERVER_SERVICE_UNAVAILABLE);
   }
@@ -59,69 +61,25 @@ eStatusCode Connection::readFromSocket() {
 }
 
 void Connection::readHandler() {
+
   eStatusCode state = readFromSocket();
 
-  switch (state) {
-  case (SOCKET_READ_ERROR):
-    mHttp.ErrorHandle(mPort, state);
-    break;
-  case (SOCKET_DISCONNECTED):
-    std::cout << RED << "disconnected" << RESET << std::endl;
-    mHttp.ErrorHandle(mPort, state);
-    break;
-  case (READ_OK):
-    state = mHttp.setOneRequest(mPort, mRecvBuffer);
-    // std::cout << PURPLE << "state: " << state << RESET << std::endl;
-    if (state == ERROR) {
-      break;
-    } else if (state == PARSING_INCOMPLETED) {
-      return;
-    }
-  case (PARSING_COMPLETED):
-    std::cout << GREEN << "==================" << RESET << std::endl;
-    std::cout << mHttp.GetRequest().Inspect() << std::endl;
-    std::cout << GREEN << "==================" << RESET << std::endl;
-    state = mHttp.PriorityHeaders(mPort);
-    if (state == REDIRECT || state == ERROR) {
-      break;
-    }
-  case (PRIORITY_HEADER_OK):
-    state = mHttp.SetResponse(mPort);
-  case (CGI):
-    mSendBuffer = mHttp.GetCGIbufferToVector();
-    mHttp.ResetCGIbuffer();
-    return ;
-  default:
-    break;
-  }
-  // 포트가 같은데 둘 다 이름이 없는 경우 localhost로 접근할 때,
-  // default_server로 안 가는 문제'
-
-  mHttp.MakeMandatoryHeaders();
-  ResponseMessage responseMessage(mHttp.GetResponse());
-
-  std::cout << CYAN << "==================" << RESET << std::endl;
-  std::string test = responseMessage.GetMessage();
-  std::cout << test << std::endl;
-  std::cout << CYAN << "==================" << RESET << std::endl;
-
-  mSendBuffer = responseMessage.GetMessageToVector();
-
-  mHttp.ResetRequest();
-  mHttp.ResetResponse();
-  mHttp.ResetRequestParser();
+  //   mHttp.SetRequest(state, mPort, mSocket, mRecvBuffer);
+  mHttp.SetRequest(state, mRecvBuffer);
 }
 
 void Connection::writeHandler() {
-  ssize_t bytesSent = send(mSocket, &mSendBuffer[0], mSendBuffer.size(), 0);
+  ssize_t bytesSent = send(mSocket, mSendBuffer.c_str(), mSendBuffer.size(),
+                           0); //   mSendBuffer.clear();
 
-  mSendBuffer.clear();
-  if (bytesSent <= 0) {
-    if (bytesSent < 0) {
-      // error
-    }
-    return;
+  if (bytesSent == -1) {
+    // 에러 처리
+    
+  } else {
+    // bytesSent 만큼 벡터에서 제거
+    mSendBuffer.erase(mSendBuffer.begin(), mSendBuffer.begin() + bytesSent);
   }
+
 }
 
 void Connection::timerHandler() {

@@ -22,13 +22,14 @@ private:
   void nodeError(const std::string &msg);
   void deleteTree(void);
 
+  // Do we really need to make these private?
 public:
   std::map<std::string, std::vector<std::string> > mDirectives;
   std::vector<Node *> mChildren;
-  int mLevel;
-  Node *mParent;
 
 private:
+  int mLevel;
+  Node *mParent;
 };
 
 #endif
