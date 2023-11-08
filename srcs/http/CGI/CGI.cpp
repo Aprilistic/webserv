@@ -1,6 +1,6 @@
 #include "CGI.hpp"
-#include "Enum.hpp"
 #include "ConfigMap.hpp"
+#include "Enum.hpp"
 
 extern char **environ;
 
@@ -147,13 +147,15 @@ void CGIHandle(Http &http) {
     freopen(requestFileName.c_str(), "r", stdin);
     freopen(outputFileName.c_str(), "w", stdout);
 
-    // 실행할 스크립트 경로 가져오기
-    const char *pwd = getenv("PWD");
-    std::string path_str = std::string(pwd) + "/cgi_tester";
-    const char *c_path_str =
-        path_str.c_str(); // std::string에서 C 스타일 문자열로 변환
-    char *argv[] = {const_cast<char *>("cgi_tester"), NULL};
-    execve(argv[0], argv, environ);
+    // cgi pass 가져오기
+    Node *location = Common::mConfigMap->GetConfigNode(
+        http.GetPort(), http.GetRequest().mHost, http.GetRequest().mUri,
+        http.GetRequest().mMethod);
+    if (location == NULL) {
+      return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
+    }
+    std::string cgiPass = location->FindValue(location, "cgi_pass")[0];
+    execve(cgiPass.c_str(), NULL, environ);
     // execve 실패 시
     exit(EXIT_FAILURE);
   } else {
