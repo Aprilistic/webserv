@@ -1,11 +1,10 @@
 #ifndef HTTP_SHARED_PTR_HPP
 #define HTTP_SHARED_PTR_HPP
 
-template <typename T>
-class SharedPtr {
+template <typename T> class SharedPtr {
 private:
-  T* ptr;
-  int* refCount;
+  T *ptr;
+  int *refCount;
 
   void dispose() {
     if (--(*refCount) == 0) {
@@ -18,31 +17,29 @@ private:
 public:
   SharedPtr() : ptr(NULL), refCount(new int(0)) {}
 
-  SharedPtr(T* p) : ptr(p), refCount(p ? new int(1) : new int(0)) {}
+  SharedPtr(T *p) : ptr(p), refCount(p ? new int(1) : new int(0)) {}
 
-  SharedPtr(const SharedPtr& other) : ptr(other.ptr), refCount(other.refCount) {
+  SharedPtr(const SharedPtr &other) : ptr(other.ptr), refCount(other.refCount) {
     if (ptr) {
       (*refCount)++;
     }
   }
 
-  ~SharedPtr() {
-    dispose();
-  }
+  ~SharedPtr() { dispose(); }
 
-  SharedPtr& operator=(SharedPtr other) {
+  SharedPtr &operator=(SharedPtr other) {
     swap(*this, other);
     return *this;
   }
 
-  friend void swap(SharedPtr& first, SharedPtr& second) {
+  friend void swap(SharedPtr &first, SharedPtr &second) {
     std::swap(first.ptr, second.ptr);
     std::swap(first.refCount, second.refCount);
   }
 
-  T& operator*() const { return *ptr; }
+  T &operator*() const { return *ptr; }
 
-  T* operator->() const { return ptr; }
+  T *operator->() const { return ptr; }
 
   void reset() {
     dispose();
@@ -50,7 +47,7 @@ public:
     refCount = new int(0);
   }
 
-  void reset(T* p) {
+  void reset(T *p) {
     if (ptr != p) {
       dispose();
       ptr = p;

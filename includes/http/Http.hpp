@@ -19,7 +19,6 @@ class IRequestHandler;
 
 class Http {
 public:
-  //   Http();
   Http(int socket, int port, std::string &sendBuffer, bool &keepAlive,
        int &remainingRequest);
   ~Http();

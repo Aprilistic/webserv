@@ -26,7 +26,8 @@ private:
 
   private:
     bool checkCGIMethos(const std::string &method, Node *locationNode);
-    Node *miniPCRE(UriMap *uriConfigs, const std::string uri, const std::string &method);
+    Node *miniPCRE(UriMap *uriConfigs, const std::string uri,
+                   const std::string &method);
     Node *longestMatchedNode(UriMap *uriConfigs, const std::string uri);
     Node *searchInServerConfig(UriMap *uriConfigs, const std::string &uri,
                                const std::string &method);

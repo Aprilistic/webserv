@@ -40,8 +40,7 @@ void DeleteHandler::Handle(Http &http) {
     if (/*파일 삭제 성공*/ true) {
       return;
     } else {
-      return (
-          http.ErrorHandle(SERVER_ERROR_INTERNAL_SERVER_ERROR));
+      return (http.ErrorHandle(SERVER_ERROR_INTERNAL_SERVER_ERROR));
     }
   }
   case PATH_INACCESSIBLE: {

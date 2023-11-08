@@ -16,7 +16,7 @@ Connection::Connection(int socket, int port)
   kevent(Common::mKqueue, events, 2, NULL, 0, NULL);
 }
 
-Connection::~Connection() {  }
+Connection::~Connection() {}
 
 void Connection::EventHandler(struct kevent &currentEvent) {
   if (currentEvent.flags & EV_ERROR) {
@@ -83,7 +83,7 @@ void Connection::writeHandler() {
     // bytesSent 만큼 벡터에서 제거
     mSendBuffer.erase(mSendBuffer.begin(), mSendBuffer.begin() + bytesSent);
   }
-  
+
   if (mSendBuffer.empty()) {
     if (mKeepAlive == false && mRemainingRequest == 0) {
       disconnect();
@@ -100,6 +100,4 @@ void Connection::signalHandler() {
   // error
 }
 
-void Connection::disconnect() {
-  close(mSocket);
-}
+void Connection::disconnect() { close(mSocket); }

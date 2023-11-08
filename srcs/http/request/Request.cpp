@@ -18,8 +18,6 @@ std::multimap<std::string, std::string> Request::GetHeaders() const {
   return mHeaders;
 }
 
-// std::vector<char> Request::GetContent() const { return mContent; }
-
 std::string Request::GetContent() const { return mContent; }
 
 std::string Request::GetHost() const { return mHost; }
@@ -47,10 +45,6 @@ void Request::SetHeaders(
 
   mHeaders = headers;
 }
-
-// void Request::SetContent(const std::vector<char> &content) {
-//   mContent = content;
-// }
 
 void Request::SetContent(const std::string &content) { mContent = content; }
 

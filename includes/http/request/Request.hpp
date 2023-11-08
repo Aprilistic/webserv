@@ -13,7 +13,6 @@ public:
   int GetVersionMajor() const;
   int GetVersionMinor() const;
   std::multimap<std::string, std::string> GetHeaders() const;
-  // std::vector<char> GetContent() const;
   std::string GetContent() const;
   std::string GetHost() const;
   int GetContentLength() const;
@@ -25,7 +24,6 @@ public:
   void SetVersionMajor(int versionMajor);
   void SetVersionMinor(int versionMinor);
   void SetHeaders(const std::multimap<std::string, std::string> &headers);
-  // void SetContent(const std::vector<char> &content);
   void SetContent(const std::string &content);
   void SetHost(const std::string &host);
   void SetContentLength(int contentLength);
@@ -41,7 +39,6 @@ public:
   int mVersionMajor;
   int mVersionMinor;
   std::multimap<std::string, std::string> mHeaders;
-  // std::vector<char> mContent;
   std::string mContent;
 
   std::string mHost;

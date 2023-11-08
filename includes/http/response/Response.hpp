@@ -13,7 +13,6 @@ public:
   unsigned int GetStatusCode() const;
   std::string GetStatus() const;
   std::multimap<std::string, std::string> GetHeaders() const;
-  // std::vector<char> GetContent() const;
   std::string GetBody() const;
   bool GetKeepAlive() const;
 
@@ -22,7 +21,6 @@ public:
   void SetStatusCode(unsigned int statusCode);
   void SetStatus(const std::string &status);
   void SetHeaders(const std::multimap<std::string, std::string> &headers);
-  // void SetContent(const std::vector<char> &content);
   void SetBody(const std::string &body);
   void SetKeepAlive(bool keepAlive);
 
@@ -34,7 +32,6 @@ public:
   unsigned int mStatusCode;
   std::string mStatus;
   std::multimap<std::string, std::string> mHeaders;
-  // std::vector<char> mContent;
   std::string mBody;
   bool mKeepAlive;
 

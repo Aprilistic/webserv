@@ -1,8 +1,6 @@
 #include "Http.hpp"
 #include "CGI.hpp"
 
-// Http::Http() {}
-
 Http::Http(int socket, int port, std::string &sendBuffer, bool &keepAlive,
            int &remainingRequest)
     : mSocket(socket), mPort(port), mSendBufferRef(sendBuffer),
@@ -267,7 +265,6 @@ void Http::HandleCGIRequest() {
 }
 
 void Http::HandleHTTPRequest() {
-  // HTTPHandle(port, *this);
   eStatusCode state = PriorityHeaders();
   if (state == REDIRECT) {
     Log(error, etc, "REDIRECT", *this);
@@ -277,10 +274,6 @@ void Http::HandleHTTPRequest() {
   }
 
   IRequestHandler *method = Router::Routing(*this);
-
-  // error 면 this로 가져간 http의 에러 핸들러를 호출하여 알아서 메시지를
-  // 작성하도록 구현하기 정상적인 response라도 해당 메소드가 불린 시점에서는
-  // 각 메서드에서 요청에 대한 처리를 하는 것을 원칙으로 작성해야할듯
 
   method->Handle(*this);
   // delete(method);

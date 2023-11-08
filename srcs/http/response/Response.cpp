@@ -17,8 +17,6 @@ std::multimap<std::string, std::string> Response::GetHeaders() const {
   return mHeaders;
 }
 
-// std::vector<char> Response::GetContent() const { return mContent; }
-
 std::string Response::GetBody() const { return mBody; }
 
 bool Response::GetKeepAlive() const { return mKeepAlive; }
@@ -41,10 +39,6 @@ void Response::SetHeaders(
     const std::multimap<std::string, std::string> &headers) {
   mHeaders = headers;
 }
-
-// void Response::SetContent(const std::vector<char> &content) {
-//   mContent = content;
-// }
 
 void Response::SetBody(const std::string &body) { mBody = body; }
 
