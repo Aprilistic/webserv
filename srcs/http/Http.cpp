@@ -8,22 +8,7 @@ Http::Http(int socket, int port, std::string &sendBuffer, bool &keepAlive,
 
 Http::~Http() {}
 
-eStatusCode Http::PriorityHeaders() {
-  if (checkRedirect()) {
-    Log(error, etc, "REDIRECT", *this);
-    return REDIRECT; // redirect path 로  response
-  }
-  if (checkClientMaxBodySize() == false) {
-    return (CLIENT_ERROR_CONTENT_TOO_LARGE);
-  }
-  if (checkLimitExcept() == false) {
-    return (CLIENT_ERROR_METHOD_NOT_ALLOWED);
-  }
-  return PRIORITY_HEADER_OK;
-}
-
 void Http::ErrorHandle(eStatusCode errorStatus) {
-
   Node *location = Common::mConfigMap->GetConfigNode(
       mPort, mRequest.mHost, mRequest.mUri, mRequest.mMethod);
 
@@ -104,6 +89,108 @@ eStatusCode Http::WriteFile(std::string &path, std::string &data,
   }
 }
 
+eStatusCode Http::CheckPathType(const std::string &path) {
+  struct stat info;
+
+  if (stat(path.c_str(), &info) != 0) {
+    if (errno == ENOENT) {
+      return (PATH_NOT_FOUND);
+    }
+    return (PATH_INACCESSIBLE); // 권한 에러 Cannot access path
+  } else if (info.st_mode & S_IFDIR) {
+    return (PATH_IS_DIRECTORY); // 디렉토리 Directory
+  } else if (info.st_mode & S_IFREG) {
+    return (PATH_IS_FILE); // 파일 Regular file
+  } else {
+    return (PATH_UNKNOWN); // 디렉토리도 파일도 아닌 타입(소켓, 파이프, 심볼릭
+  }
+}
+
+void Http::SetRequest(eStatusCode state, std::vector<char> &RecvBuffer) {
+  if (state == SOCKET_DISCONNECTED) {
+    Log(error, etc, "Socket Disconnected", *this);
+    return; // disconnection();
+  } else if (state == SOCKET_READ_ERROR) {
+    return (ErrorHandle(state));
+  }
+
+  std::string temp(RecvBuffer.begin(), RecvBuffer.end());
+  mBuffer += temp;
+
+  mRequest.mContent.reserve(100000000);
+  eStatusCode ParseState = mRequestParser.Parse(
+      mRequest, mBuffer.c_str(), mBuffer.c_str() + mBuffer.size());
+
+  if (ParseState == PARSING_ERROR) {
+    mBuffer.clear();
+    return (ErrorHandle(ParseState));
+  } else if (ParseState == PARSING_INCOMPLETED) {
+    mBuffer.clear();
+    return;
+  } else if (ParseState == PARSING_COMPLETED) {
+    // If Connection: close, never read again from socket
+    if (mRequest.mKeepAlive == false) {
+      mKeepAlive = false;
+      struct kevent event;
+      EV_SET(&event, mSocket, EVFILT_READ, EV_DELETE, 0, 0, NULL);
+      kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
+    }
+    mRemainingRequest++; // remaining request count
+
+    Log(info, request, "Request", *this);
+    mBuffer = mRequestParser.GetRemainingBuffer();
+    HandleRequestType();
+  }
+}
+
+void Http::SendResponse(eStatusCode state) {
+  mSendBufferRef += mResponseParser.MakeResponseMessage(*this, state);
+  mRemainingRequest--;
+  //   send message
+  Log(info, response, "Response", *this);
+
+  ResetAll();
+}
+
+void Http::HandleRequestType() {
+  if (IsCgiRequest(*this)) {
+    handleCGIRequest();
+  } else {
+    handleHTTPRequest();
+  }
+}
+
+void Http::handleCGIRequest() { CGIHandle(*this); }
+
+void Http::handleHTTPRequest() {
+  eStatusCode state = priorityHeaders();
+  if (state == REDIRECT) {
+    Log(error, etc, "REDIRECT", *this);
+    return; // redirect 처리
+  } else if (state != PRIORITY_HEADER_OK) {
+    return ErrorHandle(state);
+  }
+
+  IRequestHandler *method = Router::Routing(*this);
+
+  method->Handle(*this);
+  // delete(method);
+}
+
+eStatusCode Http::priorityHeaders() {
+  if (checkRedirect()) {
+    Log(error, etc, "REDIRECT", *this);
+    return REDIRECT; // redirect path 로  response
+  }
+  if (checkClientMaxBodySize() == false) {
+    return (CLIENT_ERROR_CONTENT_TOO_LARGE);
+  }
+  if (checkLimitExcept() == false) {
+    return (CLIENT_ERROR_METHOD_NOT_ALLOWED);
+  }
+  return PRIORITY_HEADER_OK;
+}
+
 bool Http::checkRedirect() {
   Node *location = Common::mConfigMap->GetConfigNode(
       mPort, mRequest.mHost, mRequest.mUri, mRequest.mMethod);
@@ -182,23 +269,6 @@ bool Http::checkLimitExcept() {
   return (true);
 }
 
-eStatusCode Http::CheckPathType(const std::string &path) {
-  struct stat info;
-
-  if (stat(path.c_str(), &info) != 0) {
-    if (errno == ENOENT) {
-      return (PATH_NOT_FOUND);
-    }
-    return (PATH_INACCESSIBLE); // 권한 에러 Cannot access path
-  } else if (info.st_mode & S_IFDIR) {
-    return (PATH_IS_DIRECTORY); // 디렉토리 Directory
-  } else if (info.st_mode & S_IFREG) {
-    return (PATH_IS_FILE); // 파일 Regular file
-  } else {
-    return (PATH_UNKNOWN); // 디렉토리도 파일도 아닌 타입(소켓, 파이프, 심볼릭
-  }
-}
-
 void Http::ResetAll() {
   mRequest = Request();
   mResponse = Response();
@@ -213,80 +283,6 @@ Request &Http::GetRequest() { return mRequest; }
 Response &Http::GetResponse() { return mResponse; }
 
 ResponseParser &Http::GetResponseParser() { return mResponseParser; }
-
-void Http::SetRequest(eStatusCode state, std::vector<char> &RecvBuffer) {
-  if (state == SOCKET_DISCONNECTED) {
-    Log(error, etc, "Socket Disconnected", *this);
-    return; // disconnection();
-  } else if (state == SOCKET_READ_ERROR) {
-    return (ErrorHandle(state));
-  }
-
-  std::string temp(RecvBuffer.begin(), RecvBuffer.end());
-  mBuffer += temp;
-
-  mRequest.mContent.reserve(100000000);
-  eStatusCode ParseState = mRequestParser.Parse(
-      mRequest, mBuffer.c_str(), mBuffer.c_str() + mBuffer.size());
-
-  if (ParseState == PARSING_ERROR) {
-    mBuffer.clear();
-    return (ErrorHandle(ParseState));
-  } else if (ParseState == PARSING_INCOMPLETED) {
-    mBuffer.clear();
-    return;
-  } else if (ParseState == PARSING_COMPLETED) {
-    if (mRequest.mKeepAlive ==
-        false) { // If Connection: close, never read again from socket
-      mKeepAlive = false;
-      struct kevent event;
-      EV_SET(&event, mSocket, EVFILT_READ, EV_DELETE, 0, 0, NULL);
-      kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
-    }
-    mRemainingRequest++; // remaining request count
-
-    Log(info, request, "Request", *this);
-    mBuffer = mRequestParser.GetRemainingBuffer();
-    HandleRequestType();
-  }
-}
-
-void Http::HandleRequestType() {
-  if (IsCgiRequest(*this)) {
-    HandleCGIRequest();
-  } else {
-    HandleHTTPRequest();
-  }
-}
-
-void Http::HandleCGIRequest() {
-  CGIHandle(*this);
-  // CGI logic
-}
-
-void Http::HandleHTTPRequest() {
-  eStatusCode state = PriorityHeaders();
-  if (state == REDIRECT) {
-    Log(error, etc, "REDIRECT", *this);
-    return; // redirect 처리
-  } else if (state != PRIORITY_HEADER_OK) {
-    return ErrorHandle(state);
-  }
-
-  IRequestHandler *method = Router::Routing(*this);
-
-  method->Handle(*this);
-  // delete(method);
-}
-
-void Http::SendResponse(eStatusCode state) {
-  mSendBufferRef += mResponseParser.MakeResponseMessage(*this, state);
-  mRemainingRequest--;
-  //   send message
-  Log(info, response, "Response", *this);
-
-  ResetAll();
-}
 
 int Http::GetPort() { return (mPort); }
 

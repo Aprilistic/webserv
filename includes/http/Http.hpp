@@ -26,27 +26,29 @@ public:
   eStatusCode ReadFile(const std::string &path);
   eStatusCode WriteFile(std::string &path, std::string &data,
                         eStatusCode pathType, bool append = false);
-
   eStatusCode CheckPathType(const std::string &path);
+
+  void ErrorHandle(eStatusCode errorStatus);
+  void HandleRequestType(void);
+  void SetRequest(eStatusCode state, std::vector<char> &RecvBuffer);
+  void SendResponse(eStatusCode state);
 
   void ResetAll(void);
   void ResetBuffer(void);
-  Request &GetRequest(void);
-  Response &GetResponse(void);
-  ResponseParser &GetResponseParser(void);
 
-  void ErrorHandle(eStatusCode errorStatus);
-  void SetRequest(eStatusCode state, std::vector<char> &RecvBuffer);
-  void HandleRequestType(void);
-  void HandleCGIRequest(void);
-  void HandleHTTPRequest(void);
   int GetPort(void);
   int GetSocket(void);
+  Request &GetRequest(void);
+  Response &GetResponse(void);
   std::string &GetSendBuffer(void);
-  eStatusCode PriorityHeaders(void);
-  void SendResponse(eStatusCode state);
+  ResponseParser &GetResponseParser(void);
 
 private:
+  void handleHTTPRequest(void);
+  void handleCGIRequest(void);
+
+  eStatusCode priorityHeaders(void);
+
   bool checkRedirect(void);
   bool checkClientMaxBodySize(void);
   bool checkLimitExcept(void);
