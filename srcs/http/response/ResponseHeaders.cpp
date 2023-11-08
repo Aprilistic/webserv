@@ -40,6 +40,8 @@ std::string ResponseParser::getStatusMessage(eStatusCode errorStatus) {
     return ("Not Found");
   case (CLIENT_ERROR_METHOD_NOT_ALLOWED):
     return ("Method Not Allowed");
+  case (CLIENT_ERROR_CONTENT_TOO_LARGE):
+    return ("Content Too Large");
   case (CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE):
     return ("Unsupported Media Type");
   case (CLIENT_ERROR_RANGE_NOT_SATISFIABLE):
