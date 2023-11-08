@@ -116,6 +116,62 @@ void setAllEnv(Http &http) {
   }
 }
 
+eStatusCode CGIResponseParsing(Http &http) {
+  // response parsing
+  std::map<std::string, std::string> headers;
+  std::string body;
+
+  std::istringstream responseStream(response);
+  std::string line;
+  bool headerSection = true;
+
+  while (std::getline(responseStream, line)) {
+    if (!line.empty() && line.back() == '\r') {
+      line.pop_back();
+    }
+
+    if (line.empty()) {
+      headerSection = false;
+      continue;
+    }
+
+    if (headerSection) {
+      std::size_t pos = line.find(": ");
+      if (pos != std::string::npos) {
+        std::string key = line.substr(0, pos);
+        std::string value = line.substr(pos + 2);
+        headers[key] = value;
+      }
+    } else {
+      body += line + "\n";
+    }
+  }
+  if (!body.empty() && body.back() == '\n') {
+    body.pop_back();
+  }
+
+  // cgi 헤더에서 status code 가져오기
+  std::string statusHeader = headers["Status"];
+  statusHeader = statusHeader.substr(0, statusHeader.find(" "));
+
+  eStatusCode statusCode =
+      static_cast<eStatusCode>(std::atoi(statusHeader.c_str()));
+
+  // headers에서 status 헤더 제거
+  headers.erase("Status");
+
+  // response에 cgi 헤더 추가
+  for (std::map<std::string, std::string>::iterator it = headers.begin();
+       it != headers.end(); ++it) {
+    http.GetResponse().mHeaders.insert(
+        std::pair<std::string, std::string>(it->first, it->second));
+  }
+
+  http.GetResponse().mBody = body;
+
+  return (statusCode);
+}
+
 void CGIHandle(Http &http) {
   // 요청 내용을 파일에 쓰기 위한 ofstream 객체 생성
   std::string tmpFileName = "cgi_request_" + generateUniqueHash("./tmp");
@@ -171,57 +227,9 @@ void CGIHandle(Http &http) {
     // 파일 내용을 읽어 응답 객체에 저장
     std::string response((std::istreambuf_iterator<char>(responseFile)),
                          std::istreambuf_iterator<char>());
+
     // response parsing
-    std::map<std::string, std::string> headers;
-    std::string body;
-
-    std::istringstream responseStream(response);
-    std::string line;
-    bool headerSection = true;
-
-    while (std::getline(responseStream, line)) {
-      if (!line.empty() && line.back() == '\r') {
-        line.pop_back();
-      }
-
-      if (line.empty()) {
-        headerSection = false;
-        continue;
-      }
-
-      if (headerSection) {
-        std::size_t pos = line.find(": ");
-        if (pos != std::string::npos) {
-          std::string key = line.substr(0, pos);
-          std::string value = line.substr(pos + 2);
-          headers[key] = value;
-        }
-      } else {
-        body += line + "\n";
-      }
-    }
-    if (!body.empty() && body.back() == '\n') {
-      body.pop_back();
-    }
-
-    // cgi 헤더에서 status code 가져오기
-    std::string statusHeader = headers["Status"];
-    statusHeader = statusHeader.substr(0, statusHeader.find(" "));
-
-    eStatusCode statusCode =
-        static_cast<eStatusCode>(std::atoi(statusHeader.c_str()));
-
-    // headers에서 status 헤더 제거
-    headers.erase("Status");
-
-    // response에 cgi 헤더 추가
-    for (std::map<std::string, std::string>::iterator it = headers.begin();
-         it != headers.end(); ++it) {
-      http.GetResponse().mHeaders.insert(
-          std::pair<std::string, std::string>(it->first, it->second));
-    }
-
-    http.GetResponse().mBody = body;
+    eStatusCode statusCode = CGIResponseParsing(http);
 
     // 파일 닫기
     responseFile.close();
