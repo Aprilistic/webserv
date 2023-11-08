@@ -28,6 +28,7 @@ public:
                         eStatusCode pathType);
   eStatusCode CheckPathType(const std::string &path);
 
+  void RedirectURI();
   void ErrorHandle(eStatusCode errorStatus);
   void HandleRequestType(void);
   void SetRequest(eStatusCode state, std::vector<char> &RecvBuffer);

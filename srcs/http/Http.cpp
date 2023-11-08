@@ -8,6 +8,22 @@ Http::Http(int socket, int port, std::string &sendBuffer, bool &keepAlive,
 
 Http::~Http() {}
 
+void Http::RedirectURI() {
+  Node *location = Common::mConfigMap->GetConfigNode(
+      mPort, mRequest.mHost, mRequest.mUri, mRequest.mMethod);
+
+  std::vector<std::string> redirectValues =
+      location->FindValue(location, "return");
+
+  eStatusCode state =
+      static_cast<eStatusCode>(std::atoi(redirectValues[0].c_str()));
+
+  mResponse.mHeaders.insert(
+      std::pair<std::string, std::string>("Location", redirectValues[1]));
+
+  SendResponse(state);
+}
+
 void Http::ErrorHandle(eStatusCode errorStatus) {
   Node *location = Common::mConfigMap->GetConfigNode(
       mPort, mRequest.mHost, mRequest.mUri, mRequest.mMethod);
@@ -157,8 +173,7 @@ void Http::handleCGIRequest() { CGIHandle(*this); }
 void Http::handleHTTPRequest() {
   eStatusCode state = priorityHeaders();
   if (state == REDIRECT) {
-    Log(error, etc, "REDIRECT", *this);
-    return; // redirect 처리
+    return RedirectURI(); // redirect 처리
   } else if (state != PRIORITY_HEADER_OK) {
     return ErrorHandle(state);
   }
@@ -171,8 +186,7 @@ void Http::handleHTTPRequest() {
 
 eStatusCode Http::priorityHeaders() {
   if (checkRedirect()) {
-    Log(error, etc, "REDIRECT", *this);
-    return REDIRECT; // redirect path 로  response
+    return REDIRECT;
   }
   if (checkClientMaxBodySize() == false) {
     return (CLIENT_ERROR_CONTENT_TOO_LARGE);

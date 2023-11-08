@@ -30,6 +30,20 @@ std::string ResponseParser::getStatusMessage(eStatusCode errorStatus) {
     return ("Partial Content");
   case (REDIRECT):
     return ("Redirect");
+  case (REDIRECTION_MOVED_PERMANENTLY):
+    return ("Moved Permanently");
+  case (REDIRECTION_FOUND):
+    return ("Found");
+  case (REDIRECTION_SEE_OTHER):
+    return ("See Other");
+  case (REDIRECTION_NOT_MODIFIED):
+    return ("Not Modified");
+  case (REDIRECTION_USE_PROXY):
+    return ("Use Proxy");
+  case (REDIRECTION_TEMPORARY_REDIRECT):
+    return ("Temporary Redirect");
+  case (REDIRECTION_PERMANENT_REDIRECT): 
+    return ("Permanent Redirect");
   case (CLIENT_ERROR_BAD_REQUEST):
     return ("Bad Request");
   case (CLIENT_ERROR_UNAUTHORIZED):
