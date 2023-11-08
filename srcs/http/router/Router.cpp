@@ -15,8 +15,6 @@ IRequestHandler *Router::Routing(Http &http) {
     return (new PostHandler());
   } else if (http.GetRequest().mMethod == "DELETE") {
     return (new DeleteHandler());
-  } else if (http.GetRequest().mMethod == "PUT") {
-    return (new PutHandler());
   }
   return (NULL);
 }

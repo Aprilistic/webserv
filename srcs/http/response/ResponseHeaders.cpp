@@ -60,9 +60,6 @@ std::string ResponseParser::getStatusMessage(eStatusCode errorStatus) {
 std::string ResponseParser::getFileType(Http &http) {
   if (http.GetRequest().mMethod == "POST") {
     return (http.GetRequest().mContentType);
-  } else if (http.GetRequest().mMethod == "PUT" &&
-             http.GetResponse().mBody.size() != 0) {
-    return (http.GetRequest().mContentType);
   }
   std::string filepath = http.GetResponse().mFilename;
   if (filepath == "autoindex") {

@@ -262,8 +262,7 @@ bool Http::checkLimitExcept() {
                   mRequest.mMethod) == limitExceptValue.end()) {
       return (false);
     }
-  } else if (mRequest.mMethod == "PUT" || mRequest.mMethod == "POST" ||
-             mRequest.mMethod == "HEAD") {
+  } else if (mRequest.mMethod == "POST" || mRequest.mMethod == "HEAD") {
     return (false);
   }
   return (true);

@@ -41,8 +41,8 @@ public:
   virtual void Handle(Http &http);
 };
 
-class PutHandler : public IRequestHandler {
-public:
-  virtual void Handle(Http &http);
-};
+// class PutHandler : public IRequestHandler {
+// public:
+//   virtual void Handle(Http &http);
+// };
 #endif
