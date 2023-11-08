@@ -1,5 +1,6 @@
 #include "CGI.hpp"
 #include "Enum.hpp"
+#include "ConfigMap.hpp"
 
 extern char **environ;
 
@@ -117,7 +118,9 @@ void setAllEnv(Http &http) {
 
 void CGIHandle(Http &http) {
   // 요청 내용을 파일에 쓰기 위한 ofstream 객체 생성
-  std::ofstream requestFile("cgi_request_data.txt",
+  std::string tmpFileName = "cgi_request_" + generateUniqueHash("./tmp");
+  std::string requestFileName = "./tmp/" + tmpFileName + ".txt";
+  std::ofstream requestFile(requestFileName.c_str(),
                             std::ios::out | std::ios::trunc);
   if (!requestFile.is_open()) {
     std::cerr << "Failed to open request temp file." << std::endl;
@@ -129,7 +132,8 @@ void CGIHandle(Http &http) {
   requestFile.close(); // 파일 쓰기 완료 후 닫기
 
   // CGI 스크립트 결과를 받을 파일 생성
-  std::string outputFileName = "cgi_output_data.txt";
+  tmpFileName = "cgi_output_" + generateUniqueHash("./tmp");
+  std::string outputFileName = "./tmp/" + tmpFileName + ".txt";
 
   // CGI 스크립트 실행을 위한 프로세스 생성
   pid_t pid = fork();
@@ -140,7 +144,7 @@ void CGIHandle(Http &http) {
     // 자식 프로세스에서 CGI 스크립트 실행
     setAllEnv(http);
 
-    freopen("cgi_request_data.txt", "r", stdin);
+    freopen(requestFileName.c_str(), "r", stdin);
     freopen(outputFileName.c_str(), "w", stdout);
 
     // 실행할 스크립트 경로 가져오기
@@ -223,7 +227,7 @@ void CGIHandle(Http &http) {
     responseFile.close();
 
     // 임시 파일 삭제
-    unlink("cgi_request_data.txt");
+    unlink(requestFileName.c_str());
     unlink(outputFileName.c_str());
 
     // 응답 보내기
