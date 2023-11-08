@@ -5,7 +5,7 @@ int Http::mFileID = 0;
 // Http::Http() {}
 
 Http::Http(int socket, int port, std::string &sendBuffer, bool &keepAlive,
-     int &remainingRequest)
+           int &remainingRequest)
     : mSocket(socket), mPort(port), mSendBufferRef(sendBuffer),
       mKeepAlive(keepAlive), mRemainingRequest(remainingRequest) {}
 
