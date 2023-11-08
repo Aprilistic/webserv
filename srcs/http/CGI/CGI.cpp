@@ -124,7 +124,7 @@ void CGIHandle(Http &http) {
                             std::ios::out | std::ios::trunc);
   if (!requestFile.is_open()) {
     std::cerr << "Failed to open request temp file." << std::endl;
-    return;
+    return (http.ErrorHandle(SERVER_ERROR_INTERNAL_SERVER_ERROR));
   }
 
   // 요청 내용을 임시 파일에 쓰기
@@ -138,8 +138,7 @@ void CGIHandle(Http &http) {
   // CGI 스크립트 실행을 위한 프로세스 생성
   pid_t pid = fork();
   if (pid == -1) {
-    std::cerr << "Failed to fork." << std::endl;
-    return;
+    return (http.ErrorHandle(SERVER_ERROR_INTERNAL_SERVER_ERROR));
   } else if (pid == 0) {
     // 자식 프로세스에서 CGI 스크립트 실행
     setAllEnv(http);
@@ -166,8 +165,7 @@ void CGIHandle(Http &http) {
     // CGI 스크립트의 출력을 읽기 위한 ifstream 객체 생성
     std::ifstream responseFile(outputFileName.c_str(), std::ios::in);
     if (!responseFile.is_open()) {
-      std::cerr << "Failed to open response temp file." << std::endl;
-      return;
+      return (http.ErrorHandle(SERVER_ERROR_INTERNAL_SERVER_ERROR));
     }
 
     // 파일 내용을 읽어 응답 객체에 저장
