@@ -8,7 +8,7 @@ std::string requestLog(const Request &request) {
   log += request.GetUri();
   if (!request.GetContent().empty()) {
     log += " | ";
-    log += std::to_string(request.GetContent().size()) + " bytes";
+    log += toString(request.GetContent().size()) + " bytes";
   }
   log += "]";
   return log;
@@ -17,7 +17,7 @@ std::string requestLog(const Request &request) {
 std::string responseLog(const Response &response) {
   std::string log;
 
-  log += "[" + std::to_string(response.GetStatusCode()) + " ";
+  log += "[" + toString(response.GetStatusCode()) + " ";
   log += response.GetStatus() + " | ";
   if (response.GetBody().size() > 30) {
     log += response.GetBody().substr(0, 30) + "..." + "]";

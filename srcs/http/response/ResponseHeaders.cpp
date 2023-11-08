@@ -106,7 +106,7 @@ void ResponseParser::setMandatoryHeaderFields(Http &http) {
       std::pair<std::string, std::string>("Server", "*u*king webserv"));
 
   // Content-Length
-  std::string contentLength = std::to_string(http.GetResponse().mBody.size());
+  std::string contentLength = toString(http.GetResponse().mBody.size());
   http.GetResponse().mHeaders.insert(
       std::pair<std::string, std::string>("Content-Length", contentLength));
 

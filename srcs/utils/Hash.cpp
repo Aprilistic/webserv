@@ -1,4 +1,5 @@
 #include "Hash.hpp"
+#include "String.hpp"
 
 unsigned long simpleHash(const std::string &str) {
   unsigned long hash = 5381;
@@ -7,12 +8,6 @@ unsigned long simpleHash(const std::string &str) {
     hash = ((hash << 5) + hash) + static_cast<unsigned char>(str[i]);
   }
   return hash;
-}
-
-std::string hasToString(unsigned long hash) {
-  std::ostringstream oss;
-  oss << hash;
-  return oss.str();
 }
 
 std::string generateUniqueHash(const std::string &uriPath) {
@@ -26,5 +21,5 @@ std::string generateUniqueHash(const std::string &uriPath) {
   std::string concatStr = uriPath + timeStr;
 
   // hash the concatenated string
-  return hasToString(simpleHash(concatStr));
+  return toString(simpleHash(concatStr));
 }
