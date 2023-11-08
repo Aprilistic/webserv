@@ -1,7 +1,6 @@
 #include "Http.hpp"
 #include "CGI.hpp"
 
-int Http::mFileID = 0;
 // Http::Http() {}
 
 Http::Http(int socket, int port, std::string &sendBuffer, bool &keepAlive,

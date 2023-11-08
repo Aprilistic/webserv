@@ -59,7 +59,6 @@ private:
   RequestParser mRequestParser;
   ResponseParser mResponseParser;
 
-  static int mFileID;
   int mPort;
   int mSocket;
   bool &mKeepAlive;
