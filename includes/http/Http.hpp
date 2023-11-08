@@ -25,7 +25,7 @@ public:
 
   eStatusCode ReadFile(const std::string &path);
   eStatusCode WriteFile(std::string &path, std::string &data,
-                        eStatusCode pathType, bool append = false);
+                        eStatusCode pathType);
   eStatusCode CheckPathType(const std::string &path);
 
   void ErrorHandle(eStatusCode errorStatus);

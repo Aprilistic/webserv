@@ -54,39 +54,31 @@ eStatusCode Http::ReadFile(const std::string &path) {
 }
 
 eStatusCode Http::WriteFile(std::string &path, std::string &data,
-                            eStatusCode pathType, bool append) {
+                            eStatusCode pathType) {
   if (pathType == PATH_IS_DIRECTORY) {
     // create random file name
-    std::string fileName = "XXX";
+    std::string fileName = "post_" + generateUniqueHash(path);
 
-    mkstemp(&fileName[0]);
-    std::stringstream ss;
-    ss << path << "/" << fileName;
-
-    path = ss.str();
+    path = path + "/" + fileName;
   }
 
-  if (append) {
-    std::fstream file;
+  std::fstream file;
+  if (pathType == PATH_IS_FILE) {
     file.open(path.c_str(), std::ios::app);
     if (file.is_open()) {
       file << data;
       file.close();
       return (SUCCESSFUL_OK);
-    } else {
-      return (CLIENT_ERROR_NOT_FOUND);
     }
   } else {
-    std::fstream file;
     file.open(path.c_str(), std::ios::out);
     if (file.is_open()) {
       file << data;
       file.close();
       return (SUCCESSFUL_CREATERD);
-    } else {
-      return (CLIENT_ERROR_NOT_FOUND);
     }
   }
+  return (CLIENT_ERROR_NOT_FOUND);
 }
 
 eStatusCode Http::CheckPathType(const std::string &path) {

@@ -47,6 +47,7 @@ $(OBJ_DIR)/%.o : %.cpp
 clean :
 	rm -rf $(OBJ_DIR)
 	rm -rf ./$(NAME).dSYM
+	rm -f ./tmp/*
 
 fclean : clean
 	rm -f webserv
