@@ -54,7 +54,6 @@ eStatusCode Connection::readFromSocket() {
     mRecvBuffer.insert(mRecvBuffer.end(), tmp, tmp + bytesRead);
   } while (bytesRead > 0);
 
-  std::cout << "last read byte: " << bytesRead << std::endl;
   if (bytesRead <= 0) {
     if (bytesRead < 0) {
       if (errno != EWOULDBLOCK && errno != EAGAIN) {
@@ -62,9 +61,6 @@ eStatusCode Connection::readFromSocket() {
         return (SERVER_ERROR_INTERNAL_SERVER_ERROR);
       }
       return (SERVER_ERROR_INTERNAL_SERVER_ERROR);
-    }
-    if (bytesRead == 0) {
-      disconnect();
     }
     return (SERVER_SERVICE_UNAVAILABLE);
   }
