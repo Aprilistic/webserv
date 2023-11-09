@@ -233,6 +233,9 @@ bool Http::checkClientMaxBodySize() {
 
   std::vector<std::string> clientMaxBodySizeValues =
       location->FindValue(location, "client_max_body_size");
+  if (clientMaxBodySizeValues.size() == 0) {
+    return (true);
+  }
   int valueSize =
       std::atoi(clientMaxBodySizeValues[0].c_str()); // overflow, k,M,G check
 
