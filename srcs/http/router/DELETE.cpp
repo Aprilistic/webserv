@@ -4,7 +4,7 @@ void DeleteHandler::Handle(Http &http) {
   // URI로 리소스 위치 확인
   Node *location = Common::mConfigMap->GetConfigNode(
       http.GetPort(), http.GetRequest().mHost, http.GetRequest().mUri,
-      http.GetRequest().mMethod);
+      http.GetRequest().GetMethod());
   if (location == NULL) {
     return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
   }
@@ -20,28 +20,20 @@ void DeleteHandler::Handle(Http &http) {
       return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
     }
   }
-  std::string resolvedPath = http.GetRequest().mUri; // /example/index.html
-  size_t pos = resolvedPath.find(uri[0]);            // /example
+  std::string resolvedPath = http.GetRequest().mUri;
+  size_t pos = resolvedPath.find(uri[0]);
   if (pos != std::string::npos) {
     resolvedPath.replace(pos, uri[0].size(), alias[0]);
   }
 
   // 데이터 삭제
   switch (http.CheckPathType(resolvedPath)) {
-  case PATH_IS_DIRECTORY: {
-    // DELETE 요청은 리소스와 관련된 메타데이터를 모두 삭제해야 함
-    // 하지만 디렉토리를 삭제하는 것은 위험할 수 있어서 허용하지 않을 수 있음
-    return (http.ErrorHandle(CLIENT_ERROR_METHOD_NOT_ALLOWED));
-  }
+  case PATH_IS_DIRECTORY:
   case PATH_IS_FILE: {
-    // 파일 삭제 로직
-    // 삭제에 성공하면 200 OK 또는 204 No Content 반환
-    // 실패하면 500 Internal Server Error 반환
-    if (/*파일 삭제 성공*/ true) {
+    if (std::remove(resolvedPath.c_str()) == 0) {
       return;
     } else {
-      return (
-          http.ErrorHandle(SERVER_ERROR_INTERNAL_SERVER_ERROR));
+      return (http.ErrorHandle(SERVER_ERROR_INTERNAL_SERVER_ERROR));
     }
   }
   case PATH_INACCESSIBLE: {

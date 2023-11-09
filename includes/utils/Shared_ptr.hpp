@@ -6,33 +6,35 @@ private:
   T *ptr;
   int *refCount;
 
-public:
-  SharedPtr() : ptr(NULL), refCount(new int(0)) {}
-
-  SharedPtr(T *p) : ptr(p), refCount(new int(1)) {}
-
-  SharedPtr(const SharedPtr &other) : ptr(other.ptr), refCount(other.refCount) {
-    (*refCount)++;
-  }
-
-  ~SharedPtr() {
+  void dispose() {
     if (--(*refCount) == 0) {
       delete ptr;
+      ptr = NULL; // Avoid dangling pointer in case of exceptions
       delete refCount;
     }
   }
 
-  SharedPtr &operator=(const SharedPtr &other) {
-    if (this != &other) {
-      if (--(*refCount) == 0) {
-        delete ptr;
-        delete refCount;
-      }
-      ptr = other.ptr;
-      refCount = other.refCount;
+public:
+  SharedPtr() : ptr(NULL), refCount(new int(0)) {}
+
+  SharedPtr(T *p) : ptr(p), refCount(p ? new int(1) : new int(0)) {}
+
+  SharedPtr(const SharedPtr &other) : ptr(other.ptr), refCount(other.refCount) {
+    if (ptr) {
       (*refCount)++;
     }
+  }
+
+  ~SharedPtr() { dispose(); }
+
+  SharedPtr &operator=(SharedPtr other) {
+    swap(*this, other);
     return *this;
+  }
+
+  friend void swap(SharedPtr &first, SharedPtr &second) {
+    std::swap(first.ptr, second.ptr);
+    std::swap(first.refCount, second.refCount);
   }
 
   T &operator*() const { return *ptr; }
@@ -40,21 +42,17 @@ public:
   T *operator->() const { return ptr; }
 
   void reset() {
-    if (--(*refCount) == 0) {
-      delete ptr;
-      delete refCount;
-    }
+    dispose();
     ptr = NULL;
     refCount = new int(0);
   }
 
   void reset(T *p) {
-    if (--(*refCount) == 0) {
-      delete ptr;
-      delete refCount;
+    if (ptr != p) {
+      dispose();
+      ptr = p;
+      refCount = p ? new int(1) : new int(0);
     }
-    ptr = p;
-    refCount = new int(1);
   }
 };
 

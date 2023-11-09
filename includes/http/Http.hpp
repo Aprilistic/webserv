@@ -13,40 +13,43 @@
 #include "ResponseParser.hpp"
 #include "Router.hpp"
 
-#define DEFAULT_ERROR_PAGE_PATH "./www/error/error.html"
+#define DEFAULT_ERROR_PAGE_PATH "./www/error/default.html"
 
 class IRequestHandler;
 
 class Http {
 public:
-//   Http();
-  Http(int socket, int port, std::string& sendBuffer);
+  Http(int socket, int port, std::string &sendBuffer, bool &keepAlive,
+       int &remainingRequest);
   ~Http();
 
   eStatusCode ReadFile(const std::string &path);
   eStatusCode WriteFile(std::string &path, std::string &data,
-                        eStatusCode pathType, bool append = false);
-
+                        eStatusCode pathType);
   eStatusCode CheckPathType(const std::string &path);
+
+  void RedirectURI();
+  void ErrorHandle(eStatusCode errorStatus);
+  void HandleRequestType(void);
+  void SetRequest(eStatusCode state, std::vector<char> &RecvBuffer);
+  void SendResponse(eStatusCode state);
 
   void ResetAll(void);
   void ResetBuffer(void);
-  Request &GetRequest(void);
-  Response &GetResponse(void);
-  ResponseParser &GetResponseParser(void);
 
-  void ErrorHandle(eStatusCode errorStatus);
-  void SetRequest(eStatusCode state, std::vector<char> &RecvBuffer);
-  void HandleRequestType(void);
-  void HandleCGIRequest(void);
-  void HandleHTTPRequest(void);
   int GetPort(void);
   int GetSocket(void);
-  std::string& GetSendBuffer(void);
-  eStatusCode PriorityHeaders(void);
-  void SendResponse(eStatusCode state);
+  Request &GetRequest(void);
+  Response &GetResponse(void);
+  std::string &GetSendBuffer(void);
+  ResponseParser &GetResponseParser(void);
 
 private:
+  void handleHTTPRequest(void);
+  void handleCGIRequest(void);
+
+  eStatusCode priorityHeaders(void);
+
   bool checkRedirect(void);
   bool checkClientMaxBodySize(void);
   bool checkLimitExcept(void);
@@ -58,10 +61,11 @@ private:
   RequestParser mRequestParser;
   ResponseParser mResponseParser;
 
-  static int mFileID;
   int mPort;
   int mSocket;
-  std::string& mSendBufferRef;
+  bool &mKeepAlive;
+  int &mRemainingRequest;
+  std::string &mSendBufferRef;
 };
 
 #endif

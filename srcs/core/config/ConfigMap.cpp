@@ -176,19 +176,6 @@ Node *ConfigMap::PortMap::searchInServerConfig(UriMap *uriConfigs,
   return locationNode; // URI not found, 404
 }
 
-// Node *ConfigMap::PortMap::searchInServerConfig(UriMap *uriConfigs,
-//                                                const std::string &uri) {
-
-//   if (uriConfigs->find(uri) != uriConfigs->end()) { // URI found
-//     return (*uriConfigs)[uri];
-//   }
-//   if (uriConfigs->find("/") != uriConfigs->end()) { // URI not found,
-//   search"/"
-//     return (*uriConfigs)["/"];
-//   }
-//   return NULL; // URI not found, 404
-// }
-
 ConfigMap::UriMap ConfigMap::PortMap::makeUriMap(Node *serverNode) {
   UriMap uriConfigs;
   addLocationNode(&uriConfigs, serverNode);

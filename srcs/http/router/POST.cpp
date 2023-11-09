@@ -21,7 +21,7 @@ void PostHandler::Handle(Http &http) {
   // URI로 리소스 위치 확인
   Node *location = Common::mConfigMap->GetConfigNode(
       http.GetPort(), http.GetRequest().mHost, http.GetRequest().mUri,
-      http.GetRequest().mMethod);
+      http.GetRequest().GetMethod());
   if (location == NULL) {
     return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
   }
@@ -38,27 +38,21 @@ void PostHandler::Handle(Http &http) {
     }
   }
 
-  std::string resolvedPath = http.GetRequest().mUri; // /example/index.html
-  size_t pos = resolvedPath.find(uri[0]);            // /example
+  std::string resolvedPath = http.GetRequest().mUri;
+  size_t pos = resolvedPath.find(uri[0]);
   if (pos != std::string::npos) {
     resolvedPath.replace(pos, uri[0].size(), alias[0]);
   }
 
   // 데이터 처리
-
   eStatusCode status;
   switch (http.CheckPathType(resolvedPath)) {
   case PATH_IS_DIRECTORY: {
-    // 디렉토리에 대한 POST 요청 처리 (예: 데이터베이스에 데이터 저장)
     status = http.WriteFile(resolvedPath, requestData, PATH_IS_DIRECTORY);
-    // 데이터 처리 후 결과에 따라 상태 코드 설정
-    // http.GetResponse().mStatusCode = writeStatus; // 새 리소스가 생성된
-    // 경우AA http.GetResponse().mStatus = http.GetStatusMessage(writeStatus);
     break;
   }
   case PATH_IS_FILE: {
-    // 파일에 대한 POST 요청 처리 (예: 파일에 데이터 추가)
-    // 데이터 처리 후 결과에 따라 상태 코드 설정
+    std::cout << RED << "PATH_IS_FILE" << RESET << std::endl;
     status = http.WriteFile(resolvedPath, requestData, PATH_IS_FILE);
     break;
   }

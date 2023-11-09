@@ -1,4 +1,5 @@
 #include "CGI.hpp"
+#include "ConfigMap.hpp"
 #include "Enum.hpp"
 
 extern char **environ;
@@ -7,7 +8,7 @@ bool IsCgiRequest(Http &http) {
 
   Node *location = Common::mConfigMap->GetConfigNode(
       http.GetPort(), http.GetRequest().mHost, http.GetRequest().mUri,
-      http.GetRequest().mMethod);
+      http.GetRequest().GetMethod());
   if (location == NULL) {
     return (false);
   }
@@ -23,7 +24,7 @@ void setAllEnv(Http &http) {
 
   Node *location = Common::mConfigMap->GetConfigNode(
       http.GetPort(), http.GetRequest().mHost, http.GetRequest().mUri,
-      http.GetRequest().mMethod);
+      http.GetRequest().GetMethod());
   if (location == NULL) {
     return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
   }
@@ -76,7 +77,7 @@ void setAllEnv(Http &http) {
   setenv("REMOTE_USER", "", 1);
 
   // REQUEST_METHOD: 클라이언트의 요청 방식(GET, POST, HEAD 등).
-  setenv("REQUEST_METHOD", tmp.mMethod.c_str(), 1);
+  setenv("REQUEST_METHOD", tmp.GetMethod().c_str(), 1);
 
   // SCRIPT_NAME: 실행되는 CGI 스크립트의 이름.
   const char *pwd = getenv("PWD");
@@ -115,13 +116,71 @@ void setAllEnv(Http &http) {
   }
 }
 
+eStatusCode CGIResponseParsing(Http &http, std::string &response) {
+  // response parsing
+  std::map<std::string, std::string> headers;
+  std::string body;
+
+  std::istringstream responseStream(response);
+  std::string line;
+  bool headerSection = true;
+
+  while (std::getline(responseStream, line)) {
+    if (!line.empty() && line.back() == '\r') {
+      line.pop_back();
+    }
+
+    if (line.empty()) {
+      headerSection = false;
+      continue;
+    }
+
+    if (headerSection) {
+      std::size_t pos = line.find(": ");
+      if (pos != std::string::npos) {
+        std::string key = line.substr(0, pos);
+        std::string value = line.substr(pos + 2);
+        headers[key] = value;
+      }
+    } else {
+      body += line + "\n";
+    }
+  }
+  if (!body.empty() && body.back() == '\n') {
+    body.pop_back();
+  }
+
+  // cgi 헤더에서 status code 가져오기
+  std::string statusHeader = headers["Status"];
+  statusHeader = statusHeader.substr(0, statusHeader.find(" "));
+
+  eStatusCode statusCode =
+      static_cast<eStatusCode>(std::atoi(statusHeader.c_str()));
+
+  // headers에서 status 헤더 제거
+  headers.erase("Status");
+
+  // response에 cgi 헤더 추가
+  for (std::map<std::string, std::string>::iterator it = headers.begin();
+       it != headers.end(); ++it) {
+    http.GetResponse().mHeaders.insert(
+        std::pair<std::string, std::string>(it->first, it->second));
+  }
+
+  http.GetResponse().mBody = body;
+
+  return (statusCode);
+}
+
 void CGIHandle(Http &http) {
   // 요청 내용을 파일에 쓰기 위한 ofstream 객체 생성
-  std::ofstream requestFile("cgi_request_data.txt",
+  std::string tmpFileName = "cgi_request_" + generateUniqueHash("./tmp");
+  std::string requestFileName = "./tmp/" + tmpFileName + ".txt";
+  std::ofstream requestFile(requestFileName.c_str(),
                             std::ios::out | std::ios::trunc);
   if (!requestFile.is_open()) {
     std::cerr << "Failed to open request temp file." << std::endl;
-    return;
+    return (http.ErrorHandle(SERVER_ERROR_INTERNAL_SERVER_ERROR));
   }
 
   // 요청 내용을 임시 파일에 쓰기
@@ -129,27 +188,29 @@ void CGIHandle(Http &http) {
   requestFile.close(); // 파일 쓰기 완료 후 닫기
 
   // CGI 스크립트 결과를 받을 파일 생성
-  std::string outputFileName = "cgi_output_data.txt";
+  tmpFileName = "cgi_output_" + generateUniqueHash("./tmp");
+  std::string outputFileName = "./tmp/" + tmpFileName + ".txt";
 
   // CGI 스크립트 실행을 위한 프로세스 생성
   pid_t pid = fork();
   if (pid == -1) {
-    std::cerr << "Failed to fork." << std::endl;
-    return;
+    return (http.ErrorHandle(SERVER_ERROR_INTERNAL_SERVER_ERROR));
   } else if (pid == 0) {
     // 자식 프로세스에서 CGI 스크립트 실행
     setAllEnv(http);
 
-    freopen("cgi_request_data.txt", "r", stdin);
+    freopen(requestFileName.c_str(), "r", stdin);
     freopen(outputFileName.c_str(), "w", stdout);
 
-    // 실행할 스크립트 경로 가져오기
-    const char *pwd = getenv("PWD");
-    std::string path_str = std::string(pwd) + "/cgi_tester";
-    const char *c_path_str =
-        path_str.c_str(); // std::string에서 C 스타일 문자열로 변환
-    char *argv[] = {const_cast<char *>("cgi_tester"), NULL};
-    execve(argv[0], argv, environ);
+    // cgi pass 가져오기
+    Node *location = Common::mConfigMap->GetConfigNode(
+        http.GetPort(), http.GetRequest().mHost, http.GetRequest().mUri,
+        http.GetRequest().GetMethod());
+    if (location == NULL) {
+      return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
+    }
+    std::string cgiPass = location->FindValue(location, "cgi_pass")[0];
+    execve(cgiPass.c_str(), NULL, environ);
     // execve 실패 시
     exit(EXIT_FAILURE);
   } else {
@@ -160,70 +221,21 @@ void CGIHandle(Http &http) {
     // CGI 스크립트의 출력을 읽기 위한 ifstream 객체 생성
     std::ifstream responseFile(outputFileName.c_str(), std::ios::in);
     if (!responseFile.is_open()) {
-      std::cerr << "Failed to open response temp file." << std::endl;
-      return;
+      return (http.ErrorHandle(SERVER_ERROR_INTERNAL_SERVER_ERROR));
     }
 
     // 파일 내용을 읽어 응답 객체에 저장
     std::string response((std::istreambuf_iterator<char>(responseFile)),
                          std::istreambuf_iterator<char>());
+
     // response parsing
-    std::map<std::string, std::string> headers;
-    std::string body;
-
-    std::istringstream responseStream(response);
-    std::string line;
-    bool headerSection = true;
-
-    while (std::getline(responseStream, line)) {
-      if (!line.empty() && line.back() == '\r') {
-        line.pop_back();
-      }
-
-      if (line.empty()) {
-        headerSection = false;
-        continue;
-      }
-
-      if (headerSection) {
-        std::size_t pos = line.find(": ");
-        if (pos != std::string::npos) {
-          std::string key = line.substr(0, pos);
-          std::string value = line.substr(pos + 2);
-          headers[key] = value;
-        }
-      } else {
-        body += line + "\n";
-      }
-    }
-    if (!body.empty() && body.back() == '\n') {
-      body.pop_back();
-    }
-
-    // cgi 헤더에서 status code 가져오기
-    std::string statusHeader = headers["Status"];
-    statusHeader = statusHeader.substr(0, statusHeader.find(" "));
-
-    eStatusCode statusCode =
-        static_cast<eStatusCode>(std::atoi(statusHeader.c_str()));
-
-    // headers에서 status 헤더 제거
-    headers.erase("Status");
-
-    // response에 cgi 헤더 추가
-    for (std::map<std::string, std::string>::iterator it = headers.begin();
-         it != headers.end(); ++it) {
-      http.GetResponse().mHeaders.insert(
-          std::pair<std::string, std::string>(it->first, it->second));
-    }
-
-    http.GetResponse().mBody = body;
+    eStatusCode statusCode = CGIResponseParsing(http, response);
 
     // 파일 닫기
     responseFile.close();
 
     // 임시 파일 삭제
-    unlink("cgi_request_data.txt");
+    unlink(requestFileName.c_str());
     unlink(outputFileName.c_str());
 
     // 응답 보내기

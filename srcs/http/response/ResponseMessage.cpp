@@ -1,15 +1,14 @@
-#include "ResponseParser.hpp"
 #include "Http.hpp"
+#include "ResponseParser.hpp"
 
 ResponseParser::ResponseParser() {}
 
 ResponseParser::~ResponseParser() {}
 
-std::string ResponseParser::MakeResponseMessage(Http& http, eStatusCode state)
-{
-  //set mandatory response message
+std::string ResponseParser::MakeResponseMessage(Http &http, eStatusCode state) {
+  // set mandatory response message
   setResponse(http, state);
-  //set response message to std::string
+  // set response message to std::string
   setMessage(http.GetResponse());
   return GetMessage();
 }
@@ -34,11 +33,11 @@ std::vector<char> ResponseParser::GetMessageToVector() {
 
 void ResponseParser::setStatusLine(Response &resp) {
   mMessage += "HTTP/";
-  mMessage += std::to_string(resp.mVersionMajor);
+  mMessage += toString(resp.mVersionMajor);
   mMessage += ".";
-  mMessage += std::to_string(resp.mVersionMinor);
+  mMessage += toString(resp.mVersionMinor);
   mMessage += SP;
-  mMessage += std::to_string(resp.mStatusCode);
+  mMessage += toString(resp.mStatusCode);
   mMessage += SP;
   mMessage += resp.mStatus + CRLF;
 }

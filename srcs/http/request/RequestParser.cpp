@@ -31,7 +31,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
         return CLIENT_ERROR_BAD_REQUEST;
       } else {
         mState = RequestMethod;
-        req.mMethod.push_back(input);
+        req.PushBackMethod(input);
       }
       break;
     case RequestMethod:
@@ -40,13 +40,12 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       } else if (!isChar(input) || isControl(input) || isSpecial(input)) {
         return CLIENT_ERROR_BAD_REQUEST;
       } else {
-        req.mMethod.push_back(input);
+        req.PushBackMethod(input);
       }
       break;
     case RequestUriStart:
-      if (req.mMethod != "GET" && req.mMethod != "POST" &&
-          req.mMethod != "DELETE" && req.mMethod != "PUT" &&
-          req.mMethod != "HEAD") {
+      if (req.GetMethod() != "GET" && req.GetMethod() != "POST" &&
+          req.GetMethod() != "DELETE" && req.GetMethod() != "HEAD") {
         return CLIENT_ERROR_METHOD_NOT_ALLOWED;
       }
       if (isControl(input)) {
@@ -193,7 +192,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       break;
     case HeaderValue:
       if (input == '\r') {
-        if (req.mMethod == "POST" || req.mMethod == "PUT") {
+        if (req.GetMethod() == "POST" || req.GetMethod() == "PUT") {
           if (strcasecmp(mHeaderName.c_str(), "Content-Length") == 0) {
             req.mContentLength = atoi(mHeaderValue.c_str());
             mContentsize = atoi(mHeaderValue.c_str());
@@ -245,7 +244,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       }
 
       if (mChunked) {
-        req.mChunked = true;
+        req.SetChunked(true);
         mState = ChunkSize;
       } else if (mContentsize == 0) {
         if (input == '\n') {

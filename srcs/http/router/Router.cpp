@@ -9,19 +9,14 @@ Router &Router::operator=(const Router &other) { return *this; }
 Router::~Router() {}
 
 IRequestHandler *Router::Routing(Http &http) {
-  // CGI 처리
-  // if (IsCgiRequest(http)) {
-  //   return (new CgiHandler());
-  // }
-  //   다른 요청 처리
-  if (http.GetRequest().mMethod == "GET") {
+  if (http.GetRequest().GetMethod() == "GET") {
     return (new GetHandler());
-  } else if (http.GetRequest().mMethod == "POST") {
+  } else if (http.GetRequest().GetMethod() == "POST") {
     return (new PostHandler());
-  } else if (http.GetRequest().mMethod == "DELETE") {
+  } else if (http.GetRequest().GetMethod() == "DELETE") {
     return (new DeleteHandler());
-  } else if (http.GetRequest().mMethod == "PUT") {
-    return (new PutHandler());
   }
   return (NULL);
 }
+
+GetHandler::~GetHandler() {}

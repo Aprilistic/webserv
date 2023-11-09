@@ -1,0 +1,84 @@
+body {
+	margin: 0;
+	padding: 0;
+	background-color: #353535;
+	color: white;
+	font-family: 'Gothic', sans-serif;
+	height: 100vh;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+}
+
+.header {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.logo {
+	font-size: 1.5em;
+	font-weight: bold;
+}
+
+.navigation {
+	display: flex;
+	gap: 20px;
+}
+
+.nav-link {
+	text-decoration: none;
+	color: white;
+	transition: color 0.3s;
+}
+
+.nav-link:hover {
+	color: #ccc;
+}
+
+.content {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+}
+
+h1 {
+	font-size: 3em;
+	margin: 0 0 15px 0;
+}
+
+hr {
+	width: 100%;
+	max-width: 500px;
+	margin: 5px 0;
+}
+
+p {
+	font-size: 1em;
+	margin-bottom: 40px;
+}
+
+.button {
+	display: inline-block;
+	padding: 10px 20px;
+	text-decoration: none;
+	color: #000;
+	background-color: #fff;
+	border-radius: 20px;
+	transition: background-color 0.3s;
+}
+
+.button:hover {
+	background-color: #555;
+	color: #fff;
+}
+
+.footer {
+	padding: 10px;
+	text-align: center;
+	font-size: 0.8em;
+}

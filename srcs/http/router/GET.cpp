@@ -4,7 +4,7 @@ void GetHandler::Handle(Http &http) {
 
   Node *location = Common::mConfigMap->GetConfigNode(
       http.GetPort(), http.GetRequest().mHost, http.GetRequest().mUri,
-      http.GetRequest().mMethod);
+      http.GetRequest().GetMethod());
 
   // NULL 인경우 -> 일치하는 location이 없고 / 도 설정되어 있지 않은 경우
   if (location == NULL) {
@@ -31,7 +31,6 @@ void GetHandler::Handle(Http &http) {
   size_t pos = resolvedPath.find(uri[0]); // /example
   if (pos != std::string::npos) {
     // resolvedPath = alias + uri
-
     resolvedPath.replace(pos, uri[0].size(), alias[0]);
   }
 
@@ -95,7 +94,6 @@ void GetHandler::Handle(Http &http) {
     return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
   }
   default: { // 언노운 파일
-             // 파일도 디렉토리도 아니면 404 확인필요
     return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
   }
   }

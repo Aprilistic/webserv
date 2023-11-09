@@ -10,8 +10,8 @@ int main(int argc, char **argv) {
     std::cout << "default config" << std::endl;
   } else if (argc == 2) {
 
-  WebServer WebServer(argv[1]);
-  WebServer.Run();
+    WebServer WebServer(argv[1]);
+    WebServer.Run();
   } else {
     std::cout << "Usage: ./" << argv[0] << "[config_file]" << std::endl;
   }

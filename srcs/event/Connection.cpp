@@ -3,19 +3,20 @@
 #include "Router.hpp"
 
 Connection::Connection(int socket, int port)
-    : mSocket(socket), mPort(port), mHttp(socket, port, mSendBuffer) {
+    : mSocket(socket), mPort(port), mKeepAlive(true), mRemainingRequest(0),
+      mHttp(socket, port, mSendBuffer, mKeepAlive, mRemainingRequest) {
   struct kevent events[2];
 
   mRecvBuffer.reserve(RECV_BUFFER_SIZE);
   mSendBuffer.reserve(SEND_BUFFER_SIZE);
 
   fcntl(mSocket, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
-  EV_SET(&events[0], mSocket, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, this);
-  EV_SET(&events[1], mSocket, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, this);
+  EV_SET(&events[0], mSocket, EVFILT_READ, EV_ADD | EV_CLEAR, 0, 0, this);
+  EV_SET(&events[1], mSocket, EVFILT_WRITE, EV_ADD | EV_CLEAR | EV_DISABLE, 0, 0, this);
   kevent(Common::mKqueue, events, 2, NULL, 0, NULL);
 }
 
-Connection::~Connection() { close(mSocket); }
+Connection::~Connection() {}
 
 void Connection::EventHandler(struct kevent &currentEvent) {
   if (currentEvent.flags & EV_ERROR) {
@@ -34,6 +35,9 @@ void Connection::EventHandler(struct kevent &currentEvent) {
   case EVFILT_SIGNAL:
     signalHandler();
     break;
+  case EVFILT_PROC:
+    // processHandler();
+    break;
   default:
     assert("Connection::EventHandler: default" == 0);
     break;
@@ -45,41 +49,54 @@ eStatusCode Connection::readFromSocket() {
 
   ssize_t bytesRead;
   char tmp[RECV_BUFFER_SIZE];
-  bytesRead = recv(mSocket, tmp, RECV_BUFFER_SIZE, 0);
-  mRecvBuffer.insert(mRecvBuffer.end(), tmp, tmp + bytesRead);
+  do {
+    errno = 0;
+    bytesRead = recv(mSocket, tmp, RECV_BUFFER_SIZE, 0);
+    mRecvBuffer.insert(mRecvBuffer.end(), tmp, tmp + bytesRead);
 
-  if (bytesRead <= 0) {
-    if (bytesRead < 0) {
-      // error
-      return (SERVER_ERROR_INTERNAL_SERVER_ERROR);
+  } while (bytesRead > 0);
+
+  if (bytesRead == -1) {
+    if (errno == EWOULDBLOCK || errno == EAGAIN) {
+      return (READ_OK);
     }
-
-    // disconnection();
-    return (SERVER_SERVICE_UNAVAILABLE);
   }
-  return (READ_OK);
+  disconnect();
+  return (SERVER_ERROR_INTERNAL_SERVER_ERROR);
 }
 
 void Connection::readHandler() {
 
   eStatusCode state = readFromSocket();
 
-  //   mHttp.SetRequest(state, mPort, mSocket, mRecvBuffer);
   mHttp.SetRequest(state, mRecvBuffer);
+
+  struct kevent event;
+  EV_SET(&event, mSocket, EVFILT_WRITE, EV_ENABLE | EV_ADD, 0, 0, this);
+  kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
 }
 
 void Connection::writeHandler() {
-  ssize_t bytesSent = send(mSocket, mSendBuffer.c_str(), mSendBuffer.size(),
-                           0); //   mSendBuffer.clear();
+  ssize_t bytesSent = send(mSocket, mSendBuffer.c_str(), mSendBuffer.size(), 0);
 
   if (bytesSent == -1) {
     // 에러 처리
-    
+    disconnect();
   } else {
     // bytesSent 만큼 벡터에서 제거
     mSendBuffer.erase(mSendBuffer.begin(), mSendBuffer.begin() + bytesSent);
   }
 
+  if (mSendBuffer.empty()) {
+    struct kevent event;
+    EV_SET(&event, mSocket, EVFILT_WRITE, EV_DISABLE, 0, 0, this);
+    kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
+
+    if (mKeepAlive == false && mRemainingRequest == 0) {
+      disconnect();
+      return;
+    }
+  }
 }
 
 void Connection::timerHandler() {
@@ -88,4 +105,13 @@ void Connection::timerHandler() {
 
 void Connection::signalHandler() {
   // error
+}
+
+void Connection::disconnect() {
+  struct kevent events[2];
+  EV_SET(&events[0], mSocket, EVFILT_READ, EV_DELETE, 0, 0, NULL);
+  EV_SET(&events[1], mSocket, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
+  kevent(Common::mKqueue, events, 2, NULL, 0, NULL);
+
+  close(mSocket);
 }

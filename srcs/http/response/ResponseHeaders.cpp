@@ -30,6 +30,20 @@ std::string ResponseParser::getStatusMessage(eStatusCode errorStatus) {
     return ("Partial Content");
   case (REDIRECT):
     return ("Redirect");
+  case (REDIRECTION_MOVED_PERMANENTLY):
+    return ("Moved Permanently");
+  case (REDIRECTION_FOUND):
+    return ("Found");
+  case (REDIRECTION_SEE_OTHER):
+    return ("See Other");
+  case (REDIRECTION_NOT_MODIFIED):
+    return ("Not Modified");
+  case (REDIRECTION_USE_PROXY):
+    return ("Use Proxy");
+  case (REDIRECTION_TEMPORARY_REDIRECT):
+    return ("Temporary Redirect");
+  case (REDIRECTION_PERMANENT_REDIRECT): 
+    return ("Permanent Redirect");
   case (CLIENT_ERROR_BAD_REQUEST):
     return ("Bad Request");
   case (CLIENT_ERROR_UNAUTHORIZED):
@@ -40,6 +54,8 @@ std::string ResponseParser::getStatusMessage(eStatusCode errorStatus) {
     return ("Not Found");
   case (CLIENT_ERROR_METHOD_NOT_ALLOWED):
     return ("Method Not Allowed");
+  case (CLIENT_ERROR_CONTENT_TOO_LARGE):
+    return ("Content Too Large");
   case (CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE):
     return ("Unsupported Media Type");
   case (CLIENT_ERROR_RANGE_NOT_SATISFIABLE):
@@ -58,12 +74,6 @@ std::string ResponseParser::getStatusMessage(eStatusCode errorStatus) {
 }
 
 std::string ResponseParser::getFileType(Http &http) {
-  if (http.GetRequest().mMethod == "POST") {
-    return (http.GetRequest().mContentType);
-  } else if (http.GetRequest().mMethod == "PUT" &&
-             http.GetResponse().mBody.size() != 0) {
-    return (http.GetRequest().mContentType);
-  }
   std::string filepath = http.GetResponse().mFilename;
   if (filepath == "autoindex") {
     return ("text/html");
@@ -112,7 +122,7 @@ void ResponseParser::setMandatoryHeaderFields(Http &http) {
       std::pair<std::string, std::string>("Server", "*u*king webserv"));
 
   // Content-Length
-  std::string contentLength = std::to_string(http.GetResponse().mBody.size());
+  std::string contentLength = toString(http.GetResponse().mBody.size());
   http.GetResponse().mHeaders.insert(
       std::pair<std::string, std::string>("Content-Length", contentLength));
 

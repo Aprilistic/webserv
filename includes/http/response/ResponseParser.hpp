@@ -15,24 +15,25 @@ public:
   ResponseParser();
   ~ResponseParser();
 
-  std::string MakeResponseMessage(Http& http, eStatusCode state);
-  
+  std::string MakeResponseMessage(Http &http, eStatusCode state);
+
   std::string GetMessage() const;
   std::vector<char> GetMessageToVector();
 
 private:
-  //set mandatory response message
+  // set mandatory response message
   void setResponse(Http &http, eStatusCode state);
   void setStatusLine(Http &http, eStatusCode state);
-  void setMandatoryHeaderFields(Http& http);
+  void setMandatoryHeaderFields(Http &http);
   std::string getStatusMessage(eStatusCode errorStatus);
-  std::string getFileType(Http& http);
+  std::string getFileType(Http &http);
 
-  //set response message to std::string
+  // set response message to std::string
   void setMessage(Response &resp);
   void setStatusLine(Response &resp);
   void setHeaderFields(Response &resp);
   void setBody(Response &resp);
+
 private:
   std::string mMessage;
 };

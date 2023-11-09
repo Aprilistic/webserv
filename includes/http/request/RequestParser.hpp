@@ -12,18 +12,13 @@ public:
   std::string GetRemainingBuffer(void);
 
 private:
-  // static bool checkIfConnection(const Request::HeaderItem &item);
   static bool
   checkIfConnection(const std::pair<const std::string, std::string> &item);
   eStatusCode consume(Request &req, const char *begin, const char *end);
-  // Check if a byte is an HTTP character.
-  inline bool isChar(int c);
-  // Check if a byte is an HTTP control character.
-  inline bool isControl(int c);
-  // Check if a byte is defined as an HTTP special character.
-  inline bool isSpecial(int c);
-  // Check if a byte is a digit.
-  inline bool isDigit(int c);
+  inline bool isChar(int c);    // Check HTTP character.
+  inline bool isControl(int c); // Check HTTP control character.
+  inline bool isSpecial(int c); // Check HTTP special character.
+  inline bool isDigit(int c);   // Check a digit.
 
 public:
   size_t mContentsize;

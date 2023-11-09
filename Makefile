@@ -13,6 +13,8 @@ INCLUDES = -I ./includes \
 			-I ./includes/http/response
 OBJ_DIR = objs
 
+TMP_DIR = tmp
+
 SRCS := $(wildcard srcs/*.cpp) \
 		$(wildcard srcs/utils/*.cpp) \
 		$(wildcard srcs/core/*.cpp) \
@@ -28,17 +30,19 @@ SRCS_DIR := $(dir $(SRCS))
 
 OBJS := $(addprefix $(OBJ_DIR)/, $(notdir $(SRCS:.cpp=.o)))
 
-
 DEPS = $(OBJS:.o=.d)
 
 vpath %.cpp $(SRCS_DIR)
 
-all : $(OBJ_DIR) $(NAME)
+all : $(OBJ_DIR) $(TMP_DIR) $(NAME)
 
 $(NAME) : $(OBJS)
 	$(CXX) $(LDFLAGS) -o $@ $^
 
 $(OBJ_DIR) :
+	mkdir $@
+
+$(TMP_DIR) :
 	mkdir $@
 
 $(OBJ_DIR)/%.o : %.cpp
@@ -47,8 +51,10 @@ $(OBJ_DIR)/%.o : %.cpp
 clean :
 	rm -rf $(OBJ_DIR)
 	rm -rf ./$(NAME).dSYM
+	rm -f ./tmp/*
 
 fclean : clean
+	rm -rf $(TMP_DIR)
 	rm -f webserv
 	rm -f leaks.txt
 

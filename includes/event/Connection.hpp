@@ -6,8 +6,8 @@
 #include "Http.hpp"
 #include "IEventHandler.hpp"
 
-#define RECV_BUFFER_SIZE 4096
-#define SEND_BUFFER_SIZE 4096
+#define RECV_BUFFER_SIZE 16384
+#define SEND_BUFFER_SIZE 16384
 
 class Connection : public IEventHandler {
 public:
@@ -21,13 +21,14 @@ private:
   void writeHandler();
   void timerHandler();
   void signalHandler();
-
+  void disconnect();
 private:
   int mSocket;
   int mPort;
+  bool mKeepAlive;
+  int mRemainingRequest;
   Http mHttp;
   std::vector<char> mRecvBuffer;
-//   std::vector<char> mSendBuffer;
   std::string mSendBuffer;
 };
 
