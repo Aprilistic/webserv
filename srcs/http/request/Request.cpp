@@ -30,9 +30,9 @@ bool Request::GetKeepAlive() const { return mKeepAlive; }
 
 bool Request::GetChunked() const { return mChunked; }
 
-void Request::SetChunked(bool chunked) { mChunked = chunked; }
+void Request::PushBackMethod(char &c) { mMethod.push_back(c); }
 
-void Request::SetMethod(const std::string &method) { mMethod = method; }
+void Request::SetChunked(bool chunked) { mChunked = chunked; }
 
 void Request::SetUri(const std::string &uri) { mUri = uri; }
 

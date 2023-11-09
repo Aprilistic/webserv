@@ -10,7 +10,7 @@ Http::~Http() {}
 
 void Http::RedirectURI() {
   Node *location = Common::mConfigMap->GetConfigNode(
-      mPort, mRequest.mHost, mRequest.mUri, mRequest.mMethod);
+      mPort, mRequest.mHost, mRequest.mUri, mRequest.GetMethod());
 
   std::vector<std::string> redirectValues =
       location->FindValue(location, "return");
@@ -26,7 +26,7 @@ void Http::RedirectURI() {
 
 void Http::ErrorHandle(eStatusCode errorStatus) {
   Node *location = Common::mConfigMap->GetConfigNode(
-      mPort, mRequest.mHost, mRequest.mUri, mRequest.mMethod);
+      mPort, mRequest.mHost, mRequest.mUri, mRequest.GetMethod());
 
   std::vector<std::string> configErrorPageValues =
       location->FindValue(location, "error_page");
@@ -199,7 +199,7 @@ eStatusCode Http::priorityHeaders() {
 
 bool Http::checkRedirect() {
   Node *location = Common::mConfigMap->GetConfigNode(
-      mPort, mRequest.mHost, mRequest.mUri, mRequest.mMethod);
+      mPort, mRequest.mHost, mRequest.mUri, mRequest.GetMethod());
 
   int redirectCode;
   std::string redirectPath;
@@ -229,7 +229,7 @@ bool Http::checkRedirect() {
 
 bool Http::checkClientMaxBodySize() {
   Node *location = Common::mConfigMap->GetConfigNode(
-      mPort, mRequest.mHost, mRequest.mUri, mRequest.mMethod);
+      mPort, mRequest.mHost, mRequest.mUri, mRequest.GetMethod());
 
   std::vector<std::string> clientMaxBodySizeValues =
       location->FindValue(location, "client_max_body_size");
@@ -262,16 +262,16 @@ bool Http::checkClientMaxBodySize() {
 
 bool Http::checkLimitExcept() {
   Node *location = Common::mConfigMap->GetConfigNode(
-      mPort, mRequest.mHost, mRequest.mUri, mRequest.mMethod);
+      mPort, mRequest.mHost, mRequest.mUri, mRequest.GetMethod());
 
   std::vector<std::string> limitExceptValue =
       location->FindValue(location, "limit_except"); // 초기화가 필요합니다.
   if (limitExceptValue.size()) {
     if (std::find(limitExceptValue.begin(), limitExceptValue.end(),
-                  mRequest.mMethod) == limitExceptValue.end()) {
+                  mRequest.GetMethod()) == limitExceptValue.end()) {
       return (false);
     }
-  } else if (mRequest.mMethod == "POST" || mRequest.mMethod == "HEAD") {
+  } else if (mRequest.GetMethod() == "POST" || mRequest.GetMethod() == "HEAD") {
     return (false);
   }
   return (true);
