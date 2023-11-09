@@ -41,10 +41,10 @@ Server::Server(int port) : mPort(port) {
 
   struct kevent events[2];
 
-  EV_SET(&events[0], mSocket, EVFILT_READ, EV_ADD | EV_CLEAR, 0, 0, this);
-  EV_SET(&events[1], mSocket, EVFILT_WRITE, EV_ADD | EV_CLEAR, 0, 0, this);
+  EV_SET(&events[0], mSocket, EVFILT_READ, EV_ADD, 0, 0, this);
+  // EV_SET(&events[1], mSocket, EVFILT_WRITE, EV_ADD | EV_CLEAR, 0, 0, this);
 
-  kevent(Common::mKqueue, events, 4, NULL, 0, NULL);
+  kevent(Common::mKqueue, events, 1, NULL, 0, NULL);
 
   //   struct timespec *timeout = NULL; // wait indefinitely
   //   int n = kevent(mWebServer->GetKqueue(), NULL, 0, events, 1, timeout);
@@ -54,8 +54,8 @@ Server::~Server() {
   // Remove the socket from the mKqueue
   struct kevent events[2];
   EV_SET(&events[0], mSocket, EVFILT_READ, EV_DELETE, 0, 0, NULL);
-  EV_SET(&events[1], mSocket, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
-  kevent(Common::mKqueue, events, 2, NULL, 0, NULL);
+  // EV_SET(&events[1], mSocket, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
+  kevent(Common::mKqueue, events, 1, NULL, 0, NULL);
 
   // Close the socket
   mConnection.clear();
@@ -88,7 +88,8 @@ void Server::EventHandler(struct kevent &currentEvent) {
 void Server::readHandler() {
   int socket = accept(mSocket, NULL, NULL);
   if (socket == -1) {
-    // error
+    std::cout << RED << "Error: Failed to accept the connection: "
+              << std::string(strerror(errno)) << RESET << std::endl;
   }
 
   mConnection[socket] = SharedPtr<Connection>(new Connection(socket, mPort));

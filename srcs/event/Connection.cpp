@@ -12,8 +12,8 @@ Connection::Connection(int socket, int port)
 
   fcntl(mSocket, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
   EV_SET(&events[0], mSocket, EVFILT_READ, EV_ADD | EV_CLEAR, 0, 0, this);
-  EV_SET(&events[1], mSocket, EVFILT_WRITE, EV_ADD | EV_DISABLE, 0, 0, this);
-  kevent(Common::mKqueue, events, 1, NULL, 0, NULL);
+  EV_SET(&events[1], mSocket, EVFILT_WRITE, EV_ADD | EV_CLEAR | EV_DISABLE, 0, 0, this);
+  kevent(Common::mKqueue, events, 2, NULL, 0, NULL);
 }
 
 Connection::~Connection() {}
@@ -47,18 +47,20 @@ void Connection::EventHandler(struct kevent &currentEvent) {
 eStatusCode Connection::readFromSocket() {
   mRecvBuffer.clear();
 
-  errno = 0;
   ssize_t bytesRead;
   char tmp[RECV_BUFFER_SIZE];
   do {
+    errno = 0;
     bytesRead = recv(mSocket, tmp, RECV_BUFFER_SIZE, 0);
     mRecvBuffer.insert(mRecvBuffer.end(), tmp, tmp + bytesRead);
+
   } while (bytesRead > 0);
 
   if (bytesRead == -1) {
     if (errno == EWOULDBLOCK || errno == EAGAIN) {
       return (READ_OK);
     }
+    return (READ_OK);
   }
   disconnect();
   return (SERVER_ERROR_INTERNAL_SERVER_ERROR);
