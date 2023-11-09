@@ -15,6 +15,7 @@
 #define DEFAULT_ERROR_PAGE_PATH "./www/error/default.html"
 
 class IRequestHandler;
+class CGI;
 
 class Http {
 public:
@@ -43,7 +44,7 @@ public:
   Response &GetResponse(void);
   std::string &GetSendBuffer(void);
   ResponseParser &GetResponseParser(void);
-
+  
   
 private:
   void handleHTTPRequest(void);
@@ -67,6 +68,7 @@ private:
   bool &mKeepAlive;
   int &mRemainingRequest;
   std::string &mSendBufferRef;
+  std::vector<SharedPtr<CGI> > mCGIList;
 };
 
 #endif

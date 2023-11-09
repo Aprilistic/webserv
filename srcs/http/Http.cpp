@@ -183,10 +183,10 @@ void Http::HandleRequestType() {
 }
 
 void Http::handleCGIRequest() {
-  // SharedPtr<CGI> cgiRequest(new CGI(*this));
-  CGI *cgiRequest = new CGI(*this);
+  SharedPtr<CGI> cgiRequest(new CGI(*this));
+  // CGI *cgiRequest = new CGI(*this);
   // CGI cgiRequest(*this);
-
+  mCGIList.push_back(cgiRequest);
   cgiRequest->CgiHandle();
 }
 
@@ -201,7 +201,7 @@ void Http::handleHTTPRequest() {
   IRequestHandler *method = Router::Routing(*this);
 
   method->Handle(*this);
-  // delete(method);
+  delete(method);
 }
 
 eStatusCode Http::priorityHeaders() {
