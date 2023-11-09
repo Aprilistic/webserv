@@ -54,18 +54,14 @@ eStatusCode Connection::readFromSocket() {
     mRecvBuffer.insert(mRecvBuffer.end(), tmp, tmp + bytesRead);
   } while (bytesRead > 0);
 
-  std::cout << "last read byte: " << bytesRead << std::endl;
   if (bytesRead <= 0) {
     if (bytesRead < 0) {
       if (errno != EWOULDBLOCK && errno != EAGAIN) {
         disconnect();
-        return (SERVER_ERROR_INTERNAL_SERVER_ERROR);
       }
       return (SERVER_ERROR_INTERNAL_SERVER_ERROR);
     }
-    if (bytesRead == 0) {
-      disconnect();
-    }
+    disconnect();
     return (SERVER_SERVICE_UNAVAILABLE);
   }
   return (READ_OK);
@@ -89,7 +85,6 @@ void Connection::writeHandler() {
 
   if (bytesSent == -1) {
     // 에러 처리
-    std::cout << RED << "1" << RESET << std::endl;
     disconnect();
   } else {
     // bytesSent 만큼 벡터에서 제거
