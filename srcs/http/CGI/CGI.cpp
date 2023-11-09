@@ -217,8 +217,10 @@ eStatusCode CGI::cgiResponseParsing(std::string &response) {
 }
 
 void CGI::CgiHandle() {
+  static int cnt;
   // 요청 내용을 파일에 쓰기 위한 ofstream 객체 생성
-  std::string tmpFileName = "cgi_request_" + generateUniqueHash("./tmp");
+  // std::string tmpFileName = "cgi_request_" + generateUniqueHash("./tmp");
+  std::string tmpFileName = "cgi_request_" + std::to_string(cnt);
   mRequestFileName = "./tmp/" + tmpFileName + ".txt";
   std::ofstream requestFile(mRequestFileName.c_str(),
                             std::ios::out | std::ios::trunc);
@@ -227,12 +229,14 @@ void CGI::CgiHandle() {
     return (mHttp.ErrorHandle(SERVER_ERROR_INTERNAL_SERVER_ERROR));
   }
 
+  std::cout<<"count: "<<cnt<<std::endl;
   // 요청 내용을 임시 파일에 쓰기
   requestFile << mHttp.GetRequest().mContent;
   requestFile.close(); // 파일 쓰기 완료 후 닫기
 
   // CGI 스크립트 결과를 받을 파일 생성
-  tmpFileName = "cgi_output_" + generateUniqueHash("./tmp");
+  // tmpFileName = "cgi_output_" + generateUniqueHash("./tmp");
+  tmpFileName = "cgi_output_" + std::to_string(cnt++);
   mOutputFileName = "./tmp/" + tmpFileName + ".txt";
 
   // CGI 스크립트 실행을 위한 프로세스 생성
