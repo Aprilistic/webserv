@@ -116,7 +116,7 @@ void setAllEnv(Http &http) {
   }
 }
 
-eStatusCode CGIResponseParsing(Http &http) {
+eStatusCode CGIResponseParsing(Http &http, std::string &response) {
   // response parsing
   std::map<std::string, std::string> headers;
   std::string body;
@@ -229,7 +229,7 @@ void CGIHandle(Http &http) {
                          std::istreambuf_iterator<char>());
 
     // response parsing
-    eStatusCode statusCode = CGIResponseParsing(http);
+    eStatusCode statusCode = CGIResponseParsing(http, response);
 
     // 파일 닫기
     responseFile.close();
