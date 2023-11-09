@@ -18,8 +18,11 @@ public:
   int GetContentLength() const;
   std::string GetContentType() const;
   bool GetKeepAlive() const;
+  bool GetChunked() const;
 
-  void SetMethod(const std::string &method);
+  void PushBackMethod(char &input);
+
+  void SetChunked(bool chunked);
   void SetUri(const std::string &uri);
   void SetVersionMajor(int versionMajor);
   void SetVersionMinor(int versionMinor);
@@ -32,9 +35,11 @@ public:
 
   std::string Inspect() const;
 
-public:
-  bool mChunked;
+private:
   std::string mMethod;
+  bool mChunked;
+
+public:
   std::string mUri;
   int mVersionMajor;
   int mVersionMinor;

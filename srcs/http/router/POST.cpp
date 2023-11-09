@@ -21,7 +21,7 @@ void PostHandler::Handle(Http &http) {
   // URI로 리소스 위치 확인
   Node *location = Common::mConfigMap->GetConfigNode(
       http.GetPort(), http.GetRequest().mHost, http.GetRequest().mUri,
-      http.GetRequest().mMethod);
+      http.GetRequest().GetMethod());
   if (location == NULL) {
     return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
   }

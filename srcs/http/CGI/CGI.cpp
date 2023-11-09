@@ -8,7 +8,7 @@ bool IsCgiRequest(Http &http) {
 
   Node *location = Common::mConfigMap->GetConfigNode(
       http.GetPort(), http.GetRequest().mHost, http.GetRequest().mUri,
-      http.GetRequest().mMethod);
+      http.GetRequest().GetMethod());
   if (location == NULL) {
     return (false);
   }
@@ -24,7 +24,7 @@ void setAllEnv(Http &http) {
 
   Node *location = Common::mConfigMap->GetConfigNode(
       http.GetPort(), http.GetRequest().mHost, http.GetRequest().mUri,
-      http.GetRequest().mMethod);
+      http.GetRequest().GetMethod());
   if (location == NULL) {
     return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
   }
@@ -77,7 +77,7 @@ void setAllEnv(Http &http) {
   setenv("REMOTE_USER", "", 1);
 
   // REQUEST_METHOD: 클라이언트의 요청 방식(GET, POST, HEAD 등).
-  setenv("REQUEST_METHOD", tmp.mMethod.c_str(), 1);
+  setenv("REQUEST_METHOD", tmp.GetMethod().c_str(), 1);
 
   // SCRIPT_NAME: 실행되는 CGI 스크립트의 이름.
   const char *pwd = getenv("PWD");
@@ -205,7 +205,7 @@ void CGIHandle(Http &http) {
     // cgi pass 가져오기
     Node *location = Common::mConfigMap->GetConfigNode(
         http.GetPort(), http.GetRequest().mHost, http.GetRequest().mUri,
-        http.GetRequest().mMethod);
+        http.GetRequest().GetMethod());
     if (location == NULL) {
       return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
     }

@@ -9,11 +9,11 @@ Router &Router::operator=(const Router &other) { return *this; }
 Router::~Router() {}
 
 IRequestHandler *Router::Routing(Http &http) {
-  if (http.GetRequest().mMethod == "GET") {
+  if (http.GetRequest().GetMethod() == "GET") {
     return (new GetHandler());
-  } else if (http.GetRequest().mMethod == "POST") {
+  } else if (http.GetRequest().GetMethod() == "POST") {
     return (new PostHandler());
-  } else if (http.GetRequest().mMethod == "DELETE") {
+  } else if (http.GetRequest().GetMethod() == "DELETE") {
     return (new DeleteHandler());
   }
   return (NULL);

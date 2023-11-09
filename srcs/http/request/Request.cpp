@@ -28,7 +28,11 @@ std::string Request::GetContentType() const { return mContentType; }
 
 bool Request::GetKeepAlive() const { return mKeepAlive; }
 
-void Request::SetMethod(const std::string &method) { mMethod = method; }
+bool Request::GetChunked() const { return mChunked; }
+
+void Request::PushBackMethod(char &c) { mMethod.push_back(c); }
+
+void Request::SetChunked(bool chunked) { mChunked = chunked; }
 
 void Request::SetUri(const std::string &uri) { mUri = uri; }
 
