@@ -75,7 +75,7 @@ void Connection::readHandler() {
   mHttp.SetRequest(state, mRecvBuffer);
 
   struct kevent event;
-  EV_SET(&event, mSocket, EVFILT_WRITE, EV_ENABLE, 0, 0, this);
+  EV_SET(&event, mSocket, EVFILT_WRITE, EV_ENABLE | EV_ADD, 0, 0, this);
   kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
 }
 
