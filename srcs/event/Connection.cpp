@@ -60,7 +60,6 @@ eStatusCode Connection::readFromSocket() {
     if (errno == EWOULDBLOCK || errno == EAGAIN) {
       return (READ_OK);
     }
-    return (READ_OK);
   }
   disconnect();
   return (SERVER_ERROR_INTERNAL_SERVER_ERROR);
@@ -70,7 +69,6 @@ void Connection::readHandler() {
 
   eStatusCode state = readFromSocket();
 
-  //   mHttp.SetRequest(state, mPort, mSocket, mRecvBuffer);
   mHttp.SetRequest(state, mRecvBuffer);
 
   struct kevent event;
@@ -79,8 +77,7 @@ void Connection::readHandler() {
 }
 
 void Connection::writeHandler() {
-  ssize_t bytesSent = send(mSocket, mSendBuffer.c_str(), mSendBuffer.size(),
-                           0); //   mSendBuffer.clear();
+  ssize_t bytesSent = send(mSocket, mSendBuffer.c_str(), mSendBuffer.size(), 0);
 
   if (bytesSent == -1) {
     // 에러 처리
@@ -111,10 +108,10 @@ void Connection::signalHandler() {
 }
 
 void Connection::disconnect() {
-
   struct kevent events[2];
   EV_SET(&events[0], mSocket, EVFILT_READ, EV_DELETE, 0, 0, NULL);
   EV_SET(&events[1], mSocket, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
   kevent(Common::mKqueue, events, 2, NULL, 0, NULL);
+
   close(mSocket);
 }
