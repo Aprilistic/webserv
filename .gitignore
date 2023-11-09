@@ -39,3 +39,7 @@ leaks.txt
 
 # vscode
 .vscode
+
+# tmp
+tmp
+tmp/*
