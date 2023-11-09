@@ -1,7 +1,6 @@
 #ifndef HTTP_HPP
 #define HTTP_HPP
 
-#include "CGI.hpp"
 #include "Common.hpp"
 #include "ConfigMap.hpp"
 #include "Core.hpp"
@@ -28,6 +27,7 @@ public:
                         eStatusCode pathType);
   eStatusCode CheckPathType(const std::string &path);
 
+  bool IsCgiRequest();
   void RedirectURI();
   void ErrorHandle(eStatusCode errorStatus);
   void HandleRequestType(void);
@@ -44,6 +44,7 @@ public:
   std::string &GetSendBuffer(void);
   ResponseParser &GetResponseParser(void);
 
+  
 private:
   void handleHTTPRequest(void);
   void handleCGIRequest(void);

@@ -110,6 +110,21 @@ eStatusCode Http::CheckPathType(const std::string &path) {
   }
 }
 
+bool Http::IsCgiRequest() {
+
+  Node *location = Common::mConfigMap->GetConfigNode(
+      mPort, GetRequest().mHost, GetRequest().mUri, GetRequest().GetMethod());
+  if (location == NULL) {
+    return (false);
+  }
+
+  std::vector<std::string> cgi_pass = location->FindValue(location, "cgi_pass");
+  if (cgi_pass.size()) {
+    return (true);
+  }
+  return (false);
+}
+
 void Http::SetRequest(eStatusCode state, std::vector<char> &RecvBuffer) {
   if (state != READ_OK) {
     if (state == SERVER_SERVICE_UNAVAILABLE) {
@@ -160,14 +175,20 @@ void Http::SendResponse(eStatusCode state) {
 }
 
 void Http::HandleRequestType() {
-  if (IsCgiRequest(*this)) {
+  if (IsCgiRequest()) {
     handleCGIRequest();
   } else {
     handleHTTPRequest();
   }
 }
 
-void Http::handleCGIRequest() { CGIHandle(*this); }
+void Http::handleCGIRequest() {
+  // SharedPtr<CGI> cgiRequest(new CGI(*this));
+  CGI *cgiRequest = new CGI(*this);
+  // CGI cgiRequest(*this);
+
+  cgiRequest->CgiHandle();
+}
 
 void Http::handleHTTPRequest() {
   eStatusCode state = priorityHeaders();
