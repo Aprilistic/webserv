@@ -122,29 +122,33 @@ void Http::SetRequest(eStatusCode state, std::vector<char> &RecvBuffer) {
   mBuffer += temp;
 
   mRequest.mContent.reserve(100000000);
-  eStatusCode ParseState = mRequestParser.Parse(
-      mRequest, mBuffer.c_str(), mBuffer.c_str() + mBuffer.size());
+  while (true) {
+    eStatusCode ParseState = mRequestParser.Parse(
+        mRequest, mBuffer.c_str(), mBuffer.c_str() + mBuffer.size());
 
-  if (ParseState == PARSING_ERROR) {
-    mBuffer.clear();
-    return (ErrorHandle(ParseState));
-  } else if (ParseState == PARSING_INCOMPLETED) {
-    mBuffer.clear();
-    return;
-  } else if (ParseState == PARSING_COMPLETED) {
-    // If Connection: close, never read again from socket
-    if (mRequest.mKeepAlive == false) {
-      mKeepAlive = false;
-      struct kevent event;
-      EV_SET(&event, mSocket, EVFILT_READ, EV_DELETE, 0, 0, NULL);
-      kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
+    if (ParseState == PARSING_ERROR) {
+      mBuffer.clear();
+      return (ErrorHandle(ParseState));
+    } else if (ParseState == PARSING_INCOMPLETED) {
+      mBuffer.clear();
+      return;
+    } else if (ParseState == PARSING_COMPLETED) {
+      // If Connection: close, never read again from socket
+
+      if (mRequest.mKeepAlive == false) {
+        mKeepAlive = false;
+        struct kevent event;
+        EV_SET(&event, mSocket, EVFILT_READ, EV_DISABLE, 0, 0, NULL);
+        kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
+      }
+      mRemainingRequest++; // remaining request count
+
+      Log(info, request, "Request", *this);
+      mBuffer = mRequestParser.GetRemainingBuffer();
+      HandleRequestType();
     }
-    mRemainingRequest++; // remaining request count
-
-    Log(info, request, "Request", *this);
-    mBuffer = mRequestParser.GetRemainingBuffer();
-    HandleRequestType();
   }
+  // std::cout << RED << "2" << RESET << std::endl;
 }
 
 void Http::SendResponse(eStatusCode state) {

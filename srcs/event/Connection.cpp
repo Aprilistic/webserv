@@ -11,9 +11,9 @@ Connection::Connection(int socket, int port)
   mSendBuffer.reserve(SEND_BUFFER_SIZE);
 
   fcntl(mSocket, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
-  EV_SET(&events[0], mSocket, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, this);
-  EV_SET(&events[1], mSocket, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, this);
-  kevent(Common::mKqueue, events, 2, NULL, 0, NULL);
+  EV_SET(&events[0], mSocket, EVFILT_READ, EV_ADD | EV_CLEAR, 0, 0, this);
+  EV_SET(&events[1], mSocket, EVFILT_WRITE, EV_ADD | EV_DISABLE, 0, 0, this);
+  kevent(Common::mKqueue, events, 1, NULL, 0, NULL);
 }
 
 Connection::~Connection() {}
@@ -49,16 +49,23 @@ eStatusCode Connection::readFromSocket() {
 
   ssize_t bytesRead;
   char tmp[RECV_BUFFER_SIZE];
-  bytesRead = recv(mSocket, tmp, RECV_BUFFER_SIZE, 0);
-  mRecvBuffer.insert(mRecvBuffer.end(), tmp, tmp + bytesRead);
+  do {
+    bytesRead = recv(mSocket, tmp, RECV_BUFFER_SIZE, 0);
+    mRecvBuffer.insert(mRecvBuffer.end(), tmp, tmp + bytesRead);
+  } while (bytesRead > 0);
 
+  std::cout << "last read byte: " << bytesRead << std::endl;
   if (bytesRead <= 0) {
     if (bytesRead < 0) {
-      // error
+      if (errno != EWOULDBLOCK && errno != EAGAIN) {
+        disconnect();
+        return (SERVER_ERROR_INTERNAL_SERVER_ERROR);
+      }
       return (SERVER_ERROR_INTERNAL_SERVER_ERROR);
     }
-
-    // disconnection();
+    if (bytesRead == 0) {
+      disconnect();
+    }
     return (SERVER_SERVICE_UNAVAILABLE);
   }
   return (READ_OK);
@@ -70,6 +77,10 @@ void Connection::readHandler() {
 
   //   mHttp.SetRequest(state, mPort, mSocket, mRecvBuffer);
   mHttp.SetRequest(state, mRecvBuffer);
+
+  struct kevent event;
+  EV_SET(&event, mSocket, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, this);
+  kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
 }
 
 void Connection::writeHandler() {
@@ -78,6 +89,7 @@ void Connection::writeHandler() {
 
   if (bytesSent == -1) {
     // 에러 처리
+    std::cout << RED << "1" << RESET << std::endl;
     disconnect();
   } else {
     // bytesSent 만큼 벡터에서 제거
@@ -85,6 +97,10 @@ void Connection::writeHandler() {
   }
 
   if (mSendBuffer.empty()) {
+    struct kevent event;
+    EV_SET(&event, mSocket, EVFILT_WRITE, EV_DELETE, 0, 0, this);
+    kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
+
     if (mKeepAlive == false && mRemainingRequest == 0) {
       disconnect();
       return;
@@ -100,4 +116,11 @@ void Connection::signalHandler() {
   // error
 }
 
-void Connection::disconnect() { close(mSocket); }
+void Connection::disconnect() {
+
+  struct kevent events[2];
+  EV_SET(&events[0], mSocket, EVFILT_READ, EV_DELETE, 0, 0, NULL);
+  EV_SET(&events[1], mSocket, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
+  kevent(Common::mKqueue, events, 2, NULL, 0, NULL);
+  close(mSocket);
+}
