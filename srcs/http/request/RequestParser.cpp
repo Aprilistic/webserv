@@ -244,7 +244,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       }
 
       if (mChunked) {
-        req.mChunked = true;
+        req.SetChunked(true);
         mState = ChunkSize;
       } else if (mContentsize == 0) {
         if (input == '\n') {

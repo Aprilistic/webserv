@@ -18,7 +18,9 @@ public:
   int GetContentLength() const;
   std::string GetContentType() const;
   bool GetKeepAlive() const;
+  bool GetChunked() const;
 
+  void SetChunked(bool chunked);
   void SetMethod(const std::string &method);
   void SetUri(const std::string &uri);
   void SetVersionMajor(int versionMajor);
@@ -32,8 +34,10 @@ public:
 
   std::string Inspect() const;
 
-public:
+private:
   bool mChunked;
+
+public:
   std::string mMethod;
   std::string mUri;
   int mVersionMajor;

@@ -239,7 +239,7 @@ bool Http::checkClientMaxBodySize() {
   int valueSize =
       std::atoi(clientMaxBodySizeValues[0].c_str()); // overflow, k,M,G check
 
-  if (mRequest.mChunked == true) {
+  if (mRequest.GetChunked() == true) {
     if (mRequest.mContent.size() > valueSize) {
       return (false);
     }
