@@ -1,0 +1,31 @@
+body {
+	font-family: 'Gothic', sans-serif;
+	color: white;
+	margin: 0;
+	padding: 0;
+	background: linear-gradient(to right, green, blue);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+	text-align: center;
+  }
+  
+  .content {
+	width: 100%;
+	max-width: 600px;
+  }
+  
+  .title {
+	font-size: 2em;
+	font-weight: bold;
+  }
+  
+  .divider {
+	margin: 1em 0;
+  }
+  
+  .subtitle {
+	font-weight: lighter;
+  }
+  
