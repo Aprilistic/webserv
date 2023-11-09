@@ -61,6 +61,7 @@ eStatusCode Connection::readFromSocket() {
       }
       return (SERVER_ERROR_INTERNAL_SERVER_ERROR);
     }
+    disconnect();
     return (SERVER_SERVICE_UNAVAILABLE);
   }
   return (READ_OK);

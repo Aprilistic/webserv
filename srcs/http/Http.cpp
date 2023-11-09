@@ -148,7 +148,6 @@ void Http::SetRequest(eStatusCode state, std::vector<char> &RecvBuffer) {
       HandleRequestType();
     }
   }
-  // std::cout << RED << "2" << RESET << std::endl;
 }
 
 void Http::SendResponse(eStatusCode state) {
