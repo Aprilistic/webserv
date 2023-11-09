@@ -111,10 +111,10 @@ eStatusCode Http::CheckPathType(const std::string &path) {
 }
 
 void Http::SetRequest(eStatusCode state, std::vector<char> &RecvBuffer) {
-  if (state == SOCKET_DISCONNECTED) {
-    Log(error, etc, "Socket Disconnected", *this);
-    return; // disconnection();
-  } else if (state == SOCKET_READ_ERROR) {
+  if (state != READ_OK) {
+    if (state == SERVER_SERVICE_UNAVAILABLE) {
+      Log(error, etc, "Socket Disconnected", *this);
+    }
     return (ErrorHandle(state));
   }
 

@@ -47,6 +47,7 @@ void Connection::EventHandler(struct kevent &currentEvent) {
 eStatusCode Connection::readFromSocket() {
   mRecvBuffer.clear();
 
+  errno = 0;
   ssize_t bytesRead;
   char tmp[RECV_BUFFER_SIZE];
   do {
@@ -54,17 +55,13 @@ eStatusCode Connection::readFromSocket() {
     mRecvBuffer.insert(mRecvBuffer.end(), tmp, tmp + bytesRead);
   } while (bytesRead > 0);
 
-  if (bytesRead <= 0) {
-    if (bytesRead < 0) {
-      if (errno != EWOULDBLOCK && errno != EAGAIN) {
-        disconnect();
-      }
-      return (SERVER_ERROR_INTERNAL_SERVER_ERROR);
+  if (bytesRead == -1) {
+    if (errno == EWOULDBLOCK || errno == EAGAIN) {
+      return (READ_OK);
     }
-    disconnect();
-    return (SERVER_SERVICE_UNAVAILABLE);
   }
-  return (READ_OK);
+  disconnect();
+  return (SERVER_ERROR_INTERNAL_SERVER_ERROR);
 }
 
 void Connection::readHandler() {
