@@ -54,14 +54,10 @@ void Http::ErrorHandle(eStatusCode errorStatus) {
 eStatusCode Http::ReadFile(const std::string &path) {
   GetResponse().mFilename = path;
 
-  std::fstream file;
-
-  file.open(path.c_str(), std::ios::in);
+  std::ifstream file(path.c_str(), std::ios::in | std::ios::binary);
   if (file.is_open()) {
-    std::string line;
-    while (std::getline(file, line)) {
-      GetResponse().mBody += line;
-    }
+    GetResponse().mBody.assign((std::istreambuf_iterator<char>(file)),
+                               std::istreambuf_iterator<char>());
     file.close();
     return (SUCCESSFUL_OK);
   } else {
