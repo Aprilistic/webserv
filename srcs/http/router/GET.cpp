@@ -69,7 +69,7 @@ void GetHandler::Handle(Http &http) {
       if (autoindex.empty() == false && autoindex[0] == "on") {
         // autoindex on 일때 처리 로직
         http.GetResponse().mBody = autoIndex(resolvedPath);
-        http.GetResponse().mStatusCode = SUCCESSFUL_OK;
+        http.GetResponse().SetStatusCode(SUCCESSFUL_OK);
         break;
       } else {
         // autoindex가 off 일때 처리 로직

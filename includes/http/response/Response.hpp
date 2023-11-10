@@ -26,10 +26,12 @@ public:
 
   std::string Inspect() const;
 
-public:
+private:
   int mVersionMajor;
   int mVersionMinor;
   unsigned int mStatusCode;
+
+public:
   std::string mStatus;
   std::multimap<std::string, std::string> mHeaders;
   std::string mBody;
