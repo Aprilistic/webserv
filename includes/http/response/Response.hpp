@@ -33,9 +33,9 @@ private:
   unsigned int mStatusCode;
   std::string mStatus;
   std::multimap<std::string, std::string> mHeaders;
+  std::string mBody;
 
 public:
-  std::string mBody;
   bool mKeepAlive;
 
   std::string mFilename;

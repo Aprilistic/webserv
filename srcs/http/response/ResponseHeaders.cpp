@@ -120,7 +120,7 @@ void ResponseParser::setMandatoryHeaderFields(Http &http) {
   http.GetResponse().InsertHeader("Server", "*u*king webserv");
 
   // Content-Length
-  std::string contentLength = toString(http.GetResponse().mBody.size());
+  std::string contentLength = toString(http.GetResponse().GetBody().size());
   http.GetResponse().InsertHeader("Content-Length", contentLength);
 
   // Content-Type

@@ -53,4 +53,4 @@ void ResponseParser::setHeaderFields(Response &resp) {
   }
 }
 
-void ResponseParser::setBody(Response &resp) { mMessage += resp.mBody; }
+void ResponseParser::setBody(Response &resp) { mMessage += resp.GetBody(); }

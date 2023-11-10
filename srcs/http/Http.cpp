@@ -55,8 +55,10 @@ eStatusCode Http::ReadFile(const std::string &path) {
 
   std::ifstream file(path.c_str(), std::ios::in | std::ios::binary);
   if (file.is_open()) {
-    GetResponse().mBody.assign((std::istreambuf_iterator<char>(file)),
-                               std::istreambuf_iterator<char>());
+    std::string tmp;
+    tmp.assign((std::istreambuf_iterator<char>(file)),
+               std::istreambuf_iterator<char>());
+    GetResponse().SetBody(tmp);
     file.close();
     return (SUCCESSFUL_OK);
   } else {
@@ -112,7 +114,8 @@ eStatusCode Http::CheckPathType(const std::string &path) {
 bool Http::IsCgiRequest() {
 
   Node *location = Common::mConfigMap->GetConfigNode(
-      mPort, GetRequest().GetHost(), GetRequest().GetUri(), GetRequest().GetMethod());
+      mPort, GetRequest().GetHost(), GetRequest().GetUri(),
+      GetRequest().GetMethod());
   if (location == NULL) {
     return (false);
   }
@@ -199,7 +202,7 @@ void Http::handleHTTPRequest() {
   IRequestHandler *method = Router::Routing(*this);
 
   method->Handle(*this);
-  delete(method);
+  delete (method);
 }
 
 eStatusCode Http::priorityHeaders() {
@@ -264,8 +267,7 @@ bool Http::checkClientMaxBodySize() {
   } else {
     if (clientMaxBodySizeValues.size()) {
 
-      std::multimap<std::string, std::string> headers =
-          mRequest.GetHeaders();
+      std::multimap<std::string, std::string> headers = mRequest.GetHeaders();
       std::multimap<std::string, std::string>::iterator it;
       it = headers.find("Content-Length");
 

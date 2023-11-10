@@ -212,7 +212,7 @@ eStatusCode CGI::cgiResponseParsing(std::string &response) {
     mHttp.GetResponse().InsertHeader(it->first, it->second);
   }
 
-  mHttp.GetResponse().mBody = body;
+  mHttp.GetResponse().SetBody(body);
 
   return (statusCode);
 }
