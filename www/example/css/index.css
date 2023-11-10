@@ -3,7 +3,6 @@ html {
 	height: 100vh;
 	margin: 0;
 	font-family: 'Gothic', sans-serif;
-	/* background-color: rgba(21, 24, 23, 1); */
 	background-image: url(../images/back1.jpg);
 	background-size: cover;
 	background-repeat: no-repeat;
@@ -80,8 +79,8 @@ html {
 }
 
 .cta-button:hover {
-	color: #fff;
-	background-color: #00f;
+	color: rgba(21, 24, 23, 1);
+	background-color: rgb(253, 253, 253);
 }
 
 .footer {
