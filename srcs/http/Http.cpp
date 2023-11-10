@@ -135,7 +135,6 @@ void Http::SetRequest(eStatusCode state, std::vector<char> &RecvBuffer) {
   std::string temp(RecvBuffer.begin(), RecvBuffer.end());
   mBuffer += temp;
 
-  mRequest.mContent.reserve(100000000);
   while (true) {
     eStatusCode ParseState = mRequestParser.Parse(
         mRequest, mBuffer.c_str(), mBuffer.c_str() + mBuffer.size());

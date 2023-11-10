@@ -2,8 +2,8 @@
 
 void PostHandler::Handle(Http &http) {
   // 요청 데이터 파싱
-  std::string requestData(http.GetRequest().mContent.begin(),
-                          http.GetRequest().mContent.end());
+  std::string content = http.GetRequest().GetContent();
+  std::string requestData(content.begin(), content.end());
 
   // check if there is chunked data
   bool isChunked = false;

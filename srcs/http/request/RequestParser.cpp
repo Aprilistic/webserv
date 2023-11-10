@@ -258,7 +258,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
     }
     case Post:
       --mContentsize;
-      req.mContent.push_back(input);
+      req.PushBackContent(input);
 
       if (mContentsize == 0) {
         mRemainingBuffer.assign(begin, end);
@@ -347,7 +347,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       }
       break;
     case ChunkData:
-      req.mContent.push_back(input);
+      req.PushBackContent(input);
 
       if (--mChunkSize == 0) {
         mState = ChunkDataNewLine_1;

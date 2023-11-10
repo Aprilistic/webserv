@@ -2,7 +2,9 @@
 
 Request::Request()
     : mChunked(false), mVersionMajor(0), mVersionMinor(0), mContentLength(0),
-      mKeepAlive(false) {}
+      mKeepAlive(false) {
+  mContent.reserve(100000000);
+}
 
 Request::~Request() {}
 
@@ -33,6 +35,8 @@ std::string Request::GetContent() const { return mContent; }
 void Request::PushBackMethod(char &c) { mMethod.push_back(c); }
 
 void Request::PushBackUri(char &c) { mUri.push_back(c); }
+
+void Request::PushBackContent(char &c) { mContent.push_back(c); }
 
 void Request::InsertHeader(std::string key, std::string value) {
   mHeaders.insert(std::pair<std::string, std::string>(key, value));

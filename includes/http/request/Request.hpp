@@ -23,6 +23,7 @@ public:
 
   void PushBackMethod(char &input);
   void PushBackUri(char &input);
+  void PushBackContent(char &input);
   void InsertHeader(std::string key, std::string value);
 
   void SetChunked(bool chunked);
@@ -50,8 +51,6 @@ private:
   int mVersionMajor;
   int mVersionMinor;
   std::multimap<std::string, std::string> mHeaders;
-
-public:
   std::string mContent;
 };
 
