@@ -1,59 +1,53 @@
 #ifndef HTTP_SHARED_PTR_HPP
 #define HTTP_SHARED_PTR_HPP
 
+#include <cstddef>
+
 template <typename T> class SharedPtr {
 private:
-  T *ptr;
-  int *refCount;
-
-  void dispose() {
-    if (--(*refCount) == 0) {
-      delete ptr;
-      ptr = NULL; // Avoid dangling pointer in case of exceptions
-      delete refCount;
-    }
-  }
+  T *_ptr;
+  size_t *_count;
 
 public:
-  SharedPtr() : ptr(NULL), refCount(new int(0)) {}
+  SharedPtr(T *ptr = NULL) : _ptr(ptr), _count(new size_t(1)) {
+    (*_count) = 1;
+  }
 
-  SharedPtr(T *p) : ptr(p), refCount(p ? new int(1) : new int(0)) {}
+  SharedPtr(const SharedPtr &orig) : _ptr(orig._ptr), _count(orig._count) {
+    (*_count)++;
+  }
 
-  SharedPtr(const SharedPtr &other) : ptr(other.ptr), refCount(other.refCount) {
-    if (ptr) {
-      (*refCount)++;
+  SharedPtr &operator=(const SharedPtr &orig) {
+    if (this == &orig)
+      return (*this);
+
+    (*_count)--;
+    if ((*_count) == 0) {
+      delete _ptr;
+      delete _count;
+    }
+
+    _ptr = orig._ptr;
+    _count = orig._count;
+    (*_count)++;
+    return (*this);
+  }
+
+  ~SharedPtr() {
+    (*_count)--;
+    if ((*_count) == 0) {
+      delete _ptr;
+      delete _count;
     }
   }
 
-  ~SharedPtr() { dispose(); }
+  T &operator*(void) { return (*_ptr); }
 
-  SharedPtr &operator=(SharedPtr other) {
-    swap(*this, other);
-    return *this;
-  }
+  const T &operator*(void) const { return (*_ptr); }
 
-  friend void swap(SharedPtr &first, SharedPtr &second) {
-    std::swap(first.ptr, second.ptr);
-    std::swap(first.refCount, second.refCount);
-  }
+  T *operator->(void) { return (_ptr); }
 
-  T &operator*() const { return *ptr; }
-
-  T *operator->() const { return ptr; }
-
-  void reset() {
-    dispose();
-    ptr = NULL;
-    refCount = new int(0);
-  }
-
-  void reset(T *p) {
-    if (ptr != p) {
-      dispose();
-      ptr = p;
-      refCount = p ? new int(1) : new int(0);
-    }
-  }
+  const T *operator->(void) const { return (_ptr); }
 };
 
 #endif
