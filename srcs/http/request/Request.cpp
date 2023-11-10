@@ -6,6 +6,16 @@ Request::Request()
 
 Request::~Request() {}
 
+bool Request::GetChunked() const { return mChunked; }
+
+bool Request::GetKeepAlive() const { return mKeepAlive; }
+
+int Request::GetContentLength() const { return mContentLength; }
+
+std::string Request::GetHost() const { return mHost; }
+
+std::string Request::GetContentType() const { return mContentType; }
+
 std::string Request::GetMethod() const { return mMethod; }
 
 std::string Request::GetUri() const { return mUri; }
@@ -19,16 +29,6 @@ std::multimap<std::string, std::string> Request::GetHeaders() const {
 }
 
 std::string Request::GetContent() const { return mContent; }
-
-std::string Request::GetHost() const { return mHost; }
-
-int Request::GetContentLength() const { return mContentLength; }
-
-std::string Request::GetContentType() const { return mContentType; }
-
-bool Request::GetKeepAlive() const { return mKeepAlive; }
-
-bool Request::GetChunked() const { return mChunked; }
 
 void Request::PushBackMethod(char &c) { mMethod.push_back(c); }
 
