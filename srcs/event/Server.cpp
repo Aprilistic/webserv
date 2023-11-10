@@ -55,23 +55,16 @@ Server::~Server() {
 
 void Server::EventHandler(struct kevent &currentEvent) {
   if (currentEvent.flags & EV_ERROR) {
-    // error
+    return;
   }
   switch (currentEvent.filter) {
   case EVFILT_READ:
     readHandler();
     break;
-  case EVFILT_WRITE:
-    writeHandler();
-    break;
   case EVFILT_TIMER:
     timerHandler();
     break;
-  case EVFILT_SIGNAL:
-    signalHandler();
-    break;
   default:
-    assert("Server::EventHandler: default" == 0);
     break;
   }
 }
@@ -86,8 +79,6 @@ void Server::readHandler() {
   mConnection[socket] = SharedPtr<Connection>(new Connection(socket, mPort));
 }
 
-void Server::writeHandler() {}
 
 void Server::timerHandler() {}
 
-void Server::signalHandler() {}

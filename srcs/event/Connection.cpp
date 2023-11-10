@@ -21,7 +21,7 @@ Connection::~Connection() {}
 
 void Connection::EventHandler(struct kevent &currentEvent) {
   if (currentEvent.flags & EV_ERROR) {
-    // error
+    return ;
   }
   switch (currentEvent.filter) {
   case EVFILT_READ:
@@ -30,17 +30,7 @@ void Connection::EventHandler(struct kevent &currentEvent) {
   case EVFILT_WRITE:
     writeHandler();
     break;
-  case EVFILT_TIMER:
-    timerHandler();
-    break;
-  case EVFILT_SIGNAL:
-    signalHandler();
-    break;
-  case EVFILT_PROC:
-    // processHandler();
-    break;
   default:
-    assert("Connection::EventHandler: default" == 0);
     break;
   }
 }
@@ -98,14 +88,6 @@ void Connection::writeHandler() {
       return;
     }
   }
-}
-
-void Connection::timerHandler() {
-  // error
-}
-
-void Connection::signalHandler() {
-  // error
 }
 
 void Connection::disconnect() {

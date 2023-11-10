@@ -19,8 +19,6 @@ private:
   eStatusCode readFromSocket();
   void readHandler();
   void writeHandler();
-  void timerHandler();
-  void signalHandler();
   void disconnect();
 private:
   int mSocket;

@@ -9,20 +9,18 @@ CGI::~CGI() {}
 
 void CGI::EventHandler(struct kevent &currentEvent) {
   if (currentEvent.flags & EV_ERROR) {
-    // error
+    return ;
   }
   switch (currentEvent.filter) {
   case EVFILT_PROC:
-    processHandler();
+    processHandler(currentEvent);
     break;
   default:
-    assert("Connection::EventHandler: default" == 0);
     break;
   }
 }
 
-void CGI::processHandler() {
-  std::cout << RED << "processHandler" << RESET << std::endl;
+void CGI::processHandler(struct kevent &currentEvent) {
 
   int status;
   waitpid(mPid, &status, 0); // 자식 프로세스가 종료될 때까지 대기
@@ -32,8 +30,6 @@ void CGI::processHandler() {
   } else if (WIFSIGNALED(status)) {
     exitStatus = WTERMSIG(status);
   }
-  std::cout << RED << "exitStatus = " << exitStatus << RESET << std::endl;
-
   if (exitStatus != 0) {
     return (mHttp.ErrorHandle(SERVER_ERROR_INTERNAL_SERVER_ERROR));
   }
@@ -41,7 +37,6 @@ void CGI::processHandler() {
   // CGI 스크립트의 출력을 읽기 위한 ifstream 객체 생성
   std::ifstream responseFile(mOutputFileName.c_str(), std::ios::in);
   if (!responseFile.is_open()) {
-    std::cout << RED << "yogiyo" << RESET << std::endl;
     return (mHttp.ErrorHandle(SERVER_ERROR_INTERNAL_SERVER_ERROR));
   }
 
@@ -220,7 +215,6 @@ eStatusCode CGI::cgiResponseParsing(std::string &response) {
 void CGI::CgiHandle() {
   static int cnt;
   // 요청 내용을 파일에 쓰기 위한 ofstream 객체 생성
-  // std::string tmpFileName = "cgi_request_" + generateUniqueHash("./tmp");
   std::string tmpFileName = "cgi_request_" + toString(cnt);
   mRequestFileName = "./tmp/" + tmpFileName + ".txt";
   std::ofstream requestFile(mRequestFileName.c_str(),
@@ -230,13 +224,11 @@ void CGI::CgiHandle() {
     return (mHttp.ErrorHandle(SERVER_ERROR_INTERNAL_SERVER_ERROR));
   }
 
-  std::cout << "count: " << cnt << std::endl;
   // 요청 내용을 임시 파일에 쓰기
   requestFile << mHttp.GetRequest().GetContent();
   requestFile.close(); // 파일 쓰기 완료 후 닫기
 
   // CGI 스크립트 결과를 받을 파일 생성
-  // tmpFileName = "cgi_output_" + generateUniqueHash("./tmp");
   tmpFileName = "cgi_output_" + toString(cnt++);
   mOutputFileName = "./tmp/" + tmpFileName + ".txt";
 

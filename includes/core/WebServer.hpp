@@ -4,7 +4,6 @@
 #include "Config.hpp"
 #include "Connection.hpp"
 #include "Core.hpp"
-#include "ProgramControl.hpp"
 #include "Server.hpp"
 
 #define MAX_EVENT 1024
@@ -23,8 +22,6 @@ private:
   bool mGood;
   std::map<int, Server *> mServerList;
   std::vector<struct kevent> mEventList;
-
-  ProgramControl mControlInstance;
 };
 
 #endif
