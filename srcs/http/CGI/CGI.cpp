@@ -143,8 +143,9 @@ void CGI::setAllEnv() {
   // SERVER_SOFTWARE: 서버의 소프트웨어 이름과 버전.
   setenv("SERVER_SOFTWARE", "", 1);
 
-  for (std::map<std::string, std::string>::iterator it = tmp.mHeaders.begin();
-       it != tmp.mHeaders.end(); ++it) {
+  std::multimap<std::string, std::string> headers = tmp.GetHeaders();
+  for (std::multimap<std::string, std::string>::iterator it = headers.begin();
+       it != headers.end(); ++it) {
     std::string key = it->first;
     std::string value = it->second;
 

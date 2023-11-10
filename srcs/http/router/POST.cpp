@@ -7,9 +7,11 @@ void PostHandler::Handle(Http &http) {
 
   // check if there is chunked data
   bool isChunked = false;
+  std::multimap<std::string, std::string> headers =
+      http.GetRequest().GetHeaders();
   std::multimap<std::string, std::string>::iterator it =
-      http.GetRequest().mHeaders.find("Transfer-Encoding");
-  if (it != http.GetRequest().mHeaders.end() && it->second == "chunked") {
+      headers.find("Transfer-Encoding");
+  if (it != headers.end() && it->second == "chunked") {
     isChunked = true;
   }
 

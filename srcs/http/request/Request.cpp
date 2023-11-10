@@ -34,6 +34,10 @@ void Request::PushBackMethod(char &c) { mMethod.push_back(c); }
 
 void Request::PushBackUri(char &c) { mUri.push_back(c); }
 
+void Request::InsertHeader(std::string key, std::string value) {
+  mHeaders.insert(std::pair<std::string, std::string>(key, value));
+}
+
 void Request::SetChunked(bool chunked) { mChunked = chunked; }
 
 void Request::SetUri(const std::string &uri) { mUri = uri; }

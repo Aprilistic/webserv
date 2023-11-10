@@ -266,10 +266,12 @@ bool Http::checkClientMaxBodySize() {
   } else {
     if (clientMaxBodySizeValues.size()) {
 
+      std::multimap<std::string, std::string> headers =
+          mRequest.GetHeaders();
       std::multimap<std::string, std::string>::iterator it;
-      it = mRequest.mHeaders.find("Content-Length");
+      it = headers.find("Content-Length");
 
-      if (it != mRequest.mHeaders.end()) {
+      if (it != headers.end()) {
         int contentLength = std::atoi(it->second.c_str());
         if (contentLength > valueSize) {
           return (false);

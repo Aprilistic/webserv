@@ -153,7 +153,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
     case HeaderLineStart:
       if (input == '\r') {
         mState = ExpectingNewline_3;
-      } else if (!req.mHeaders.empty() && (input == ' ' || input == '\t')) {
+      } else if (!req.GetHeaders().empty() && (input == ' ' || input == '\t')) {
         mState = HeaderLws;
       } else if (!isChar(input) || isControl(input) || isSpecial(input)) {
         return CLIENT_ERROR_BAD_REQUEST;
@@ -210,7 +210,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
         if (tmp == "host") {
           req.mHost = mHeaderValue;
         }
-        req.mHeaders.insert(std::make_pair(mHeaderName, mHeaderValue));
+        req.InsertHeader(mHeaderName, mHeaderValue);
         mHeaderValue.clear();
         mState = ExpectingNewline_2;
       } else if (isControl(input)) {
@@ -227,10 +227,11 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       }
       break;
     case ExpectingNewline_3: {
+      std::multimap<std::string, std::string> headers = req.GetHeaders();
       std::multimap<std::string, std::string>::iterator it = std::find_if(
-          req.mHeaders.begin(), req.mHeaders.end(), checkIfConnection);
+          headers.begin(), headers.end(), checkIfConnection);
 
-      if (it != req.mHeaders.end()) {
+      if (it != headers.end()) {
         if (strcasecmp(it->second.c_str(), "Keep-Alive") == 0) {
           req.mKeepAlive = true;
         } else // == Close
