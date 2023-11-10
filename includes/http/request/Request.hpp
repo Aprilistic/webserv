@@ -40,9 +40,9 @@ private:
   std::string mMethod;
   bool mChunked;
   std::string mUri;
+  int mVersionMajor;
 
 public:
-  int mVersionMajor;
   int mVersionMinor;
   std::multimap<std::string, std::string> mHeaders;
   std::string mContent;

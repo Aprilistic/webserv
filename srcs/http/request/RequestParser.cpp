@@ -99,7 +99,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       break;
     case RequestHttpVersion_slash:
       if (input == '/') {
-        req.mVersionMajor = 0;
+        req.SetVersionMajor(0);
         req.mVersionMinor = 0;
         mState = RequestHttpVersion_majorStart;
       } else {
@@ -108,7 +108,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       break;
     case RequestHttpVersion_majorStart:
       if (isDigit(input)) {
-        req.mVersionMajor = input - '0';
+        req.SetVersionMajor(input - '0');
         mState = RequestHttpVersion_major;
       } else {
         return CLIENT_ERROR_BAD_REQUEST;
@@ -118,7 +118,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       if (input == '.') {
         mState = RequestHttpVersion_minorStart;
       } else if (isDigit(input)) {
-        req.mVersionMajor = req.mVersionMajor * 10 + input - '0';
+        req.SetVersionMajor(req.GetVersionMajor() * 10 + input - '0');
       } else {
         return CLIENT_ERROR_BAD_REQUEST;
       }
@@ -141,7 +141,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       }
       break;
     case ResponseHttpVersion_newLine:
-      if (req.mVersionMajor != 1 && req.mVersionMinor != 1) {
+      if (req.GetVersionMajor() != 1 && req.mVersionMinor != 1) {
         return SERVER_ERROR_HTTP_VERSION_NOT_SUPPORTED;
       }
       if (input == '\n') {
@@ -238,8 +238,8 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
           req.mKeepAlive = false;
         }
       } else {
-        if (req.mVersionMajor > 1 ||
-            (req.mVersionMajor == 1 && req.mVersionMinor == 1))
+        if (req.GetVersionMajor() > 1 ||
+            (req.GetVersionMajor() == 1 && req.mVersionMinor == 1))
           req.mKeepAlive = true;
       }
 
