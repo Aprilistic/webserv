@@ -100,7 +100,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
     case RequestHttpVersion_slash:
       if (input == '/') {
         req.SetVersionMajor(0);
-        req.mVersionMinor = 0;
+        req.SetVersionMinor(0);
         mState = RequestHttpVersion_majorStart;
       } else {
         return CLIENT_ERROR_BAD_REQUEST;
@@ -125,7 +125,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       break;
     case RequestHttpVersion_minorStart:
       if (isDigit(input)) {
-        req.mVersionMinor = input - '0';
+        req.SetVersionMinor(input - '0');
         mState = RequestHttpVersion_minor;
       } else {
         return CLIENT_ERROR_BAD_REQUEST;
@@ -135,13 +135,13 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       if (input == '\r') {
         mState = ResponseHttpVersion_newLine;
       } else if (isDigit(input)) {
-        req.mVersionMinor = req.mVersionMinor * 10 + input - '0';
+        req.SetVersionMinor(req.GetVersionMinor() * 10 + input - '0');
       } else {
         return CLIENT_ERROR_BAD_REQUEST;
       }
       break;
     case ResponseHttpVersion_newLine:
-      if (req.GetVersionMajor() != 1 && req.mVersionMinor != 1) {
+      if (req.GetVersionMajor() != 1 && req.GetVersionMinor() != 1) {
         return SERVER_ERROR_HTTP_VERSION_NOT_SUPPORTED;
       }
       if (input == '\n') {
@@ -239,7 +239,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
         }
       } else {
         if (req.GetVersionMajor() > 1 ||
-            (req.GetVersionMajor() == 1 && req.mVersionMinor == 1))
+            (req.GetVersionMajor() == 1 && req.GetVersionMinor() == 1))
           req.mKeepAlive = true;
       }
 

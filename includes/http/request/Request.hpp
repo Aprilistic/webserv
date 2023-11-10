@@ -41,9 +41,9 @@ private:
   bool mChunked;
   std::string mUri;
   int mVersionMajor;
+  int mVersionMinor;
 
 public:
-  int mVersionMinor;
   std::multimap<std::string, std::string> mHeaders;
   std::string mContent;
 
