@@ -39,7 +39,7 @@ void ResponseParser::setStatusLine(Response &resp) {
   mMessage += SP;
   mMessage += toString(resp.GetStatusCode());
   mMessage += SP;
-  mMessage += resp.mStatus + CRLF;
+  mMessage += resp.GetStatus() + CRLF;
 }
 
 void ResponseParser::setHeaderFields(Response &resp) {

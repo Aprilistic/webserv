@@ -30,9 +30,9 @@ private:
   int mVersionMajor;
   int mVersionMinor;
   unsigned int mStatusCode;
+  std::string mStatus;
 
 public:
-  std::string mStatus;
   std::multimap<std::string, std::string> mHeaders;
   std::string mBody;
   bool mKeepAlive;
