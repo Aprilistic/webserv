@@ -16,11 +16,12 @@ public:
   std::string GetBody() const;
   bool GetKeepAlive() const;
 
+  void InsertHeader(const std::string &key, const std::string &value);
+
   void SetVersionMajor(int versionMajor);
   void SetVersionMinor(int versionMinor);
   void SetStatusCode(unsigned int statusCode);
   void SetStatus(const std::string &status);
-  void SetHeaders(const std::multimap<std::string, std::string> &headers);
   void SetBody(const std::string &body);
   void SetKeepAlive(bool keepAlive);
 
@@ -31,9 +32,9 @@ private:
   int mVersionMinor;
   unsigned int mStatusCode;
   std::string mStatus;
+  std::multimap<std::string, std::string> mHeaders;
 
 public:
-  std::multimap<std::string, std::string> mHeaders;
   std::string mBody;
   bool mKeepAlive;
 

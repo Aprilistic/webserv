@@ -43,9 +43,9 @@ void ResponseParser::setStatusLine(Response &resp) {
 }
 
 void ResponseParser::setHeaderFields(Response &resp) {
-  for (std::multimap<std::string, std::string>::iterator it =
-           resp.mHeaders.begin();
-       it != resp.mHeaders.end(); ++it) {
+  std::multimap<std::string, std::string> headers = resp.GetHeaders();
+  for (std::multimap<std::string, std::string>::iterator it = headers.begin();
+       it != headers.end(); ++it) {
     mMessage += it->first;
     mMessage += ": ";
     mMessage += it->second;

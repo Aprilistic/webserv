@@ -18,8 +18,7 @@ void Http::RedirectURI() {
   eStatusCode state =
       static_cast<eStatusCode>(std::atoi(redirectValues[0].c_str()));
 
-  mResponse.mHeaders.insert(
-      std::pair<std::string, std::string>("Location", redirectValues[1]));
+  mResponse.InsertHeader("Location", redirectValues[1]);
 
   SendResponse(state);
 }

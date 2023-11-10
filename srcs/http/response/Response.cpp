@@ -21,6 +21,10 @@ std::string Response::GetBody() const { return mBody; }
 
 bool Response::GetKeepAlive() const { return mKeepAlive; }
 
+void Response::InsertHeader(const std::string &key, const std::string &value) {
+  mHeaders.insert(std::pair<std::string, std::string>(key, value));
+}
+
 void Response::SetVersionMajor(int versionMajor) {
   mVersionMajor = versionMajor;
 }
@@ -34,11 +38,6 @@ void Response::SetStatusCode(unsigned int statusCode) {
 }
 
 void Response::SetStatus(const std::string &status) { mStatus = status; }
-
-void Response::SetHeaders(
-    const std::multimap<std::string, std::string> &headers) {
-  mHeaders = headers;
-}
 
 void Response::SetBody(const std::string &body) { mBody = body; }
 

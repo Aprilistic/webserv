@@ -23,7 +23,7 @@ void CGI::EventHandler(struct kevent &currentEvent) {
 
 void CGI::processHandler() {
   std::cout << RED << "processHandler" << RESET << std::endl;
-  
+
   int status;
   waitpid(mPid, &status, 0); // 자식 프로세스가 종료될 때까지 대기
   int exitStatus = 0;
@@ -32,7 +32,7 @@ void CGI::processHandler() {
   } else if (WIFSIGNALED(status)) {
     exitStatus = WTERMSIG(status);
   }
-    std::cout << RED << "exitStatus = "<< exitStatus << RESET << std::endl;
+  std::cout << RED << "exitStatus = " << exitStatus << RESET << std::endl;
 
   if (exitStatus != 0) {
     return (mHttp.ErrorHandle(SERVER_ERROR_INTERNAL_SERVER_ERROR));
@@ -60,15 +60,15 @@ void CGI::processHandler() {
   unlink(mOutputFileName.c_str());
 
   // 응답 보내기
-  
+
   mHttp.SendResponse(statusCode);
 }
 
 void CGI::setAllEnv() {
 
   Node *location = Common::mConfigMap->GetConfigNode(
-      mHttp.GetPort(), mHttp.GetRequest().GetHost(), mHttp.GetRequest().GetUri(),
-      mHttp.GetRequest().GetMethod());
+      mHttp.GetPort(), mHttp.GetRequest().GetHost(),
+      mHttp.GetRequest().GetUri(), mHttp.GetRequest().GetMethod());
   if (location == NULL) {
     return (mHttp.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
   }
@@ -209,8 +209,7 @@ eStatusCode CGI::cgiResponseParsing(std::string &response) {
   // response에 cgi 헤더 추가
   for (std::map<std::string, std::string>::iterator it = headers.begin();
        it != headers.end(); ++it) {
-    mHttp.GetResponse().mHeaders.insert(
-        std::pair<std::string, std::string>(it->first, it->second));
+    mHttp.GetResponse().InsertHeader(it->first, it->second);
   }
 
   mHttp.GetResponse().mBody = body;
@@ -231,7 +230,7 @@ void CGI::CgiHandle() {
     return (mHttp.ErrorHandle(SERVER_ERROR_INTERNAL_SERVER_ERROR));
   }
 
-  std::cout<<"count: "<<cnt<<std::endl;
+  std::cout << "count: " << cnt << std::endl;
   // 요청 내용을 임시 파일에 쓰기
   requestFile << mHttp.GetRequest().mContent;
   requestFile.close(); // 파일 쓰기 완료 후 닫기
@@ -254,8 +253,8 @@ void CGI::CgiHandle() {
 
     // cgi pass 가져오기
     Node *location = Common::mConfigMap->GetConfigNode(
-        mHttp.GetPort(), mHttp.GetRequest().GetHost(), mHttp.GetRequest().GetUri(),
-        mHttp.GetRequest().GetMethod());
+        mHttp.GetPort(), mHttp.GetRequest().GetHost(),
+        mHttp.GetRequest().GetUri(), mHttp.GetRequest().GetMethod());
     if (location == NULL) {
       return (mHttp.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
     }
@@ -267,8 +266,8 @@ void CGI::CgiHandle() {
     // 부모 프로세스
     fcntl(mPid, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
     struct kevent event;
-    EV_SET(&event, mPid, EVFILT_PROC, EV_ADD | EV_ENABLE | EV_ONESHOT, NOTE_EXIT,
-           0, this);
+    EV_SET(&event, mPid, EVFILT_PROC, EV_ADD | EV_ENABLE | EV_ONESHOT,
+           NOTE_EXIT, 0, this);
     kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
   }
 }
