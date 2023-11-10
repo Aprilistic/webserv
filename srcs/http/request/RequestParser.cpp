@@ -228,20 +228,18 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       break;
     case ExpectingNewline_3: {
       std::multimap<std::string, std::string> headers = req.GetHeaders();
-      std::multimap<std::string, std::string>::iterator it = std::find_if(
-          headers.begin(), headers.end(), checkIfConnection);
+      std::multimap<std::string, std::string>::iterator it =
+          std::find_if(headers.begin(), headers.end(), checkIfConnection);
 
       if (it != headers.end()) {
         if (strcasecmp(it->second.c_str(), "Keep-Alive") == 0) {
-          req.mKeepAlive = true;
-        } else // == Close
-        {
-          req.mKeepAlive = false;
+          req.SetKeepAlive(true);
+        } else {
+          req.SetKeepAlive(false);
         }
-      } else {
-        if (req.GetVersionMajor() > 1 ||
-            (req.GetVersionMajor() == 1 && req.GetVersionMinor() == 1))
-          req.mKeepAlive = true;
+      } else if (req.GetVersionMajor() > 1 ||
+                 (req.GetVersionMajor() == 1 && req.GetVersionMinor() == 1)) {
+        req.SetKeepAlive(true);
       }
 
       if (mChunked) {

@@ -135,7 +135,7 @@ void ResponseParser::setMandatoryHeaderFields(Http &http) {
   }
 
   // Connection
-  if (http.GetRequest().mKeepAlive == true) {
+  if (http.GetRequest().GetKeepAlive() == true) {
     http.GetResponse().mHeaders.insert(
         std::pair<std::string, std::string>("Connection", "keep-alive"));
   } else {

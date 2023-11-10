@@ -47,11 +47,11 @@ private:
   std::string mHost;
   int mContentLength;
   std::string mContentType;
+  bool mKeepAlive;
 
 public:
   std::string mContent;
 
-  bool mKeepAlive;
 };
 
 #endif

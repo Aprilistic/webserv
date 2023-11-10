@@ -150,7 +150,7 @@ void Http::SetRequest(eStatusCode state, std::vector<char> &RecvBuffer) {
     } else if (ParseState == PARSING_COMPLETED) {
       // If Connection: close, never read again from socket
 
-      if (mRequest.mKeepAlive == false) {
+      if (mRequest.GetKeepAlive() == false) {
         mKeepAlive = false;
         struct kevent event;
         EV_SET(&event, mSocket, EVFILT_READ, EV_DISABLE, 0, 0, NULL);
