@@ -67,7 +67,7 @@ void CGI::processHandler() {
 void CGI::setAllEnv() {
 
   Node *location = Common::mConfigMap->GetConfigNode(
-      mHttp.GetPort(), mHttp.GetRequest().mHost, mHttp.GetRequest().mUri,
+      mHttp.GetPort(), mHttp.GetRequest().mHost, mHttp.GetRequest().GetUri(),
       mHttp.GetRequest().GetMethod());
   if (location == NULL) {
     return (mHttp.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
@@ -92,17 +92,18 @@ void CGI::setAllEnv() {
   setenv("GATEWAY_INTERFACE", "CGI/1.1", 1);
 
   // REQUEST_URI
-  setenv("REQUEST_URI", tmp.mUri.c_str(), 1);
+  setenv("REQUEST_URI", tmp.GetUri().c_str(), 1);
 
   // PATH_INFO: CGI 스크립트에 전달되는 추가적인 경로 정보.
-  setenv("PATH_INFO", tmp.mUri.c_str(), 1);
+  setenv("PATH_INFO", tmp.GetUri().c_str(), 1);
 
   // PATH_TRANSLATED: PATH_INFO에 대응하는 실제 파일 경로.
 
   // QUERY_STRING: URL에서 '?' 뒤에 오는 쿼리 문자열.
-  std::size_t pos = tmp.mUri.find("?");
+  std::size_t pos = tmp.GetUri().find("?");
   if (pos != std::string::npos) {
-    const char *query = &tmp.mUri[pos + 1];
+    std::string uri = tmp.GetUri();
+    const char *query = uri.c_str() + pos + 1;
     setenv("QUERY_STRING", query, 1);
   } else {
     setenv("QUERY_STRING", "", 1);
@@ -252,7 +253,7 @@ void CGI::CgiHandle() {
 
     // cgi pass 가져오기
     Node *location = Common::mConfigMap->GetConfigNode(
-        mHttp.GetPort(), mHttp.GetRequest().mHost, mHttp.GetRequest().mUri,
+        mHttp.GetPort(), mHttp.GetRequest().mHost, mHttp.GetRequest().GetUri(),
         mHttp.GetRequest().GetMethod());
     if (location == NULL) {
       return (mHttp.ErrorHandle(CLIENT_ERROR_NOT_FOUND));

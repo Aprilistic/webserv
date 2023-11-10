@@ -21,6 +21,7 @@ public:
   bool GetChunked() const;
 
   void PushBackMethod(char &input);
+  void PushBackUri(char &input);
 
   void SetChunked(bool chunked);
   void SetUri(const std::string &uri);
@@ -38,9 +39,9 @@ public:
 private:
   std::string mMethod;
   bool mChunked;
+  std::string mUri;
 
 public:
-  std::string mUri;
   int mVersionMajor;
   int mVersionMinor;
   std::multimap<std::string, std::string> mHeaders;

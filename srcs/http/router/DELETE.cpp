@@ -3,7 +3,7 @@
 void DeleteHandler::Handle(Http &http) {
   // URI로 리소스 위치 확인
   Node *location = Common::mConfigMap->GetConfigNode(
-      http.GetPort(), http.GetRequest().mHost, http.GetRequest().mUri,
+      http.GetPort(), http.GetRequest().mHost, http.GetRequest().GetUri(),
       http.GetRequest().GetMethod());
   if (location == NULL) {
     return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
@@ -20,7 +20,7 @@ void DeleteHandler::Handle(Http &http) {
       return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
     }
   }
-  std::string resolvedPath = http.GetRequest().mUri;
+  std::string resolvedPath = http.GetRequest().GetUri();
   size_t pos = resolvedPath.find(uri[0]);
   if (pos != std::string::npos) {
     resolvedPath.replace(pos, uri[0].size(), alias[0]);

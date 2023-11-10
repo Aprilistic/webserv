@@ -52,7 +52,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
         return CLIENT_ERROR_BAD_REQUEST;
       } else {
         mState = RequestUri;
-        req.mUri.push_back(input);
+        req.PushBackUri(input);
       }
       break;
     case RequestUri:
@@ -63,11 +63,11 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       } else if (isControl(input)) {
         return CLIENT_ERROR_BAD_REQUEST;
       } else {
-        req.mUri.push_back(input);
+        req.PushBackUri(input);
       }
       break;
     case RequestHttpVersion_h:
-      if (req.mUri.empty()) {
+      if (req.GetUri().empty()) {
         return CLIENT_ERROR_BAD_REQUEST;
       }
       if (input == 'H') {

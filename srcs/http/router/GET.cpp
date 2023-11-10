@@ -3,7 +3,7 @@
 void GetHandler::Handle(Http &http) {
 
   Node *location = Common::mConfigMap->GetConfigNode(
-      http.GetPort(), http.GetRequest().mHost, http.GetRequest().mUri,
+      http.GetPort(), http.GetRequest().mHost, http.GetRequest().GetUri(),
       http.GetRequest().GetMethod());
 
   // NULL 인경우 -> 일치하는 location이 없고 / 도 설정되어 있지 않은 경우
@@ -26,7 +26,7 @@ void GetHandler::Handle(Http &http) {
   // resolvedPath = uri(/abc/)+ alias(/var/www/wow) = /var/www/wow/abc/
   // 구한 경로가 디렉토리인지 파일인지 권한에러인지 언노운파일인지 확인하는
   // 로직
-  std::string resolvedPath = http.GetRequest().mUri; // /example/index.html
+  std::string resolvedPath = http.GetRequest().GetUri(); // /example/index.html
 
   size_t pos = resolvedPath.find(uri[0]); // /example
   if (pos != std::string::npos) {

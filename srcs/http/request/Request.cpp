@@ -32,6 +32,8 @@ bool Request::GetChunked() const { return mChunked; }
 
 void Request::PushBackMethod(char &c) { mMethod.push_back(c); }
 
+void Request::PushBackUri(char &c) { mUri.push_back(c); }
+
 void Request::SetChunked(bool chunked) { mChunked = chunked; }
 
 void Request::SetUri(const std::string &uri) { mUri = uri; }
@@ -46,7 +48,6 @@ void Request::SetVersionMinor(int versionMinor) {
 
 void Request::SetHeaders(
     const std::multimap<std::string, std::string> &headers) {
-
   mHeaders = headers;
 }
 

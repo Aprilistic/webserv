@@ -10,7 +10,7 @@ Http::~Http() {}
 
 void Http::RedirectURI() {
   Node *location = Common::mConfigMap->GetConfigNode(
-      mPort, mRequest.mHost, mRequest.mUri, mRequest.GetMethod());
+      mPort, mRequest.mHost, mRequest.GetUri(), mRequest.GetMethod());
 
   std::vector<std::string> redirectValues =
       location->FindValue(location, "return");
@@ -26,7 +26,7 @@ void Http::RedirectURI() {
 
 void Http::ErrorHandle(eStatusCode errorStatus) {
   Node *location = Common::mConfigMap->GetConfigNode(
-      mPort, mRequest.mHost, mRequest.mUri, mRequest.GetMethod());
+      mPort, mRequest.mHost, mRequest.GetUri(), mRequest.GetMethod());
 
   std::vector<std::string> configErrorPageValues =
       location->FindValue(location, "error_page");
@@ -113,7 +113,7 @@ eStatusCode Http::CheckPathType(const std::string &path) {
 bool Http::IsCgiRequest() {
 
   Node *location = Common::mConfigMap->GetConfigNode(
-      mPort, GetRequest().mHost, GetRequest().mUri, GetRequest().GetMethod());
+      mPort, GetRequest().mHost, GetRequest().GetUri(), GetRequest().GetMethod());
   if (location == NULL) {
     return (false);
   }
@@ -219,12 +219,12 @@ eStatusCode Http::priorityHeaders() {
 
 bool Http::checkRedirect() {
   Node *location = Common::mConfigMap->GetConfigNode(
-      mPort, mRequest.mHost, mRequest.mUri, mRequest.GetMethod());
+      mPort, mRequest.mHost, mRequest.GetUri(), mRequest.GetMethod());
 
   int redirectCode;
   std::string redirectPath;
 
-  if (mRequest.mUri == "/") {
+  if (mRequest.GetUri() == "/") {
     std::vector<std::string> Topvalue;
     Topvalue =
         location->FindTopValue(location, "return", std::vector<std::string>());
@@ -249,7 +249,7 @@ bool Http::checkRedirect() {
 
 bool Http::checkClientMaxBodySize() {
   Node *location = Common::mConfigMap->GetConfigNode(
-      mPort, mRequest.mHost, mRequest.mUri, mRequest.GetMethod());
+      mPort, mRequest.mHost, mRequest.GetUri(), mRequest.GetMethod());
 
   std::vector<std::string> clientMaxBodySizeValues =
       location->FindValue(location, "client_max_body_size");
@@ -282,7 +282,7 @@ bool Http::checkClientMaxBodySize() {
 
 bool Http::checkLimitExcept() {
   Node *location = Common::mConfigMap->GetConfigNode(
-      mPort, mRequest.mHost, mRequest.mUri, mRequest.GetMethod());
+      mPort, mRequest.mHost, mRequest.GetUri(), mRequest.GetMethod());
 
   std::vector<std::string> limitExceptValue =
       location->FindValue(location, "limit_except"); // 초기화가 필요합니다.
