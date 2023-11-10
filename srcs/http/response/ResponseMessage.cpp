@@ -33,19 +33,19 @@ std::vector<char> ResponseParser::GetMessageToVector() {
 
 void ResponseParser::setStatusLine(Response &resp) {
   mMessage += "HTTP/";
-  mMessage += toString(resp.mVersionMajor);
+  mMessage += toString(resp.GetVersionMajor());
   mMessage += ".";
-  mMessage += toString(resp.mVersionMinor);
+  mMessage += toString(resp.GetVersionMinor());
   mMessage += SP;
-  mMessage += toString(resp.mStatusCode);
+  mMessage += toString(resp.GetStatusCode());
   mMessage += SP;
-  mMessage += resp.mStatus + CRLF;
+  mMessage += resp.GetStatus() + CRLF;
 }
 
 void ResponseParser::setHeaderFields(Response &resp) {
-  for (std::multimap<std::string, std::string>::iterator it =
-           resp.mHeaders.begin();
-       it != resp.mHeaders.end(); ++it) {
+  std::multimap<std::string, std::string> headers = resp.GetHeaders();
+  for (std::multimap<std::string, std::string>::iterator it = headers.begin();
+       it != headers.end(); ++it) {
     mMessage += it->first;
     mMessage += ": ";
     mMessage += it->second;
@@ -53,4 +53,4 @@ void ResponseParser::setHeaderFields(Response &resp) {
   }
 }
 
-void ResponseParser::setBody(Response &resp) { mMessage += resp.mBody; }
+void ResponseParser::setBody(Response &resp) { mMessage += resp.GetBody(); }

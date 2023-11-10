@@ -10,7 +10,7 @@ Http::~Http() {}
 
 void Http::RedirectURI() {
   Node *location = Common::mConfigMap->GetConfigNode(
-      mPort, mRequest.mHost, mRequest.mUri, mRequest.GetMethod());
+      mPort, mRequest.GetHost(), mRequest.GetUri(), mRequest.GetMethod());
 
   std::vector<std::string> redirectValues =
       location->FindValue(location, "return");
@@ -18,15 +18,14 @@ void Http::RedirectURI() {
   eStatusCode state =
       static_cast<eStatusCode>(std::atoi(redirectValues[0].c_str()));
 
-  mResponse.mHeaders.insert(
-      std::pair<std::string, std::string>("Location", redirectValues[1]));
+  mResponse.InsertHeader("Location", redirectValues[1]);
 
   SendResponse(state);
 }
 
 void Http::ErrorHandle(eStatusCode errorStatus) {
   Node *location = Common::mConfigMap->GetConfigNode(
-      mPort, mRequest.mHost, mRequest.mUri, mRequest.GetMethod());
+      mPort, mRequest.GetHost(), mRequest.GetUri(), mRequest.GetMethod());
 
   std::vector<std::string> configErrorPageValues =
       location->FindValue(location, "error_page");
@@ -56,8 +55,10 @@ eStatusCode Http::ReadFile(const std::string &path) {
 
   std::ifstream file(path.c_str(), std::ios::in | std::ios::binary);
   if (file.is_open()) {
-    GetResponse().mBody.assign((std::istreambuf_iterator<char>(file)),
-                               std::istreambuf_iterator<char>());
+    std::string tmp;
+    tmp.assign((std::istreambuf_iterator<char>(file)),
+               std::istreambuf_iterator<char>());
+    GetResponse().SetBody(tmp);
     file.close();
     return (SUCCESSFUL_OK);
   } else {
@@ -110,6 +111,22 @@ eStatusCode Http::CheckPathType(const std::string &path) {
   }
 }
 
+bool Http::IsCgiRequest() {
+
+  Node *location = Common::mConfigMap->GetConfigNode(
+      mPort, GetRequest().GetHost(), GetRequest().GetUri(),
+      GetRequest().GetMethod());
+  if (location == NULL) {
+    return (false);
+  }
+
+  std::vector<std::string> cgi_pass = location->FindValue(location, "cgi_pass");
+  if (cgi_pass.size()) {
+    return (true);
+  }
+  return (false);
+}
+
 void Http::SetRequest(eStatusCode state, std::vector<char> &RecvBuffer) {
   if (state != READ_OK) {
     if (state == SERVER_SERVICE_UNAVAILABLE) {
@@ -121,7 +138,6 @@ void Http::SetRequest(eStatusCode state, std::vector<char> &RecvBuffer) {
   std::string temp(RecvBuffer.begin(), RecvBuffer.end());
   mBuffer += temp;
 
-  mRequest.mContent.reserve(100000000);
   while (true) {
     eStatusCode ParseState = mRequestParser.Parse(
         mRequest, mBuffer.c_str(), mBuffer.c_str() + mBuffer.size());
@@ -135,7 +151,7 @@ void Http::SetRequest(eStatusCode state, std::vector<char> &RecvBuffer) {
     } else if (ParseState == PARSING_COMPLETED) {
       // If Connection: close, never read again from socket
 
-      if (mRequest.mKeepAlive == false) {
+      if (mRequest.GetKeepAlive() == false) {
         mKeepAlive = false;
         struct kevent event;
         EV_SET(&event, mSocket, EVFILT_READ, EV_DISABLE, 0, 0, NULL);
@@ -160,14 +176,20 @@ void Http::SendResponse(eStatusCode state) {
 }
 
 void Http::HandleRequestType() {
-  if (IsCgiRequest(*this)) {
+  if (IsCgiRequest()) {
     handleCGIRequest();
   } else {
     handleHTTPRequest();
   }
 }
 
-void Http::handleCGIRequest() { CGIHandle(*this); }
+void Http::handleCGIRequest() {
+  SharedPtr<CGI> cgiRequest(new CGI(*this));
+  // CGI *cgiRequest = new CGI(*this);
+  // CGI cgiRequest(*this);
+  mCGIList.push_back(cgiRequest);
+  cgiRequest->CgiHandle();
+}
 
 void Http::handleHTTPRequest() {
   eStatusCode state = priorityHeaders();
@@ -180,7 +202,7 @@ void Http::handleHTTPRequest() {
   IRequestHandler *method = Router::Routing(*this);
 
   method->Handle(*this);
-  // delete(method);
+  delete (method);
 }
 
 eStatusCode Http::priorityHeaders() {
@@ -198,12 +220,12 @@ eStatusCode Http::priorityHeaders() {
 
 bool Http::checkRedirect() {
   Node *location = Common::mConfigMap->GetConfigNode(
-      mPort, mRequest.mHost, mRequest.mUri, mRequest.GetMethod());
+      mPort, mRequest.GetHost(), mRequest.GetUri(), mRequest.GetMethod());
 
   int redirectCode;
   std::string redirectPath;
 
-  if (mRequest.mUri == "/") {
+  if (mRequest.GetUri() == "/") {
     std::vector<std::string> Topvalue;
     Topvalue =
         location->FindTopValue(location, "return", std::vector<std::string>());
@@ -228,7 +250,7 @@ bool Http::checkRedirect() {
 
 bool Http::checkClientMaxBodySize() {
   Node *location = Common::mConfigMap->GetConfigNode(
-      mPort, mRequest.mHost, mRequest.mUri, mRequest.GetMethod());
+      mPort, mRequest.GetHost(), mRequest.GetUri(), mRequest.GetMethod());
 
   std::vector<std::string> clientMaxBodySizeValues =
       location->FindValue(location, "client_max_body_size");
@@ -239,16 +261,17 @@ bool Http::checkClientMaxBodySize() {
       std::atoi(clientMaxBodySizeValues[0].c_str()); // overflow, k,M,G check
 
   if (mRequest.GetChunked() == true) {
-    if (mRequest.mContent.size() > valueSize) {
+    if (mRequest.GetContent().size() > valueSize) {
       return (false);
     }
   } else {
     if (clientMaxBodySizeValues.size()) {
 
+      std::multimap<std::string, std::string> headers = mRequest.GetHeaders();
       std::multimap<std::string, std::string>::iterator it;
-      it = mRequest.mHeaders.find("Content-Length");
+      it = headers.find("Content-Length");
 
-      if (it != mRequest.mHeaders.end()) {
+      if (it != headers.end()) {
         int contentLength = std::atoi(it->second.c_str());
         if (contentLength > valueSize) {
           return (false);
@@ -261,7 +284,7 @@ bool Http::checkClientMaxBodySize() {
 
 bool Http::checkLimitExcept() {
   Node *location = Common::mConfigMap->GetConfigNode(
-      mPort, mRequest.mHost, mRequest.mUri, mRequest.GetMethod());
+      mPort, mRequest.GetHost(), mRequest.GetUri(), mRequest.GetMethod());
 
   std::vector<std::string> limitExceptValue =
       location->FindValue(location, "limit_except"); // 초기화가 필요합니다.

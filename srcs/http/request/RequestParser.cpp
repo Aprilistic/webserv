@@ -52,7 +52,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
         return CLIENT_ERROR_BAD_REQUEST;
       } else {
         mState = RequestUri;
-        req.mUri.push_back(input);
+        req.PushBackUri(input);
       }
       break;
     case RequestUri:
@@ -63,11 +63,11 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       } else if (isControl(input)) {
         return CLIENT_ERROR_BAD_REQUEST;
       } else {
-        req.mUri.push_back(input);
+        req.PushBackUri(input);
       }
       break;
     case RequestHttpVersion_h:
-      if (req.mUri.empty()) {
+      if (req.GetUri().empty()) {
         return CLIENT_ERROR_BAD_REQUEST;
       }
       if (input == 'H') {
@@ -99,8 +99,8 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       break;
     case RequestHttpVersion_slash:
       if (input == '/') {
-        req.mVersionMajor = 0;
-        req.mVersionMinor = 0;
+        req.SetVersionMajor(0);
+        req.SetVersionMinor(0);
         mState = RequestHttpVersion_majorStart;
       } else {
         return CLIENT_ERROR_BAD_REQUEST;
@@ -108,7 +108,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       break;
     case RequestHttpVersion_majorStart:
       if (isDigit(input)) {
-        req.mVersionMajor = input - '0';
+        req.SetVersionMajor(input - '0');
         mState = RequestHttpVersion_major;
       } else {
         return CLIENT_ERROR_BAD_REQUEST;
@@ -118,14 +118,14 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       if (input == '.') {
         mState = RequestHttpVersion_minorStart;
       } else if (isDigit(input)) {
-        req.mVersionMajor = req.mVersionMajor * 10 + input - '0';
+        req.SetVersionMajor(req.GetVersionMajor() * 10 + input - '0');
       } else {
         return CLIENT_ERROR_BAD_REQUEST;
       }
       break;
     case RequestHttpVersion_minorStart:
       if (isDigit(input)) {
-        req.mVersionMinor = input - '0';
+        req.SetVersionMinor(input - '0');
         mState = RequestHttpVersion_minor;
       } else {
         return CLIENT_ERROR_BAD_REQUEST;
@@ -135,13 +135,13 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       if (input == '\r') {
         mState = ResponseHttpVersion_newLine;
       } else if (isDigit(input)) {
-        req.mVersionMinor = req.mVersionMinor * 10 + input - '0';
+        req.SetVersionMinor(req.GetVersionMinor() * 10 + input - '0');
       } else {
         return CLIENT_ERROR_BAD_REQUEST;
       }
       break;
     case ResponseHttpVersion_newLine:
-      if (req.mVersionMajor != 1 && req.mVersionMinor != 1) {
+      if (req.GetVersionMajor() != 1 && req.GetVersionMinor() != 1) {
         return SERVER_ERROR_HTTP_VERSION_NOT_SUPPORTED;
       }
       if (input == '\n') {
@@ -153,7 +153,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
     case HeaderLineStart:
       if (input == '\r') {
         mState = ExpectingNewline_3;
-      } else if (!req.mHeaders.empty() && (input == ' ' || input == '\t')) {
+      } else if (!req.GetHeaders().empty() && (input == ' ' || input == '\t')) {
         mState = HeaderLws;
       } else if (!isChar(input) || isControl(input) || isSpecial(input)) {
         return CLIENT_ERROR_BAD_REQUEST;
@@ -194,23 +194,23 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       if (input == '\r') {
         if (req.GetMethod() == "POST" || req.GetMethod() == "PUT") {
           if (strcasecmp(mHeaderName.c_str(), "Content-Length") == 0) {
-            req.mContentLength = atoi(mHeaderValue.c_str());
+            req.SetContentLength(atoi(mHeaderValue.c_str()));
             mContentsize = atoi(mHeaderValue.c_str());
-            req.mContent.reserve(mContentsize);
+            // req.mContent.reserve(mContentsize);
           } else if (strcasecmp(mHeaderName.c_str(), "Transfer-Encoding") ==
                      0) {
             if (strcasecmp(mHeaderValue.c_str(), "Chunked") == 0)
               mChunked = true;
           } else if (strcasecmp(mHeaderName.c_str(), "Content-Type") == 0) {
-            req.mContentType = mHeaderValue;
+            req.SetContentType(mHeaderValue);
           }
         }
         std::string tmp = mHeaderName;
         std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
         if (tmp == "host") {
-          req.mHost = mHeaderValue;
+          req.SetHost(mHeaderValue);
         }
-        req.mHeaders.insert(std::make_pair(mHeaderName, mHeaderValue));
+        req.InsertHeader(mHeaderName, mHeaderValue);
         mHeaderValue.clear();
         mState = ExpectingNewline_2;
       } else if (isControl(input)) {
@@ -227,20 +227,19 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       }
       break;
     case ExpectingNewline_3: {
-      std::multimap<std::string, std::string>::iterator it = std::find_if(
-          req.mHeaders.begin(), req.mHeaders.end(), checkIfConnection);
+      std::multimap<std::string, std::string> headers = req.GetHeaders();
+      std::multimap<std::string, std::string>::iterator it =
+          std::find_if(headers.begin(), headers.end(), checkIfConnection);
 
-      if (it != req.mHeaders.end()) {
+      if (it != headers.end()) {
         if (strcasecmp(it->second.c_str(), "Keep-Alive") == 0) {
-          req.mKeepAlive = true;
-        } else // == Close
-        {
-          req.mKeepAlive = false;
+          req.SetKeepAlive(true);
+        } else {
+          req.SetKeepAlive(false);
         }
-      } else {
-        if (req.mVersionMajor > 1 ||
-            (req.mVersionMajor == 1 && req.mVersionMinor == 1))
-          req.mKeepAlive = true;
+      } else if (req.GetVersionMajor() > 1 ||
+                 (req.GetVersionMajor() == 1 && req.GetVersionMinor() == 1)) {
+        req.SetKeepAlive(true);
       }
 
       if (mChunked) {
@@ -259,7 +258,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
     }
     case Post:
       --mContentsize;
-      req.mContent.push_back(input);
+      req.PushBackContent(input);
 
       if (mContentsize == 0) {
         mRemainingBuffer.assign(begin, end);
@@ -348,7 +347,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       }
       break;
     case ChunkData:
-      req.mContent.push_back(input);
+      req.PushBackContent(input);
 
       if (--mChunkSize == 0) {
         mState = ChunkDataNewLine_1;

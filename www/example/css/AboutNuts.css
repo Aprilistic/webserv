@@ -3,25 +3,20 @@ html {
 	height: 100vh;
 	margin: 0;
 	font-family: 'Gothic', sans-serif;
-	background-image: url(../images/back1.jpg);
-	background-size: cover;
-	background-repeat: no-repeat;
-	background-position: center;
+	background-color: rgba(21, 24, 23, 1);
 	color: rgb(253, 253, 253);
 	overflow-x: hidden;
 	overflow-y: hidden;
-}
-
-*, *:before, *:after {
-	box-sizing: border-box;
-}
-
-.main-content {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
 	justify-content: center;
-	height: calc(100vh - 40px);
+	align-items: center;
+}
+
+*,
+*:before,
+*:after {
+	box-sizing: border-box;
 }
 
 .top-nav {
@@ -79,8 +74,8 @@ html {
 }
 
 .cta-button:hover {
-	color: rgba(21, 24, 23, 1);
-	background-color: rgb(253, 253, 253);
+	color: #fff;
+	background-color: #00f;
 }
 
 .footer {
@@ -90,4 +85,53 @@ html {
 	padding: 10px;
 	text-align: center;
 	font-size: 0.8em;
+}
+
+/* Style for the peaky-blinders container */
+.peaky-blinders-container {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	grid-gap: 20px;
+	padding: 50px;
+	/* or your preferred max width */
+	margin: 0 auto;
+	border-radius: 20px;
+	/* Adjust as needed for rounded corners */
+	background: rgba(255, 255, 255, 0.1);
+	/* Semi-transparent white background */
+	backdrop-filter: blur(10px);
+	/* This will give the frosted glass effect */
+	border: 2px solid rgba(255, 255, 255, 0.3);
+	/* Light white border */
+	position: relative;
+	width: 100%;
+	max-width: 800px;
+}
+
+.member {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+}
+
+.member img {
+	width: 100px;
+	/* Adjust size as needed */
+	height: 100px;
+	/* Adjust size as needed */
+	border-radius: 50%;
+	/* Round image */
+	margin-bottom: 10px;
+}
+
+.member h3 {
+	font-size: 1.2em;
+	/* Adjust size as needed */
+}
+
+.member p {
+	font-size: 1em;
+	/* Adjust size as needed */
 }

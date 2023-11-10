@@ -8,19 +8,23 @@ public:
   Request();
   ~Request();
 
+  bool GetChunked() const;
+  bool GetKeepAlive() const;
+  int GetContentLength() const;
+  std::string GetHost() const;
+  std::string GetContentType() const;
+
   std::string GetMethod() const;
   std::string GetUri() const;
   int GetVersionMajor() const;
   int GetVersionMinor() const;
   std::multimap<std::string, std::string> GetHeaders() const;
   std::string GetContent() const;
-  std::string GetHost() const;
-  int GetContentLength() const;
-  std::string GetContentType() const;
-  bool GetKeepAlive() const;
-  bool GetChunked() const;
 
   void PushBackMethod(char &input);
+  void PushBackUri(char &input);
+  void PushBackContent(char &input);
+  void InsertHeader(std::string key, std::string value);
 
   void SetChunked(bool chunked);
   void SetUri(const std::string &uri);
@@ -36,20 +40,18 @@ public:
   std::string Inspect() const;
 
 private:
-  std::string mMethod;
   bool mChunked;
+  bool mKeepAlive;
+  int mContentLength;
+  std::string mHost;
+  std::string mContentType;
 
-public:
+  std::string mMethod;
   std::string mUri;
   int mVersionMajor;
   int mVersionMinor;
   std::multimap<std::string, std::string> mHeaders;
   std::string mContent;
-
-  std::string mHost;
-  int mContentLength;
-  std::string mContentType;
-  bool mKeepAlive;
 };
 
 #endif

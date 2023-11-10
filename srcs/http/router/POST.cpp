@@ -2,14 +2,16 @@
 
 void PostHandler::Handle(Http &http) {
   // 요청 데이터 파싱
-  std::string requestData(http.GetRequest().mContent.begin(),
-                          http.GetRequest().mContent.end());
+  std::string content = http.GetRequest().GetContent();
+  std::string requestData(content.begin(), content.end());
 
   // check if there is chunked data
   bool isChunked = false;
+  std::multimap<std::string, std::string> headers =
+      http.GetRequest().GetHeaders();
   std::multimap<std::string, std::string>::iterator it =
-      http.GetRequest().mHeaders.find("Transfer-Encoding");
-  if (it != http.GetRequest().mHeaders.end() && it->second == "chunked") {
+      headers.find("Transfer-Encoding");
+  if (it != headers.end() && it->second == "chunked") {
     isChunked = true;
   }
 
@@ -20,7 +22,7 @@ void PostHandler::Handle(Http &http) {
 
   // URI로 리소스 위치 확인
   Node *location = Common::mConfigMap->GetConfigNode(
-      http.GetPort(), http.GetRequest().mHost, http.GetRequest().mUri,
+      http.GetPort(), http.GetRequest().GetHost(), http.GetRequest().GetUri(),
       http.GetRequest().GetMethod());
   if (location == NULL) {
     return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
@@ -38,7 +40,7 @@ void PostHandler::Handle(Http &http) {
     }
   }
 
-  std::string resolvedPath = http.GetRequest().mUri;
+  std::string resolvedPath = http.GetRequest().GetUri();
   size_t pos = resolvedPath.find(uri[0]);
   if (pos != std::string::npos) {
     resolvedPath.replace(pos, uri[0].size(), alias[0]);

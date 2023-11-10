@@ -1,7 +1,6 @@
 #ifndef HTTP_HPP
 #define HTTP_HPP
 
-#include "CGI.hpp"
 #include "Common.hpp"
 #include "ConfigMap.hpp"
 #include "Core.hpp"
@@ -16,6 +15,7 @@
 #define DEFAULT_ERROR_PAGE_PATH "./www/error/default.html"
 
 class IRequestHandler;
+class CGI;
 
 class Http {
 public:
@@ -28,6 +28,7 @@ public:
                         eStatusCode pathType);
   eStatusCode CheckPathType(const std::string &path);
 
+  bool IsCgiRequest();
   void RedirectURI();
   void ErrorHandle(eStatusCode errorStatus);
   void HandleRequestType(void);
@@ -43,7 +44,8 @@ public:
   Response &GetResponse(void);
   std::string &GetSendBuffer(void);
   ResponseParser &GetResponseParser(void);
-
+  
+  
 private:
   void handleHTTPRequest(void);
   void handleCGIRequest(void);
@@ -66,6 +68,7 @@ private:
   bool &mKeepAlive;
   int &mRemainingRequest;
   std::string &mSendBufferRef;
+  std::vector<SharedPtr<CGI> > mCGIList;
 };
 
 #endif

@@ -2,9 +2,21 @@
 
 Request::Request()
     : mChunked(false), mVersionMajor(0), mVersionMinor(0), mContentLength(0),
-      mKeepAlive(false) {}
+      mKeepAlive(false) {
+  mContent.reserve(100000000);
+}
 
 Request::~Request() {}
+
+bool Request::GetChunked() const { return mChunked; }
+
+bool Request::GetKeepAlive() const { return mKeepAlive; }
+
+int Request::GetContentLength() const { return mContentLength; }
+
+std::string Request::GetHost() const { return mHost; }
+
+std::string Request::GetContentType() const { return mContentType; }
 
 std::string Request::GetMethod() const { return mMethod; }
 
@@ -20,17 +32,15 @@ std::multimap<std::string, std::string> Request::GetHeaders() const {
 
 std::string Request::GetContent() const { return mContent; }
 
-std::string Request::GetHost() const { return mHost; }
-
-int Request::GetContentLength() const { return mContentLength; }
-
-std::string Request::GetContentType() const { return mContentType; }
-
-bool Request::GetKeepAlive() const { return mKeepAlive; }
-
-bool Request::GetChunked() const { return mChunked; }
-
 void Request::PushBackMethod(char &c) { mMethod.push_back(c); }
+
+void Request::PushBackUri(char &c) { mUri.push_back(c); }
+
+void Request::PushBackContent(char &c) { mContent.push_back(c); }
+
+void Request::InsertHeader(std::string key, std::string value) {
+  mHeaders.insert(std::pair<std::string, std::string>(key, value));
+}
 
 void Request::SetChunked(bool chunked) { mChunked = chunked; }
 
@@ -46,7 +56,6 @@ void Request::SetVersionMinor(int versionMinor) {
 
 void Request::SetHeaders(
     const std::multimap<std::string, std::string> &headers) {
-
   mHeaders = headers;
 }
 

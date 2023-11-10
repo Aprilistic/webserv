@@ -114,32 +114,26 @@ void ResponseParser::setMandatoryHeaderFields(Http &http) {
   struct tm *timeinfo = localtime(&now);
   char buf[80];
   strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S GMT", timeinfo);
-  http.GetResponse().mHeaders.insert(
-      std::pair<std::string, std::string>("Date", buf));
+  http.GetResponse().InsertHeader("Date", buf);
 
   // Server
-  http.GetResponse().mHeaders.insert(
-      std::pair<std::string, std::string>("Server", "*u*king webserv"));
+  http.GetResponse().InsertHeader("Server", "*u*king webserv");
 
   // Content-Length
-  std::string contentLength = toString(http.GetResponse().mBody.size());
-  http.GetResponse().mHeaders.insert(
-      std::pair<std::string, std::string>("Content-Length", contentLength));
+  std::string contentLength = toString(http.GetResponse().GetBody().size());
+  http.GetResponse().InsertHeader("Content-Length", contentLength);
 
   // Content-Type
-  if (http.GetResponse().mHeaders.find("Content-Type") ==
-      http.GetResponse().mHeaders.end()) {
+  if (http.GetResponse().GetHeaders().find("Content-Type") ==
+      http.GetResponse().GetHeaders().end()) {
     std::string contentType = getFileType(http);
-    http.GetResponse().mHeaders.insert(
-        std::pair<std::string, std::string>("Content-Type", contentType));
+    http.GetResponse().InsertHeader("Content-Type", contentType);
   }
 
   // Connection
-  if (http.GetRequest().mKeepAlive == true) {
-    http.GetResponse().mHeaders.insert(
-        std::pair<std::string, std::string>("Connection", "keep-alive"));
+  if (http.GetRequest().GetKeepAlive() == true) {
+    http.GetResponse().InsertHeader("Connection", "keep-alive");
   } else {
-    http.GetResponse().mHeaders.insert(
-        std::pair<std::string, std::string>("Connection", "close"));
+    http.GetResponse().InsertHeader("Connection", "close");
   }
 }
