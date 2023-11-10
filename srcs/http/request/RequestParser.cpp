@@ -194,7 +194,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       if (input == '\r') {
         if (req.GetMethod() == "POST" || req.GetMethod() == "PUT") {
           if (strcasecmp(mHeaderName.c_str(), "Content-Length") == 0) {
-            req.mContentLength = atoi(mHeaderValue.c_str());
+            req.SetContentLength(atoi(mHeaderValue.c_str()));
             mContentsize = atoi(mHeaderValue.c_str());
             req.mContent.reserve(mContentsize);
           } else if (strcasecmp(mHeaderName.c_str(), "Transfer-Encoding") ==

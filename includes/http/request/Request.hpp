@@ -45,11 +45,11 @@ private:
   int mVersionMinor;
   std::multimap<std::string, std::string> mHeaders;
   std::string mHost;
+  int mContentLength;
 
 public:
   std::string mContent;
 
-  int mContentLength;
   std::string mContentType;
   bool mKeepAlive;
 };

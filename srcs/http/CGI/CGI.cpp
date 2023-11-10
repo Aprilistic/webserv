@@ -85,7 +85,7 @@ void CGI::setAllEnv() {
   setenv("CONTENT_TYPE", tmp.mContentType.c_str(), 1);
 
   // CONTENT_LENGTH: 요청 본문의 길이.
-  ss << mHttp.GetRequest().mContentLength;
+  ss << mHttp.GetRequest().GetContentLength();
   setenv("CONTENT_LENGTH", ss.str().c_str(), 1);
 
   // GATEWAY_INTERFACE: CGI 스펙의 버전.
