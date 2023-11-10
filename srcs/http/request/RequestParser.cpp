@@ -208,7 +208,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
         std::string tmp = mHeaderName;
         std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
         if (tmp == "host") {
-          req.mHost = mHeaderValue;
+          req.SetHost(mHeaderValue);
         }
         req.InsertHeader(mHeaderName, mHeaderValue);
         mHeaderValue.clear();

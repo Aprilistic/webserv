@@ -67,7 +67,7 @@ void CGI::processHandler() {
 void CGI::setAllEnv() {
 
   Node *location = Common::mConfigMap->GetConfigNode(
-      mHttp.GetPort(), mHttp.GetRequest().mHost, mHttp.GetRequest().GetUri(),
+      mHttp.GetPort(), mHttp.GetRequest().GetHost(), mHttp.GetRequest().GetUri(),
       mHttp.GetRequest().GetMethod());
   if (location == NULL) {
     return (mHttp.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
@@ -254,7 +254,7 @@ void CGI::CgiHandle() {
 
     // cgi pass 가져오기
     Node *location = Common::mConfigMap->GetConfigNode(
-        mHttp.GetPort(), mHttp.GetRequest().mHost, mHttp.GetRequest().GetUri(),
+        mHttp.GetPort(), mHttp.GetRequest().GetHost(), mHttp.GetRequest().GetUri(),
         mHttp.GetRequest().GetMethod());
     if (location == NULL) {
       return (mHttp.ErrorHandle(CLIENT_ERROR_NOT_FOUND));

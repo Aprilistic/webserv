@@ -3,7 +3,7 @@
 void GetHandler::Handle(Http &http) {
 
   Node *location = Common::mConfigMap->GetConfigNode(
-      http.GetPort(), http.GetRequest().mHost, http.GetRequest().GetUri(),
+      http.GetPort(), http.GetRequest().GetHost(), http.GetRequest().GetUri(),
       http.GetRequest().GetMethod());
 
   // NULL 인경우 -> 일치하는 location이 없고 / 도 설정되어 있지 않은 경우
