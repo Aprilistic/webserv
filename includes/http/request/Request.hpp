@@ -46,11 +46,11 @@ private:
   std::multimap<std::string, std::string> mHeaders;
   std::string mHost;
   int mContentLength;
+  std::string mContentType;
 
 public:
   std::string mContent;
 
-  std::string mContentType;
   bool mKeepAlive;
 };
 

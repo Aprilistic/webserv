@@ -82,7 +82,7 @@ void CGI::setAllEnv() {
   setenv("AUTH_TYPE", "", 1);
 
   // CONTENT_TYPE: 요청 본문의 MIME 타입, 주로 POST 요청에서 사용됩니다.
-  setenv("CONTENT_TYPE", tmp.mContentType.c_str(), 1);
+  setenv("CONTENT_TYPE", tmp.GetContentType().c_str(), 1);
 
   // CONTENT_LENGTH: 요청 본문의 길이.
   ss << mHttp.GetRequest().GetContentLength();
