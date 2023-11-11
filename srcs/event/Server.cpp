@@ -74,5 +74,9 @@ void Server::readHandler() {
     return;
   }
 
+  fcntl(socket, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
+  
+
+
   mConnection[socket] = SharedPtr<Connection>(new Connection(socket, mPort));
 }

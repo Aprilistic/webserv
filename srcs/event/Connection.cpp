@@ -11,7 +11,6 @@ Connection::Connection(int socket, int port)
   mRecvBuffer.reserve(RECV_BUFFER_SIZE);
   mSendBuffer.reserve(SEND_BUFFER_SIZE);
 
-  fcntl(mSocket, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
   EV_SET(&events[0], mSocket, EVFILT_READ, EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, this);
   // EV_SET(&events[1], mSocket, EVFILT_WRITE, EV_ADD | EV_CLEAR | EV_DISABLE, 0, 0, this);
   EV_SET(&events[1], mSocket, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, this);
