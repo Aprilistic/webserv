@@ -1,6 +1,6 @@
 #include "Http.hpp"
 #include "ResponseParser.hpp"
-#include "string.hpp"
+#include "String.hpp"
 #include "WebServer.hpp"
 
 #include <ctime>
@@ -40,19 +40,6 @@ static bool parseDate(const std::string &dateString, struct tm &tm) {
   tm.tm_isdst = -1; // Not dealing with daylight saving time
 
   return true;
-}
-
-static bool isExpired(const std::string &lastVisit) {
-  struct tm lastVisitTm;
-  if (!parseDate(lastVisit, lastVisitTm)) {
-    std::cerr << "Failed to parse expiry date." << std::endl;
-    return true; // Treat parse failure as expired
-  }
-
-  time_t lastVisitTime = mktime(&lastVisitTm);
-  time_t currentTime = time(nullptr);
-
-  return difftime(lastVisitTime, currentTime) > SESSION_TIMEOUT;
 }
 
 static std::string trim(const std::string &str) {
@@ -107,14 +94,8 @@ void ResponseParser::setCookie(Http &http) {
     std::map<std::string, std::string> cookieMap = parseCookie(it->second);
     if (cookieMap.count("id")) {
       if (access(cookieMap["id"].c_str(), F_OK | R_OK) == 0) {
-        std::ifstream ifs(cookieMap["id"].c_str(), std::ios::in);
-        std::string line;
-        std::getline(ifs, line);
-        if (isExpired(line) == false) {
-          isExist = true;
-          cookieFileName += cookieMap["id"];
-        }
-        ifs.close();
+        isExist = true;
+				cookieFileName = cookieMap["id"];
       }
     }
   }
@@ -126,12 +107,13 @@ void ResponseParser::setCookie(Http &http) {
 
   std::ofstream ofs(cookieFileName.c_str(), std::ios::out | std::ios::trunc);
   if (ofs.is_open()) {
-		std::multimap<std::string, std::string>::iterator it = http.GetResponse().GetHeaders().find("Date");
-		std::string responseTime = it->second;
+    std::multimap<std::string, std::string>::iterator it =
+        http.GetResponse().GetHeaders().find("Date");
+    std::string responseTime = it->second;
     ofs << responseTime;
     ofs.close();
   }
 
-	std::string cookie = "id=" + cookieFileName + "; Max-Age=" + toString(SESSION_TIMEOUT);
+  std::string cookie = "id=" + cookieFileName + "; Max-Age=" + toString(SESSION_TIMEOUT);
   http.GetResponse().InsertHeader("Set-Cookie", cookie);
 }
