@@ -262,7 +262,7 @@ void CGI::CgiHandle() {
     std::string cgiPass = location->FindValue(location, "cgi_pass")[0];
 
     char *argv[] = {(char *)cgiPass.c_str(), NULL};
-    execve(NULL, argv, environ);
+    execve(argv[0], argv, environ);
     // execve 실패 시
     exit(EXIT_FAILURE);
   } else {
