@@ -7,7 +7,11 @@
 #include "Server.hpp"
 
 #define MAX_EVENT 1024
+
 #define SESSION_TIMEOUT 100
+
+#define RECV_BUFFER_SIZE 16384
+#define SEND_BUFFER_SIZE 16384
 
 class WebServer {
 public:

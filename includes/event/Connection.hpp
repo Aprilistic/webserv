@@ -6,9 +6,6 @@
 #include "Http.hpp"
 #include "IEventHandler.hpp"
 
-#define RECV_BUFFER_SIZE 16384
-#define SEND_BUFFER_SIZE 16384
-
 class Connection : public IEventHandler {
 public:
   Connection(int socket, int port);
