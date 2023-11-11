@@ -17,7 +17,6 @@ public:
 private:
   Server();
   void readHandler();
-  void timerHandler();
 
 public:
   std::map<int, SharedPtr<Connection> > mConnection;

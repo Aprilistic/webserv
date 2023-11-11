@@ -61,9 +61,6 @@ void Server::EventHandler(struct kevent &currentEvent) {
   case EVFILT_READ:
     readHandler();
     break;
-  case EVFILT_TIMER:
-    timerHandler();
-    break;
   default:
     break;
   }
@@ -79,7 +76,3 @@ void Server::readHandler() {
 
   mConnection[socket] = SharedPtr<Connection>(new Connection(socket, mPort));
 }
-
-
-void Server::timerHandler() {}
-
