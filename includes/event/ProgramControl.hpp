@@ -8,11 +8,12 @@
 class ProgramControl : public IEventHandler {
 public:
   virtual void EventHandler(struct kevent &currentEvent);
-  void RegisterTerminationSignals(void);
-  void UnregisterTerminationSignals(void);
-
+  ProgramControl();
+  ~ProgramControl();
 private:
-  static void signalHandler(int signal);
+  static void timerHandler();
+
+  void eraseCookieFile();
 };
 
 #endif
