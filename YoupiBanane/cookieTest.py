@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # Python script to show the value of a cookie from an environment variable
 
 import os
