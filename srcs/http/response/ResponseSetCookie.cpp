@@ -103,6 +103,7 @@ void ResponseParser::setCookie(Http &http) {
   if (isExist == false) { // create cookie
     std::string hostname = http.GetRequest().GetHost();
     cookieFileName += hostname + "_" + toString(number++) + ".cookie";
+    number %= 987654321;
   }
 
   std::ofstream ofs(cookieFileName.c_str(), std::ios::out | std::ios::trunc);
