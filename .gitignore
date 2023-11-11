@@ -43,3 +43,7 @@ leaks.txt
 # tmp
 tmp
 tmp/*
+
+# cookie
+cookie
+cookie/*
