@@ -22,6 +22,9 @@ void CGI::EventHandler(struct kevent &currentEvent) {
 
 void CGI::processHandler(struct kevent &currentEvent) {
   if ((currentEvent.fflags & NOTE_EXIT) == 0) {
+    struct kevent event;
+    EV_SET(&event, mPid, EVFILT_PROC, EV_ADD | EV_ENABLE | EV_ONESHOT, NOTE_EXIT, 0, this);
+    kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
     return;
   }
 
@@ -269,7 +272,7 @@ void CGI::CgiHandle() {
     // 부모 프로세스
     fcntl(mPid, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
     struct kevent event;
-    EV_SET(&event, mPid, EVFILT_PROC, EV_ADD | EV_ENABLE, NOTE_EXIT, 0, this);
+    EV_SET(&event, mPid, EVFILT_PROC, EV_ADD | EV_ENABLE | EV_ONESHOT, NOTE_EXIT, 0, this);
     kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
   }
 }
