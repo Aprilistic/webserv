@@ -20,6 +20,10 @@ Connection::Connection(int socket, int port)
 Connection::~Connection() {}
 
 void Connection::EventHandler(struct kevent &currentEvent) {
+  if (currentEvent.flags & EV_EOF) {
+    disconnect();
+    return ;
+  }
   if (currentEvent.flags & EV_ERROR) {
     return ;
   }
