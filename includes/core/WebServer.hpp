@@ -7,6 +7,7 @@
 #include "Server.hpp"
 
 #define MAX_EVENT 1024
+#define SESSION_TIMEOUT 100
 
 class WebServer {
 public:

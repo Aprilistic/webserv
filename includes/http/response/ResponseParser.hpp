@@ -25,6 +25,7 @@ private:
   void setResponse(Http &http, eStatusCode state);
   void setStatusLine(Http &http, eStatusCode state);
   void setMandatoryHeaderFields(Http &http);
+  void setCookie(Http &http);
   std::string getStatusMessage(eStatusCode errorStatus);
   std::string getFileType(Http &http);
 

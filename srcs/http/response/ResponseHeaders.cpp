@@ -4,6 +4,7 @@
 void ResponseParser::setResponse(Http &http, eStatusCode state) {
   setStatusLine(http, state);
   setMandatoryHeaderFields(http);
+  setCookie(http);
 }
 
 void ResponseParser::setStatusLine(Http &http, eStatusCode state) {
@@ -42,7 +43,7 @@ std::string ResponseParser::getStatusMessage(eStatusCode errorStatus) {
     return ("Use Proxy");
   case (REDIRECTION_TEMPORARY_REDIRECT):
     return ("Temporary Redirect");
-  case (REDIRECTION_PERMANENT_REDIRECT): 
+  case (REDIRECTION_PERMANENT_REDIRECT):
     return ("Permanent Redirect");
   case (CLIENT_ERROR_BAD_REQUEST):
     return ("Bad Request");
@@ -113,7 +114,7 @@ void ResponseParser::setMandatoryHeaderFields(Http &http) {
   time_t now = time(0);
   struct tm *timeinfo = localtime(&now);
   char buf[80];
-  strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S GMT", timeinfo);
+  strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S KST", timeinfo);
   http.GetResponse().InsertHeader("Date", buf);
 
   // Server
