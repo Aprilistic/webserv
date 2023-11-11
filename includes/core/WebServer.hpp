@@ -10,8 +10,8 @@
 
 #define SESSION_TIMEOUT 100
 
-#define RECV_BUFFER_SIZE 16384
-#define SEND_BUFFER_SIZE 16384
+#define RECV_BUFFER_SIZE 131072
+#define SEND_BUFFER_SIZE 131072
 
 class WebServer {
 public:

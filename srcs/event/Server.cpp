@@ -75,8 +75,21 @@ void Server::readHandler() {
   }
 
   fcntl(socket, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
-  
 
+  // int sndBufSize = SEND_BUFFER_SIZE;
+  // int rcvBufSize = RECV_BUFFER_SIZE;
+
+  // if (setsockopt(socket, SOL_SOCKET, SO_SNDBUF, &sndBufSize,
+  //                sizeof(sndBufSize)) < 0) {
+  //   std::cerr << RED << "Error: Failed to set send buffer size: "
+  //             << std::string(strerror(errno)) << RESET << std::endl;
+  // }
+
+  // if (setsockopt(socket, SOL_SOCKET, SO_RCVBUF, &rcvBufSize,
+  //                sizeof(rcvBufSize)) < 0) {
+  //   std::cerr << RED << "Error: Failed to set receive buffer size: "
+  //             << std::string(strerror(errno)) << RESET << std::endl;
+  // }
 
   mConnection[socket] = SharedPtr<Connection>(new Connection(socket, mPort));
 }
