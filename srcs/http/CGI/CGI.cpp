@@ -11,7 +11,7 @@ void CGI::EventHandler(struct kevent &currentEvent) {
   if (currentEvent.flags & EV_ERROR) {
     return ;
   }
-  switch (currentEvent.filter) {
+  switch (currentEvent. filter) {
   case EVFILT_PROC:
     processHandler(currentEvent);
     break;
@@ -63,7 +63,6 @@ void CGI::processHandler(struct kevent &currentEvent) {
 }
 
 void CGI::setAllEnv() {
-
   Node *location = Common::mConfigMap->GetConfigNode(
       mHttp.GetPort(), mHttp.GetRequest().GetHost(),
       mHttp.GetRequest().GetUri(), mHttp.GetRequest().GetMethod());

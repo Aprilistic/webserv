@@ -74,6 +74,7 @@ void Server::readHandler() {
   if (socket == -1) {
     std::cout << RED << "Error: Failed to accept the connection: "
               << std::string(strerror(errno)) << RESET << std::endl;
+    return;
   }
 
   mConnection[socket] = SharedPtr<Connection>(new Connection(socket, mPort));
