@@ -21,9 +21,12 @@ void CGI::EventHandler(struct kevent &currentEvent) {
 }
 
 void CGI::processHandler(struct kevent &currentEvent) {
+  if ((currentEvent.fflags & NOTE_EXIT) == 0){
+    return ;
+  }
 
   int status;
-  waitpid(mPid, &status, 0); // 자식 프로세스가 종료될 때까지 대기
+  waitpid(mPid, &status, WNOHANG); // 자식 프로세스가 종료될 때까지 대기
   int exitStatus = 0;
   if (WIFEXITED(status)) {
     exitStatus = WEXITSTATUS(status); // 자식 프로세스의 종료 상태를 반환
@@ -258,8 +261,7 @@ void CGI::CgiHandle() {
     // 부모 프로세스
     fcntl(mPid, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
     struct kevent event;
-    EV_SET(&event, mPid, EVFILT_PROC, EV_ADD | EV_ENABLE | EV_ONESHOT,
-           NOTE_EXIT, 0, this);
+    EV_SET(&event, mPid, EVFILT_PROC, EV_ADD | EV_ENABLE, NOTE_EXIT, 0, this);
     kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
   }
 }
