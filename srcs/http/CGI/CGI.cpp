@@ -9,9 +9,9 @@ CGI::~CGI() {}
 
 void CGI::EventHandler(struct kevent &currentEvent) {
   if (currentEvent.flags & EV_ERROR) {
-    return ;
+    return;
   }
-  switch (currentEvent. filter) {
+  switch (currentEvent.filter) {
   case EVFILT_PROC:
     processHandler(currentEvent);
     break;
@@ -21,8 +21,8 @@ void CGI::EventHandler(struct kevent &currentEvent) {
 }
 
 void CGI::processHandler(struct kevent &currentEvent) {
-  if ((currentEvent.fflags & NOTE_EXIT) == 0){
-    return ;
+  if ((currentEvent.fflags & NOTE_EXIT) == 0) {
+    return;
   }
 
   int status;
@@ -122,9 +122,15 @@ void CGI::setAllEnv() {
   setenv("REQUEST_METHOD", tmp.GetMethod().c_str(), 1);
 
   // SCRIPT_NAME: 실행되는 CGI 스크립트의 이름.
-  const char *pwd = getenv("PWD");
-  std::string path_str = std::string(pwd) + "/cgi_tester";
-  setenv("SCRIPT_NAME", path_str.c_str(), 1);
+  std::string cgiPass = "";
+  Node *configNode = Common::mConfigMap->GetConfigNode(
+      mHttp.GetPort(), mHttp.GetRequest().GetHost(),
+      mHttp.GetRequest().GetUri(), mHttp.GetRequest().GetMethod());
+  if (configNode == NULL) {
+    return (mHttp.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
+  }
+  cgiPass = location->FindValue(location, "cgi_pass")[0];
+  setenv("SCRIPT_NAME", cgiPass.c_str(), 1);
 
   // SERVER_NAME: 서버의 호스트 이름.
   setenv("SERVER_NAME", server_name[0].c_str(), 1);
@@ -250,7 +256,8 @@ void CGI::CgiHandle() {
         mHttp.GetPort(), mHttp.GetRequest().GetHost(),
         mHttp.GetRequest().GetUri(), mHttp.GetRequest().GetMethod());
     if (location == NULL) {
-      return (mHttp.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
+      mHttp.ErrorHandle(CLIENT_ERROR_NOT_FOUND);
+      exit(EXIT_FAILURE);
     }
     std::string cgiPass = location->FindValue(location, "cgi_pass")[0];
     execve(cgiPass.c_str(), NULL, environ);
