@@ -9,31 +9,33 @@ CGI::~CGI() {}
 
 void CGI::EventHandler(struct kevent &currentEvent) {
   if (currentEvent.flags & EV_ERROR) {
-    // error
+    return;
   }
   switch (currentEvent.filter) {
   case EVFILT_PROC:
-    processHandler();
+    processHandler(currentEvent);
     break;
   default:
-    assert("Connection::EventHandler: default" == 0);
     break;
   }
 }
 
-void CGI::processHandler() {
-  std::cout << RED << "processHandler" << RESET << std::endl;
+void CGI::processHandler(struct kevent &currentEvent) {
+  if ((currentEvent.fflags & NOTE_EXIT) == 0) {
+    struct kevent event;
+    EV_SET(&event, mPid, EVFILT_PROC, EV_ADD | EV_ENABLE | EV_ONESHOT, NOTE_EXIT, 0, this);
+    kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
+    return;
+  }
 
   int status;
-  waitpid(mPid, &status, 0); // 자식 프로세스가 종료될 때까지 대기
+  waitpid(mPid, &status, WNOHANG); // 자식 프로세스가 종료될 때까지 대기
   int exitStatus = 0;
   if (WIFEXITED(status)) {
     exitStatus = WEXITSTATUS(status); // 자식 프로세스의 종료 상태를 반환
   } else if (WIFSIGNALED(status)) {
     exitStatus = WTERMSIG(status);
   }
-  std::cout << RED << "exitStatus = " << exitStatus << RESET << std::endl;
-
   if (exitStatus != 0) {
     return (mHttp.ErrorHandle(SERVER_ERROR_INTERNAL_SERVER_ERROR));
   }
@@ -41,7 +43,6 @@ void CGI::processHandler() {
   // CGI 스크립트의 출력을 읽기 위한 ifstream 객체 생성
   std::ifstream responseFile(mOutputFileName.c_str(), std::ios::in);
   if (!responseFile.is_open()) {
-    std::cout << RED << "yogiyo" << RESET << std::endl;
     return (mHttp.ErrorHandle(SERVER_ERROR_INTERNAL_SERVER_ERROR));
   }
 
@@ -65,7 +66,6 @@ void CGI::processHandler() {
 }
 
 void CGI::setAllEnv() {
-
   Node *location = Common::mConfigMap->GetConfigNode(
       mHttp.GetPort(), mHttp.GetRequest().GetHost(),
       mHttp.GetRequest().GetUri(), mHttp.GetRequest().GetMethod());
@@ -125,9 +125,15 @@ void CGI::setAllEnv() {
   setenv("REQUEST_METHOD", tmp.GetMethod().c_str(), 1);
 
   // SCRIPT_NAME: 실행되는 CGI 스크립트의 이름.
-  const char *pwd = getenv("PWD");
-  std::string path_str = std::string(pwd) + "/cgi_tester";
-  setenv("SCRIPT_NAME", path_str.c_str(), 1);
+  std::string cgiPass = "";
+  Node *configNode = Common::mConfigMap->GetConfigNode(
+      mHttp.GetPort(), mHttp.GetRequest().GetHost(),
+      mHttp.GetRequest().GetUri(), mHttp.GetRequest().GetMethod());
+  if (configNode == NULL) {
+    return (mHttp.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
+  }
+  cgiPass = location->FindValue(location, "cgi_pass")[0];
+  setenv("SCRIPT_NAME", cgiPass.c_str(), 1);
 
   // SERVER_NAME: 서버의 호스트 이름.
   setenv("SERVER_NAME", server_name[0].c_str(), 1);
@@ -220,7 +226,6 @@ eStatusCode CGI::cgiResponseParsing(std::string &response) {
 void CGI::CgiHandle() {
   static int cnt;
   // 요청 내용을 파일에 쓰기 위한 ofstream 객체 생성
-  // std::string tmpFileName = "cgi_request_" + generateUniqueHash("./tmp");
   std::string tmpFileName = "cgi_request_" + toString(cnt);
   mRequestFileName = "./tmp/" + tmpFileName + ".txt";
   std::ofstream requestFile(mRequestFileName.c_str(),
@@ -230,13 +235,11 @@ void CGI::CgiHandle() {
     return (mHttp.ErrorHandle(SERVER_ERROR_INTERNAL_SERVER_ERROR));
   }
 
-  std::cout << "count: " << cnt << std::endl;
   // 요청 내용을 임시 파일에 쓰기
   requestFile << mHttp.GetRequest().GetContent();
   requestFile.close(); // 파일 쓰기 완료 후 닫기
 
   // CGI 스크립트 결과를 받을 파일 생성
-  // tmpFileName = "cgi_output_" + generateUniqueHash("./tmp");
   tmpFileName = "cgi_output_" + toString(cnt++);
   mOutputFileName = "./tmp/" + tmpFileName + ".txt";
 
@@ -256,18 +259,20 @@ void CGI::CgiHandle() {
         mHttp.GetPort(), mHttp.GetRequest().GetHost(),
         mHttp.GetRequest().GetUri(), mHttp.GetRequest().GetMethod());
     if (location == NULL) {
-      return (mHttp.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
+      mHttp.ErrorHandle(CLIENT_ERROR_NOT_FOUND);
+      exit(EXIT_FAILURE);
     }
     std::string cgiPass = location->FindValue(location, "cgi_pass")[0];
-    execve(cgiPass.c_str(), NULL, environ);
+
+    char *argv[] = {(char *)cgiPass.c_str(), NULL};
+    execve(argv[0], argv, environ);
     // execve 실패 시
     exit(EXIT_FAILURE);
   } else {
     // 부모 프로세스
     fcntl(mPid, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
     struct kevent event;
-    EV_SET(&event, mPid, EVFILT_PROC, EV_ADD | EV_ENABLE | EV_ONESHOT,
-           NOTE_EXIT, 0, this);
+    EV_SET(&event, mPid, EVFILT_PROC, EV_ADD | EV_ENABLE | EV_ONESHOT, NOTE_EXIT, 0, this);
     kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
   }
 }

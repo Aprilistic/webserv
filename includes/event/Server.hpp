@@ -17,13 +17,8 @@ public:
 private:
   Server();
   void readHandler();
-  void writeHandler();
-  void timerHandler();
-  void signalHandler();
 
-// Do we need mConnection to be public?
 public:
-  // std::map<int, Connection *> mConnection;
   std::map<int, SharedPtr<Connection> > mConnection;
 
 private:

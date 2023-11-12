@@ -55,23 +55,13 @@ Server::~Server() {
 
 void Server::EventHandler(struct kevent &currentEvent) {
   if (currentEvent.flags & EV_ERROR) {
-    // error
+    return;
   }
   switch (currentEvent.filter) {
   case EVFILT_READ:
     readHandler();
     break;
-  case EVFILT_WRITE:
-    writeHandler();
-    break;
-  case EVFILT_TIMER:
-    timerHandler();
-    break;
-  case EVFILT_SIGNAL:
-    signalHandler();
-    break;
   default:
-    assert("Server::EventHandler: default" == 0);
     break;
   }
 }
@@ -81,13 +71,25 @@ void Server::readHandler() {
   if (socket == -1) {
     std::cout << RED << "Error: Failed to accept the connection: "
               << std::string(strerror(errno)) << RESET << std::endl;
+    return;
   }
+
+  fcntl(socket, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
+
+  // int sndBufSize = SEND_BUFFER_SIZE;
+  // int rcvBufSize = RECV_BUFFER_SIZE;
+
+  // if (setsockopt(socket, SOL_SOCKET, SO_SNDBUF, &sndBufSize,
+  //                sizeof(sndBufSize)) < 0) {
+  //   std::cerr << RED << "Error: Failed to set send buffer size: "
+  //             << std::string(strerror(errno)) << RESET << std::endl;
+  // }
+
+  // if (setsockopt(socket, SOL_SOCKET, SO_RCVBUF, &rcvBufSize,
+  //                sizeof(rcvBufSize)) < 0) {
+  //   std::cerr << RED << "Error: Failed to set receive buffer size: "
+  //             << std::string(strerror(errno)) << RESET << std::endl;
+  // }
 
   mConnection[socket] = SharedPtr<Connection>(new Connection(socket, mPort));
 }
-
-void Server::writeHandler() {}
-
-void Server::timerHandler() {}
-
-void Server::signalHandler() {}

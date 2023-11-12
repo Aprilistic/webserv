@@ -4,10 +4,14 @@
 #include "Config.hpp"
 #include "Connection.hpp"
 #include "Core.hpp"
-#include "ProgramControl.hpp"
 #include "Server.hpp"
 
 #define MAX_EVENT 1024
+
+#define SESSION_TIMEOUT 100
+
+#define RECV_BUFFER_SIZE 131072
+#define SEND_BUFFER_SIZE 131072
 
 class WebServer {
 public:
@@ -23,8 +27,6 @@ private:
   bool mGood;
   std::map<int, Server *> mServerList;
   std::vector<struct kevent> mEventList;
-
-  ProgramControl mControlInstance;
 };
 
 #endif

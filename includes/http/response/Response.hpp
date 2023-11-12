@@ -12,7 +12,7 @@ public:
   int GetVersionMinor() const;
   unsigned int GetStatusCode() const;
   std::string GetStatus() const;
-  std::multimap<std::string, std::string> GetHeaders() const;
+  std::multimap<std::string, std::string> &GetHeaders();
   std::string GetBody() const;
   bool GetKeepAlive() const;
 

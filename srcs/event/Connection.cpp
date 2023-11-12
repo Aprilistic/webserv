@@ -1,6 +1,7 @@
 #include "Connection.hpp"
 #include "Node.hpp"
 #include "Router.hpp"
+#include "WebServer.hpp"
 
 Connection::Connection(int socket, int port)
     : mSocket(socket), mPort(port), mKeepAlive(true), mRemainingRequest(0),
@@ -10,8 +11,7 @@ Connection::Connection(int socket, int port)
   mRecvBuffer.reserve(RECV_BUFFER_SIZE);
   mSendBuffer.reserve(SEND_BUFFER_SIZE);
 
-  fcntl(mSocket, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
-  EV_SET(&events[0], mSocket, EVFILT_READ, EV_ADD | EV_CLEAR, 0, 0, this);
+  EV_SET(&events[0], mSocket, EVFILT_READ, EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, this);
   // EV_SET(&events[1], mSocket, EVFILT_WRITE, EV_ADD | EV_CLEAR | EV_DISABLE, 0, 0, this);
   EV_SET(&events[1], mSocket, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, this);
   kevent(Common::mKqueue, events, 2, NULL, 0, NULL);
@@ -20,8 +20,12 @@ Connection::Connection(int socket, int port)
 Connection::~Connection() {}
 
 void Connection::EventHandler(struct kevent &currentEvent) {
+  if (currentEvent.flags & EV_EOF) {
+    disconnect();
+    return ;
+  }
   if (currentEvent.flags & EV_ERROR) {
-    // error
+    return ;
   }
   switch (currentEvent.filter) {
   case EVFILT_READ:
@@ -30,17 +34,7 @@ void Connection::EventHandler(struct kevent &currentEvent) {
   case EVFILT_WRITE:
     writeHandler();
     break;
-  case EVFILT_TIMER:
-    timerHandler();
-    break;
-  case EVFILT_SIGNAL:
-    signalHandler();
-    break;
-  case EVFILT_PROC:
-    // processHandler();
-    break;
   default:
-    assert("Connection::EventHandler: default" == 0);
     break;
   }
 }
@@ -98,14 +92,6 @@ void Connection::writeHandler() {
       return;
     }
   }
-}
-
-void Connection::timerHandler() {
-  // error
-}
-
-void Connection::signalHandler() {
-  // error
 }
 
 void Connection::disconnect() {

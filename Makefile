@@ -14,6 +14,7 @@ INCLUDES = -I ./includes \
 OBJ_DIR = objs
 
 TMP_DIR = tmp
+COOKIE_DIR = cookie
 
 SRCS := $(wildcard srcs/*.cpp) \
 		$(wildcard srcs/utils/*.cpp) \
@@ -34,7 +35,7 @@ DEPS = $(OBJS:.o=.d)
 
 vpath %.cpp $(SRCS_DIR)
 
-all : $(OBJ_DIR) $(TMP_DIR) $(NAME)
+all : $(OBJ_DIR) $(TMP_DIR) $(COOKIE_DIR) $(NAME)
 
 $(NAME) : $(OBJS)
 	$(CXX) $(LDFLAGS) -o $@ $^
@@ -43,6 +44,9 @@ $(OBJ_DIR) :
 	mkdir $@
 
 $(TMP_DIR) :
+	mkdir $@
+
+$(COOKIE_DIR) :
 	mkdir $@
 
 $(OBJ_DIR)/%.o : %.cpp
@@ -54,7 +58,7 @@ clean :
 	rm -f ./tmp/*
 
 fclean : clean
-	rm -rf $(TMP_DIR)
+	rm -rf $(TMP_DIR) $(COOKIE_DIR)
 	rm -f webserv
 	rm -f leaks.txt
 

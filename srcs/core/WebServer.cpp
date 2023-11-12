@@ -26,16 +26,12 @@ WebServer::WebServer(const std::string &path)
     mGood = false;
     return;
   }
-
-  mControlInstance.RegisterTerminationSignals();
-}
+} 
 
 bool WebServer::IsGood(void) const { return (mGood); }
 
 WebServer::~WebServer(void) {
   int safeExit = 1;
-
-  mControlInstance.UnregisterTerminationSignals();
 
   if (Common::mKqueue != -1) {
     close(Common::mKqueue);
@@ -89,7 +85,7 @@ void WebServer::eventMonitoring(void) {
       struct kevent currentEvent = mEventList[index];
 
       if (currentEvent.flags & EV_ERROR) {
-        // error
+        continue;
       }
       IEventHandler *object = static_cast<IEventHandler *>(currentEvent.udata);
       object->EventHandler(currentEvent);

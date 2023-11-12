@@ -16,7 +16,7 @@ public:
 
 	void CgiHandle();
 private:
-	void processHandler();
+	void processHandler(struct kevent &currentEvent);
 	eStatusCode cgiResponseParsing(std::string &response);
 	void setAllEnv();
 

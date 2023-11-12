@@ -13,7 +13,7 @@ unsigned int Response::GetStatusCode() const { return mStatusCode; }
 
 std::string Response::GetStatus() const { return mStatus; }
 
-std::multimap<std::string, std::string> Response::GetHeaders() const {
+std::multimap<std::string, std::string> &Response::GetHeaders() {
   return mHeaders;
 }
 
