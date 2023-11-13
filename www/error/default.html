@@ -1,52 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error - Service Unavailable</title>
+    <title>404 Error Page</title>
     <style>
-        body {
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Gothic', sans-serif;
+            /* font-family: 'Gothic', sans-serif; */
+            display: flex;
+            justify-content: center;
+            align-items: center;
             text-align: center;
-            padding: 50px;
-            font-family: "Arial", sans-serif;
-            background-color: #f4f4f4;
+            background: url('./images/error3.jpg') no-repeat center center;
+            background-size: cover;
         }
 
-        h1 {
-            font-size: 50px;
-            color: #e74c3c;
+        .error-message {
+            color: #FFF;
+            /* Oops 텍스트 색상 */
+            font-size: 10em;
+            font-weight: bold;
         }
 
-        p {
-            font-size: 20px;
-            color: #333;
+        .error-description {
+            font-size: 1.5em;
+            font-weight: bold;
         }
 
-        a {
-            color: #3498db;
+        .error-description2 {
+            margin-top: 10px;
+            font-size: 1.2em;
+            font-weight: lighter;
+        }
+
+        .home-link {
+            display: inline-block;
+            margin-top: 50px;
+            padding: 10px 20px;
+            color: #FFF;
+            background-color: #333;
+            /* 배경 색상 */
             text-decoration: none;
-            font-size: 22px;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        .error-details {
-            margin-top: 20px;
-            padding: 10px;
-            border-top: 1px solid #ccc;
+            font-weight: bold;
+            border-radius: 50px;
         }
     </style>
 </head>
+
 <body>
-    <h1>Error</h1>
-    <p>We're sorry, but something went wrong.</p>
-    <p>We're working to fix the issue as soon as possible.</p>
-    <div class="error-details">
-        <p>If you need immediate assistance, please <a href="mailto:support@example.com">email us</a>.</p>
-        <p>Otherwise, please try refreshing the page or come back later.</p>
-        <p><a href="/">Return Home</a></p>
+    <div>
+        <div class="error-message">Oops!</div>
+        <div class="error-description">404 - Page Not Found</div>
+        <div class="error-description2">The page you are looking for might have been removed <br> had its name changed or is
+            temporarily unavailable.</div>
+        <a href="/" class="home-link">GO TO HOMEPAGE</a>
     </div>
 </body>
+
 </html>
