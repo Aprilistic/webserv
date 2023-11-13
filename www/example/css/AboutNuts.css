@@ -148,6 +148,7 @@ html {
 	/* Top margin 5px, bottom margin 10px, no margin on left and right */
 	font-size: 0.8em;
 	/* Adjust font size as needed */
+	color: rgba(255, 255, 255, 0.7);
 }
 
 .member.central p {
@@ -155,9 +156,11 @@ html {
 	/* Top margin 5px, bottom margin 10px, no margin on left and right */
 	font-size: 0.9em;
 	/* Adjust font size as needed */
+	color: rgba(255, 255, 255, 0.7);
 }
 
 .member.central h3 {
+	margin: 10px 0 0 0;
 	font-size: 1.2em;
 	/* Top margin 5px, no margin on other sides */
 }
