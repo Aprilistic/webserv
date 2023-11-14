@@ -54,7 +54,6 @@ void PostHandler::Handle(Http &http) {
     break;
   }
   case PATH_IS_FILE: {
-    std::cout << RED << "PATH_IS_FILE" << RESET << std::endl;
     status = http.WriteFile(resolvedPath, requestData, PATH_IS_FILE);
     break;
   }
