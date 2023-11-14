@@ -37,12 +37,14 @@ void CGI::processHandler(struct kevent &currentEvent) {
     exitStatus = WTERMSIG(status);
   }
   if (exitStatus != 0) {
+    Log(warn, "CGI: CGI script exited abnormally.");
     return (mHttp.ErrorHandle(SERVER_ERROR_INTERNAL_SERVER_ERROR));
   }
 
   // CGI 스크립트의 출력을 읽기 위한 ifstream 객체 생성
   std::ifstream responseFile(mOutputFileName.c_str(), std::ios::in);
   if (!responseFile.is_open()) {
+    Log(warn, "CGI: Failed to open output temp file.");
     return (mHttp.ErrorHandle(SERVER_ERROR_INTERNAL_SERVER_ERROR));
   }
 
@@ -70,6 +72,7 @@ void CGI::setAllEnv() {
       mHttp.GetPort(), mHttp.GetRequest().GetHost(),
       mHttp.GetRequest().GetUri(), mHttp.GetRequest().GetMethod());
   if (location == NULL) {
+    Log(warn, "CGI: location is NULL");
     return (mHttp.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
   }
 
@@ -130,6 +133,7 @@ void CGI::setAllEnv() {
       mHttp.GetPort(), mHttp.GetRequest().GetHost(),
       mHttp.GetRequest().GetUri(), mHttp.GetRequest().GetMethod());
   if (configNode == NULL) {
+    Log(warn, "CGI: configNode is NULL");
     return (mHttp.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
   }
   cgiPass = location->FindValue(location, "cgi_pass")[0];
@@ -231,7 +235,7 @@ void CGI::CgiHandle() {
   std::ofstream requestFile(mRequestFileName.c_str(),
                             std::ios::out | std::ios::trunc);
   if (!requestFile.is_open()) {
-    std::cerr << "Failed to open request temp file." << std::endl;
+    Log(warn, "CGI: Failed to open request temp file.");
     return (mHttp.ErrorHandle(SERVER_ERROR_INTERNAL_SERVER_ERROR));
   }
 
@@ -246,6 +250,7 @@ void CGI::CgiHandle() {
   // CGI 스크립트 실행을 위한 프로세스 생성
   mPid = fork();
   if (mPid == -1) {
+    Log(warn, "CGI: Failed to fork.");
     return (mHttp.ErrorHandle(SERVER_ERROR_INTERNAL_SERVER_ERROR));
   } else if (mPid == 0) {
     // 자식 프로세스에서 CGI 스크립트 실행
@@ -259,6 +264,7 @@ void CGI::CgiHandle() {
         mHttp.GetPort(), mHttp.GetRequest().GetHost(),
         mHttp.GetRequest().GetUri(), mHttp.GetRequest().GetMethod());
     if (location == NULL) {
+      Log(warn, "CGI: location is NULL");
       mHttp.ErrorHandle(CLIENT_ERROR_NOT_FOUND);
       exit(EXIT_FAILURE);
     }

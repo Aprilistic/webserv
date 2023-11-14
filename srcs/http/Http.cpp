@@ -129,9 +129,7 @@ bool Http::IsCgiRequest() {
 
 void Http::SetRequest(eStatusCode state, std::vector<char> &RecvBuffer) {
   if (state != READ_OK) {
-    if (state == SERVER_SERVICE_UNAVAILABLE) {
-      Log(error, etc, "Socket Disconnected", *this);
-    }
+    Log(error, "Http: Read error");
     return (ErrorHandle(state));
   }
 
@@ -144,6 +142,7 @@ void Http::SetRequest(eStatusCode state, std::vector<char> &RecvBuffer) {
 
     if (ParseState == PARSING_ERROR) {
       mBuffer.clear();
+      Log(error, "Http: Parsing error");
       return (ErrorHandle(ParseState));
     } else if (ParseState == PARSING_INCOMPLETED) {
       mBuffer.clear();
@@ -159,8 +158,8 @@ void Http::SetRequest(eStatusCode state, std::vector<char> &RecvBuffer) {
       }
       mRemainingRequest++; // remaining request count
 
-      Log(info, request, "Request", *this);
       mBuffer = mRequestParser.GetRemainingBuffer();
+      Log(info, request, *this);
       HandleRequestType();
     }
   }
@@ -169,9 +168,7 @@ void Http::SetRequest(eStatusCode state, std::vector<char> &RecvBuffer) {
 void Http::SendResponse(eStatusCode state) {
   mSendBufferRef += mResponseParser.MakeResponseMessage(*this, state);
   mRemainingRequest--;
-  //   send message
-  Log(info, response, "Response", *this);
-
+  Log(info, response, *this);
   ResetAll();
 }
 
@@ -196,6 +193,7 @@ void Http::handleHTTPRequest() {
   if (state == REDIRECT) {
     return RedirectURI(); // redirect 처리
   } else if (state != PRIORITY_HEADER_OK) {
+    Log(warn, "Http: Priority header error");
     return ErrorHandle(state);
   }
 

@@ -5,10 +5,12 @@
 
 class Http;
 
-enum LogLevel { info, warn, error, fatal };
+enum LogLevel { info, warn, error};
 
-enum LogType { request, response, etc };
+enum LogType { request, response};
 
-void Log(LogLevel level, LogType type, std::string message, Http &http);
+void Log(LogLevel level, LogType type, Http &http);
+
+void Log(LogLevel level, std::string message);
 
 #endif

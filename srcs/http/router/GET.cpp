@@ -8,6 +8,7 @@ void GetHandler::Handle(Http &http) {
 
   // NULL 인경우 -> 일치하는 location이 없고 / 도 설정되어 있지 않은 경우
   if (location == NULL) {
+    Log(warn, "GetHandler: location is NULL");
     return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
   }
 
@@ -19,6 +20,7 @@ void GetHandler::Handle(Http &http) {
 
   if (alias.empty()) {
     if (uri[0] == "/") {
+      Log(warn, "GetHandler: uri is /");
       return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
     }
   }
@@ -55,6 +57,7 @@ void GetHandler::Handle(Http &http) {
       // fullPath에 저장된 파일 제공
       eStatusCode readStatus = http.ReadFile(fullPath);
       if (readStatus != SUCCESSFUL_OK) {
+        Log(warn, "GetHandler: read error");
         return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
       }
 
@@ -73,6 +76,7 @@ void GetHandler::Handle(Http &http) {
         break;
       } else {
         // autoindex가 off 일때 처리 로직
+        Log(warn, "GetHandler: autoindex off");
         return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
       }
     }
@@ -81,6 +85,7 @@ void GetHandler::Handle(Http &http) {
   case PATH_IS_FILE: {
     eStatusCode readStatus = http.ReadFile(resolvedPath);
     if (readStatus != SUCCESSFUL_OK) {
+      Log(warn, "GetHandler: read error");
       return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
     }
     // 파일 탐색 실패 -> http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUN, socketD);
@@ -88,12 +93,15 @@ void GetHandler::Handle(Http &http) {
     break;
   }
   case PATH_INACCESSIBLE: { // 권한에러
+    Log(warn, "GetHandler: PATH_INACCESSIBLE");
     return (http.ErrorHandle(CLIENT_ERROR_FORBIDDEN));
   }
   case PATH_NOT_FOUND: {
+    Log(warn, "GetHandler: PATH_NOT_FOUND");
     return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
   }
   default: { // 언노운 파일
+    Log(warn, "GetHandler: default");
     return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
   }
   }

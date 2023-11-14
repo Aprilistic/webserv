@@ -6,6 +6,7 @@ void DeleteHandler::Handle(Http &http) {
       http.GetPort(), http.GetRequest().GetHost(), http.GetRequest().GetUri(),
       http.GetRequest().GetMethod());
   if (location == NULL) {
+    Log(warn, "DeleteHandler: location is NULL");
     return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
   }
 
@@ -16,7 +17,7 @@ void DeleteHandler::Handle(Http &http) {
   // file path 구하기
   if (alias.empty()) {
     if (uri[0] == "/") {
-      // 어떤 동작하는지 찾아봐야 함
+      Log(warn, "DeleteHandler: uri is /");
       return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
     }
   }
@@ -33,16 +34,20 @@ void DeleteHandler::Handle(Http &http) {
     if (std::remove(resolvedPath.c_str()) == 0) {
       return;
     } else {
+      Log(warn, "DeleteHandler: remove error");
       return (http.ErrorHandle(SERVER_ERROR_INTERNAL_SERVER_ERROR));
     }
   }
   case PATH_INACCESSIBLE: {
+    Log(warn, "DeleteHandler: PATH_INACCESSIBLE");
     return (http.ErrorHandle(CLIENT_ERROR_FORBIDDEN));
   }
   case PATH_NOT_FOUND: {
+    Log(warn, "DeleteHandler: PATH_NOT_FOUND");
     return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
   }
   default: {
+    Log(warn, "DeleteHandler: default");
     return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
   }
   }
