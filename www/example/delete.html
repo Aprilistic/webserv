@@ -1,34 +1,55 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DELETE 요청 페이지</title>
+  <title>Nuts Web Service</title>
+  <link rel="stylesheet" href="./css/Delete.css">
+</head>
+
+<body>
+  <header class="top-nav">
+    <a href="./index.html" class="nav-logo">Nuts</a>
+    <nav class="nav-links">
+      <a href="./test.html">Updates</a>
+      <a href="./AboutNuts.html">About Nuts</a>
+    </nav>
+  </header>
+  <!-- DELETE 요청을 위한 버튼 -->
+  <div class="delete-button">
+    <button id="deleteButton">Delete Resource</button>
+  </div>
   <script>
-    function sendDeleteRequest() {
-      fetch('http://localhost:4000/tmp', {
+    document.getElementById('deleteButton').addEventListener('click', function () {
+      fetch('http://localhost:4000/tmp', { // 여기서 'your-endpoint-url'을 서버의 DELETE 엔드포인트로 교체하세요.
         method: 'DELETE',
         headers: {
+          // 필요한 헤더를 추가합니다
           'Content-Type': 'application/json'
-          // 필요한 경우 추가 헤더를 여기에 추가하세요.
         },
-        // 요청과 함께 보낼 데이터가 있다면 body를 사용하세요.
-        // body: JSON.stringify({ key: 'value' })
+        // 만약 요청과 함께 서버로 보낼 데이터가 있다면 body 속성을 사용합니다
+        // body: JSON.stringify({ key: 'value' }) 
       })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Success:', data);
-        alert('삭제되었습니다!');
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-        alert('오류가 발생했습니다.');
-      });
-    }
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json(); // 또는 response.text() 를 사용할 수 있습니다, 응답 형식에 따라 다릅니다.
+        })
+        .then(data => {
+          console.log('Success:', data);
+          alert('Resource deleted successfully');
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Error deleting resource');
+        });
+    });
   </script>
-</head>
-<body>
-  <h1>삭제 요청 보내기</h1>
-  <button onclick="sendDeleteRequest()">삭제 요청</button>
+  <div class="footer">
+    <p>Powered by <strong>Nuts</strong></p>
+  </div>
 </body>
+
 </html>
