@@ -60,17 +60,14 @@ html {
 }
 
 #deleteButton {
-	/* 버튼 스타일을 여기에 추가합니다 */
 	padding: 10px 15px;
 	margin-top: 20px;
-	/* 페이지 상단에서 일정 간격 띄우기 */
 	font-size: 1rem;
 	color: white;
 	background-color: #ff4136;
 	border: none;
 	border-radius: 5px;
 	cursor: pointer;
-	/* 클릭 가능한 요소임을 나타내는 커서 스타일 */
 	transition: background-color 0.2s ease-in-out;
 }
 
