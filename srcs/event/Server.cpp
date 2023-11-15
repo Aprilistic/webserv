@@ -76,7 +76,7 @@ void Server::readHandler() {
   int socket = accept(mSocket, NULL, NULL);
   if (socket == -1) {
     Log(warn,
-        "Server: Failed to accept new client: " + std::string(strerror(errno)));
+        "Server: Failed to accept new client");
     return;
   }
   Log(info, "Server: New client " + ToString(socket) + " is accepted");
