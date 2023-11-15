@@ -197,19 +197,23 @@ eStatusCode CGI::cgiResponseParsing(std::string &response) {
   }
 
   // cgi 헤더에서 status code 가져오기
-  std::string statusHeader = headers["Status"];
-  statusHeader = statusHeader.substr(0, statusHeader.find(" "));
+  eStatusCode statusCode = SUCCESSFUL_OK;
+  if (!headers.empty()) {
+    if (headers.count("Status") != 0) {
+      std::string statusHeader = headers["Status"];
+      statusHeader = statusHeader.substr(0, statusHeader.find(" "));
 
-  eStatusCode statusCode =
-      static_cast<eStatusCode>(std::atoi(statusHeader.c_str()));
+      statusCode = static_cast<eStatusCode>(std::atoi(statusHeader.c_str()));
 
-  // headers에서 status 헤더 제거
-  headers.erase("Status");
+      // headers에서 status 헤더 제거
+      headers.erase("Status");
+    }
 
-  // response에 cgi 헤더 추가
-  for (std::map<std::string, std::string>::iterator it = headers.begin();
-       it != headers.end(); ++it) {
-    mHttp.GetResponse().InsertHeader(it->first, it->second);
+    // response에 cgi 헤더 추가
+    for (std::map<std::string, std::string>::iterator it = headers.begin();
+         it != headers.end(); ++it) {
+      mHttp.GetResponse().InsertHeader(it->first, it->second);
+    }
   }
 
   mHttp.GetResponse().SetBody(body);
