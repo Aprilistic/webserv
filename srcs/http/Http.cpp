@@ -51,7 +51,7 @@ void Http::ErrorHandle(eStatusCode errorStatus) {
 }
 
 eStatusCode Http::ReadFile(const std::string &path) {
-  GetResponse().mFilename = path;
+  GetResponse().SetFilename(path);
 
   std::ifstream file(path.c_str(), std::ios::in | std::ios::binary);
   if (file.is_open()) {
@@ -70,7 +70,7 @@ eStatusCode Http::WriteFile(std::string &path, std::string &data,
                             eStatusCode pathType) {
   if (pathType == PATH_IS_DIRECTORY) {
     // create random file name
-    std::string fileName = "post_" + generateUniqueHash(path);
+    std::string fileName = "post_" + GenerateUniqueHash(path);
 
     path = path + "/" + fileName;
   }
@@ -182,8 +182,6 @@ void Http::HandleRequestType() {
 
 void Http::handleCGIRequest() {
   SharedPtr<CGI> cgiRequest(new CGI(*this));
-  // CGI *cgiRequest = new CGI(*this);
-  // CGI cgiRequest(*this);
   mCGIList.push_back(cgiRequest);
   cgiRequest->CgiHandle();
 }

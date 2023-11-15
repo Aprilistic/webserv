@@ -23,7 +23,8 @@ void CGI::EventHandler(struct kevent &currentEvent) {
 void CGI::processHandler(struct kevent &currentEvent) {
   if ((currentEvent.fflags & NOTE_EXIT) == 0) {
     struct kevent event;
-    EV_SET(&event, mPid, EVFILT_PROC, EV_ADD | EV_ENABLE | EV_ONESHOT, NOTE_EXIT, 0, this);
+    EV_SET(&event, mPid, EVFILT_PROC, EV_ADD | EV_ENABLE | EV_ONESHOT,
+           NOTE_EXIT, 0, this);
     kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
     return;
   }
@@ -63,7 +64,6 @@ void CGI::processHandler(struct kevent &currentEvent) {
   unlink(mOutputFileName.c_str());
 
   // 응답 보내기
-
   mHttp.SendResponse(statusCode);
 }
 
@@ -230,7 +230,7 @@ eStatusCode CGI::cgiResponseParsing(std::string &response) {
 void CGI::CgiHandle() {
   static int cnt;
   // 요청 내용을 파일에 쓰기 위한 ofstream 객체 생성
-  std::string tmpFileName = "cgi_request_" + toString(cnt);
+  std::string tmpFileName = "cgi_request_" + ToString(cnt);
   mRequestFileName = "./tmp/" + tmpFileName + ".txt";
   std::ofstream requestFile(mRequestFileName.c_str(),
                             std::ios::out | std::ios::trunc);
@@ -244,7 +244,7 @@ void CGI::CgiHandle() {
   requestFile.close(); // 파일 쓰기 완료 후 닫기
 
   // CGI 스크립트 결과를 받을 파일 생성
-  tmpFileName = "cgi_output_" + toString(cnt++);
+  tmpFileName = "cgi_output_" + ToString(cnt++);
   mOutputFileName = "./tmp/" + tmpFileName + ".txt";
 
   // CGI 스크립트 실행을 위한 프로세스 생성
@@ -278,7 +278,8 @@ void CGI::CgiHandle() {
     // 부모 프로세스
     fcntl(mPid, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
     struct kevent event;
-    EV_SET(&event, mPid, EVFILT_PROC, EV_ADD | EV_ENABLE | EV_ONESHOT, NOTE_EXIT, 0, this);
+    EV_SET(&event, mPid, EVFILT_PROC, EV_ADD | EV_ENABLE | EV_ONESHOT,
+           NOTE_EXIT, 0, this);
     kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
   }
 }

@@ -10,7 +10,7 @@ unsigned long simpleHash(const std::string &str) {
   return hash;
 }
 
-std::string generateUniqueHash(const std::string &uriPath) {
+std::string GenerateUniqueHash(const std::string &uriPath) {
   //change current time to string
   std::time_t currentTime = std::time(0);
   std::ostringstream oss;
@@ -21,5 +21,5 @@ std::string generateUniqueHash(const std::string &uriPath) {
   std::string concatStr = uriPath + timeStr;
 
   // hash the concatenated string
-  return toString(simpleHash(concatStr));
+  return ToString(simpleHash(concatStr));
 }

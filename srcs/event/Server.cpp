@@ -12,7 +12,7 @@ Server::Server(int port) : mPort(port) {
     throw std::runtime_error("Error: socket() creation failed: " +
                              std::string(strerror(errno)));
   }
-  Log(info, "Server: Socket " + toString(mSocket) + " is created");
+  Log(info, "Server: Socket " + ToString(mSocket) + " is created");
 
   fcntl(mSocket, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
 
@@ -32,15 +32,15 @@ Server::Server(int port) : mPort(port) {
     throw std::runtime_error("Error: Failed to bind the socket: " +
                              std::string(strerror(errno)));
   }
-  Log(info, "Server: Socket " + toString(mSocket) + " is binded at port " +
-                toString(mPort));
+  Log(info, "Server: Socket " + ToString(mSocket) + " is binded at port " +
+                ToString(mPort));
 
   if (listen(mSocket, SOMAXCONN /* backlog size*/) < 0) {
     throw std::runtime_error("Error: Failed to listen on the socket: " +
                              std::string(strerror(errno)));
   }
 
-  Log(info, "Server: Socket " + toString(mSocket) + " is listening");
+  Log(info, "Server: Socket " + ToString(mSocket) + " is listening");
 
   struct kevent event;
   EV_SET(&event, mSocket, EVFILT_READ, EV_ADD, 0, 0, this);
@@ -56,7 +56,7 @@ Server::~Server() {
   // Close the socket
   mConnection.clear();
   close(mSocket);
-  Log(info, "Server: Socket " + toString(mSocket) + " is closed");
+  Log(info, "Server: Socket " + ToString(mSocket) + " is closed");
 }
 
 void Server::EventHandler(struct kevent &currentEvent) {
@@ -75,28 +75,13 @@ void Server::EventHandler(struct kevent &currentEvent) {
 void Server::readHandler() {
   int socket = accept(mSocket, NULL, NULL);
   if (socket == -1) {
-    Log(warn, "Server: Failed to accept new client: " +
-                  std::string(strerror(errno)));
+    Log(warn,
+        "Server: Failed to accept new client: " + std::string(strerror(errno)));
     return;
   }
-  Log(info, "Server: New client " + toString(socket) + " is accepted");
+  Log(info, "Server: New client " + ToString(socket) + " is accepted");
 
   fcntl(socket, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
-
-  // int sndBufSize = SEND_BUFFER_SIZE;
-  // int rcvBufSize = RECV_BUFFER_SIZE;
-
-  // if (setsockopt(socket, SOL_SOCKET, SO_SNDBUF, &sndBufSize,
-  //                sizeof(sndBufSize)) < 0) {
-  //   std::cerr << RED << "Error: Failed to set send buffer size: "
-  //             << std::string(strerror(errno)) << RESET << std::endl;
-  // }
-
-  // if (setsockopt(socket, SOL_SOCKET, SO_RCVBUF, &rcvBufSize,
-  //                sizeof(rcvBufSize)) < 0) {
-  //   std::cerr << RED << "Error: Failed to set receive buffer size: "
-  //             << std::string(strerror(errno)) << RESET << std::endl;
-  // }
 
   mConnection[socket] = SharedPtr<Connection>(new Connection(socket, mPort));
 }

@@ -95,14 +95,14 @@ void ResponseParser::setCookie(Http &http) {
     if (cookieMap.count("id")) {
       if (access(cookieMap["id"].c_str(), F_OK | R_OK) == 0) {
         isExist = true;
-				cookieFileName = cookieMap["id"];
+        cookieFileName = cookieMap["id"];
       }
     }
   }
 
   if (isExist == false) { // create cookie
     std::string hostname = http.GetRequest().GetHost();
-    cookieFileName += hostname + "_" + toString(number++) + ".cookie";
+    cookieFileName += hostname + "_" + ToString(number++) + ".cookie";
     number %= 987654321;
   }
 
@@ -115,6 +115,7 @@ void ResponseParser::setCookie(Http &http) {
     ofs.close();
   }
 
-  std::string cookie = "id=" + cookieFileName + "; Max-Age=" + toString(SESSION_TIMEOUT);
+  std::string cookie =
+      "id=" + cookieFileName + "; Max-Age=" + ToString(SESSION_TIMEOUT);
   http.GetResponse().InsertHeader("Set-Cookie", cookie);
 }

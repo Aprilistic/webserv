@@ -44,8 +44,7 @@ public:
   Response &GetResponse(void);
   std::string &GetSendBuffer(void);
   ResponseParser &GetResponseParser(void);
-  
-  
+
 private:
   void handleHTTPRequest(void);
   void handleCGIRequest(void);

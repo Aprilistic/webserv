@@ -25,12 +25,10 @@ void GetHandler::Handle(Http &http) {
     }
   }
   // alias 있는 경우
-  // resolvedPath = uri(/abc/)+ alias(/var/www/wow) = /var/www/wow/abc/
-  // 구한 경로가 디렉토리인지 파일인지 권한에러인지 언노운파일인지 확인하는
-  // 로직
-  std::string resolvedPath = http.GetRequest().GetUri(); // /example/index.html
+  // 구한 경로가 디렉토리인지 파일인지 권한에러인지 언노운파일인지 확인하는 로직
+  std::string resolvedPath = http.GetRequest().GetUri();
 
-  size_t pos = resolvedPath.find(uri[0]); // /example
+  size_t pos = resolvedPath.find(uri[0]);
   if (pos != std::string::npos) {
     // resolvedPath = alias + uri
     resolvedPath.replace(pos, uri[0].size(), alias[0]);
@@ -44,8 +42,7 @@ void GetHandler::Handle(Http &http) {
     std::string fullPath;
 
     for (size_t i = 0; i < index.size(); i++) {
-      // configfile에 index에 있는 파일을 resolvedPath에 붙이면서 파일인지
-      // 확인
+      // configfile에 index에 있는 파일을 resolvedPath에 붙이면서 파일인지 확인
       fullPath = resolvedPath + "/" + index[i]; // file
       if (http.CheckPathType(fullPath) == PATH_IS_FILE) {
         found = true;
@@ -63,9 +60,8 @@ void GetHandler::Handle(Http &http) {
 
       break;
     } else {
-      http.GetResponse().mFilename = "autoindex";
-      // 경로에 파일이 없다면
-      // autoindex 설정 확인
+      http.GetResponse().SetFilename("autoindex");
+      // 경로에 파일이 없다면 autoindex 설정 확인
       std::vector<std::string> autoindex =
           location->FindValue(location, "autoindex");
 

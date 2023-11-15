@@ -75,7 +75,7 @@ std::string ResponseParser::getStatusMessage(eStatusCode errorStatus) {
 }
 
 std::string ResponseParser::getFileType(Http &http) {
-  std::string filepath = http.GetResponse().mFilename;
+  std::string filepath = http.GetResponse().GetFilename();
   if (filepath == "autoindex") {
     return ("text/html");
   }
@@ -121,7 +121,7 @@ void ResponseParser::setMandatoryHeaderFields(Http &http) {
   http.GetResponse().InsertHeader("Server", "*u*king webserv");
 
   // Content-Length
-  std::string contentLength = toString(http.GetResponse().GetBody().size());
+  std::string contentLength = ToString(http.GetResponse().GetBody().size());
   http.GetResponse().InsertHeader("Content-Length", contentLength);
 
   // Content-Type

@@ -13,8 +13,6 @@ Connection::Connection(int socket, int port)
 
   EV_SET(&events[0], mSocket, EVFILT_READ, EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0,
          this);
-  // EV_SET(&events[1], mSocket, EVFILT_WRITE, EV_ADD | EV_CLEAR | EV_DISABLE,
-  // 0, 0, this);
   EV_SET(&events[1], mSocket, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, this);
   kevent(Common::mKqueue, events, 2, NULL, 0, NULL);
 }
@@ -77,7 +75,6 @@ void Connection::writeHandler() {
   ssize_t bytesSent = send(mSocket, mSendBuffer.c_str(), mSendBuffer.size(), 0);
 
   if (bytesSent == -1) {
-    // 에러 처리
     disconnect();
   } else {
     // bytesSent 만큼 벡터에서 제거
@@ -85,10 +82,6 @@ void Connection::writeHandler() {
   }
 
   if (mSendBuffer.empty()) {
-    // struct kevent event;
-    // EV_SET(&event, mSocket, EVFILT_WRITE, EV_DISABLE, 0, 0, this);
-    // kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
-
     if (mKeepAlive == false && mRemainingRequest == 0) {
       disconnect();
       return;
@@ -103,5 +96,5 @@ void Connection::disconnect() {
   kevent(Common::mKqueue, events, 2, NULL, 0, NULL);
 
   close(mSocket);
-  Log(info, "Connection: Client " + toString(mSocket) + " is disconnected");
+  Log(info, "Connection: Client " + ToString(mSocket) + " is disconnected");
 }
