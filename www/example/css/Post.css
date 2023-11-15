@@ -1,0 +1,85 @@
+body,
+html {
+	height: 100vh;
+	margin: 0;
+	font-family: 'Gothic', sans-serif;
+	background-color: rgba(21, 24, 23, 1);
+	color: rgb(253, 253, 253);
+	overflow-x: hidden;
+	overflow-y: hidden;
+}
+
+*,
+*:before,
+*:after {
+	box-sizing: border-box;
+}
+
+.top-nav {
+	position: absolute;
+	top: 0;
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	padding: 25px 50px;
+	border-bottom: 0.1px solid rgba(255, 255, 255, 0.2);
+}
+
+.nav-logo {
+	font-size: 1.5em;
+	color: #fff;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.nav-links a {
+	color: #fff;
+	font-weight: 100;
+	text-decoration: none;
+	margin-left: 30px;
+}
+
+.footer {
+	position: absolute;
+	bottom: 30px;
+	width: 100%;
+	padding: 10px;
+	text-align: center;
+	font-size: 0.8em;
+}
+
+.post-form {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	width: 300px;
+	align-items: center;
+}
+
+.post-form input[type="text"] {
+	width: 100%;
+	padding: 10px;
+	border: none;
+	border-radius: 5px;
+}
+
+.post-form input[type="submit"] {
+	display: inline-block;
+	margin-top: 20px;
+	padding: 10px 20px;
+	border: 1px solid rgb(253, 253, 253);
+	border-radius: 25px;
+	color: rgb(253, 253, 253);
+	background-color: transparent;
+	text-decoration: none;
+	transition: background-color 0.3s, color 0.3s;
+}
+
+.post-form input[type="submit"]:hover {
+	background-color: rgb(253, 253, 253);
+	color: rgba(21, 24, 23, 1);
+}

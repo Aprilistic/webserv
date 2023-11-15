@@ -17,6 +17,7 @@ void PostHandler::Handle(Http &http) {
 
   // 데이터가 없는 경우 400 Bad Request 반환
   if (requestData.empty() && isChunked == false) {
+    Log(warn, "PostHandler: requestData is empty");
     return (http.ErrorHandle(CLIENT_ERROR_BAD_REQUEST));
   }
 
@@ -25,6 +26,7 @@ void PostHandler::Handle(Http &http) {
       http.GetPort(), http.GetRequest().GetHost(), http.GetRequest().GetUri(),
       http.GetRequest().GetMethod());
   if (location == NULL) {
+    Log(warn, "PostHandler: location is NULL");
     return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
   }
 
@@ -36,6 +38,7 @@ void PostHandler::Handle(Http &http) {
   if (alias.empty()) {
     if (uri[0] == "/") {
       // nginx는 404 Not found 반환
+      Log(warn, "PostHandler: uri is /");
       return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
     }
   }
@@ -54,17 +57,19 @@ void PostHandler::Handle(Http &http) {
     break;
   }
   case PATH_IS_FILE: {
-    std::cout << RED << "PATH_IS_FILE" << RESET << std::endl;
     status = http.WriteFile(resolvedPath, requestData, PATH_IS_FILE);
     break;
   }
   case PATH_INACCESSIBLE: {
+    Log(warn, "PostHandler: PATH_INACCESSIBLE");
     return (http.ErrorHandle(CLIENT_ERROR_FORBIDDEN));
   }
   case PATH_NOT_FOUND: {
+    Log(warn, "PostHandler: PATH_NOT_FOUND");
     return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
   }
   default: {
+    Log(warn, "PostHandler: default");
     return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
   }
   }

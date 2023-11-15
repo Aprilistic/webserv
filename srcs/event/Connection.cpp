@@ -11,8 +11,10 @@ Connection::Connection(int socket, int port)
   mRecvBuffer.reserve(RECV_BUFFER_SIZE);
   mSendBuffer.reserve(SEND_BUFFER_SIZE);
 
-  EV_SET(&events[0], mSocket, EVFILT_READ, EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, this);
-  // EV_SET(&events[1], mSocket, EVFILT_WRITE, EV_ADD | EV_CLEAR | EV_DISABLE, 0, 0, this);
+  EV_SET(&events[0], mSocket, EVFILT_READ, EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0,
+         this);
+  // EV_SET(&events[1], mSocket, EVFILT_WRITE, EV_ADD | EV_CLEAR | EV_DISABLE,
+  // 0, 0, this);
   EV_SET(&events[1], mSocket, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, this);
   kevent(Common::mKqueue, events, 2, NULL, 0, NULL);
 }
@@ -22,10 +24,10 @@ Connection::~Connection() {}
 void Connection::EventHandler(struct kevent &currentEvent) {
   if (currentEvent.flags & EV_EOF) {
     disconnect();
-    return ;
+    return;
   }
   if (currentEvent.flags & EV_ERROR) {
-    return ;
+    return;
   }
   switch (currentEvent.filter) {
   case EVFILT_READ:
@@ -101,4 +103,5 @@ void Connection::disconnect() {
   kevent(Common::mKqueue, events, 2, NULL, 0, NULL);
 
   close(mSocket);
+  Log(info, "Connection: Client " + toString(mSocket) + " is disconnected");
 }

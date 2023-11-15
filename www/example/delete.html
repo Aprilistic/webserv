@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nuts Web Service</title>
+  <link rel="stylesheet" href="./css/Delete.css">
+</head>
+
+<body>
+  <header class="top-nav">
+    <a href="./index.html" class="nav-logo">Nuts</a>
+    <nav class="nav-links">
+      <a href="./test.html">Updates</a>
+      <a href="./AboutNuts.html">About Nuts</a>
+    </nav>
+  </header>
+  <div class="delete-button">
+    <button id="deleteButton">Delete Resource</button>
+  </div>
+  <script>
+    document.getElementById('deleteButton').addEventListener('click', function () {
+      fetch('http://localhost:4000/test/test.txt', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Success:', data);
+          alert('Resource deleted successfully');
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Error deleting resource');
+        });
+    });
+  </script>
+  <div class="footer">
+    <p>Powered by <strong>Nuts</strong></p>
+  </div>
+</body>
+
+</html>
