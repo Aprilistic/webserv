@@ -76,8 +76,6 @@ void CGI::setAllEnv() {
     return (mHttp.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
   }
 
-  std::vector<std::string> server_name =
-      location->FindValue(location, "server_name");
   Request tmp = mHttp.GetRequest();
   std::stringstream ss;
 
@@ -127,20 +125,12 @@ void CGI::setAllEnv() {
   // REQUEST_METHOD: 클라이언트의 요청 방식(GET, POST, HEAD 등).
   setenv("REQUEST_METHOD", tmp.GetMethod().c_str(), 1);
 
-  // SCRIPT_NAME: 실행되는 CGI 스크립트의 이름.
-  std::string cgiPass = "";
-  Node *configNode = Common::mConfigMap->GetConfigNode(
-      mHttp.GetPort(), mHttp.GetRequest().GetHost(),
-      mHttp.GetRequest().GetUri(), mHttp.GetRequest().GetMethod());
-  if (configNode == NULL) {
-    Log(warn, "CGI: configNode is NULL");
-    return (mHttp.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
-  }
-  cgiPass = location->FindValue(location, "cgi_pass")[0];
-  setenv("SCRIPT_NAME", cgiPass.c_str(), 1);
-
   // SERVER_NAME: 서버의 호스트 이름.
-  setenv("SERVER_NAME", server_name[0].c_str(), 1);
+  std::vector<std::string> server_name =
+      location->FindValue(location, "server_name");
+  if (!server_name.empty()) {
+    setenv("SERVER_NAME", server_name[0].c_str(), 1);
+  }
 
   // SERVER_PORT: 서버의 포트 번호.
   ss.clear();
@@ -268,7 +258,14 @@ void CGI::CgiHandle() {
       mHttp.ErrorHandle(CLIENT_ERROR_NOT_FOUND);
       exit(EXIT_FAILURE);
     }
-    std::string cgiPass = location->FindValue(location, "cgi_pass")[0];
+    std::vector<std::string> cgiPassValue =
+        location->FindValue(location, "cgi_pass");
+    if (cgiPassValue.empty()) {
+      Log(warn, "CGI: cgiPassValue is NULL");
+      mHttp.ErrorHandle(CLIENT_ERROR_NOT_FOUND);
+      exit(EXIT_FAILURE);
+    }
+    std::string cgiPass = cgiPassValue[0];
 
     char *argv[] = {(char *)cgiPass.c_str(), NULL};
     execve(argv[0], argv, environ);

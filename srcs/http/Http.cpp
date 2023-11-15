@@ -14,6 +14,10 @@ void Http::RedirectURI() {
 
   std::vector<std::string> redirectValues =
       location->FindValue(location, "return");
+  if (redirectValues.empty()) {
+    Log(warn, "Http: redirectValues is NULL");
+    return (ErrorHandle(CLIENT_ERROR_NOT_FOUND));
+  }
 
   eStatusCode state =
       static_cast<eStatusCode>(std::atoi(redirectValues[0].c_str()));
@@ -40,7 +44,6 @@ void Http::ErrorHandle(eStatusCode errorStatus) {
         errorPagePath = configErrorPageValues.back();
         ReadFile(errorPagePath);
         SendResponse(errorStatus);
-        // errorPagePath response
         return;
       }
     }
