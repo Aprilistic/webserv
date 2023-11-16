@@ -5,7 +5,7 @@
 
 class Http;
 
-enum LogLevel { info, warn, error };
+enum LogLevel { info, warn, error, debug };
 
 enum LogType { request, response };
 

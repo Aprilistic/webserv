@@ -56,6 +56,11 @@ void timeWithLevel(LogLevel level) {
     levelStr += "error";
     levelStr += RESET;
     break;
+  case debug:
+    levelStr += PURPLE;
+    levelStr += "debug";
+    levelStr += RESET;
+    break;
   }
 
   std::cout << buf << " [" << levelStr << "] ";
@@ -100,5 +105,8 @@ void Log(LogLevel level, std::string message) {
     std::cout << RED << message << RESET << std::endl;
     break;
   }
+  case debug: {
+    std::cout << PURPLE << message << RESET << std::endl;
+    break;
   }
 }
