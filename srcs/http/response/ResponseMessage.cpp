@@ -20,7 +20,7 @@ void ResponseParser::setMessage(Response &resp) {
   setBody(resp);
 }
 
-std::string ResponseParser::GetMessage() const { return mMessage; }
+std::string const &ResponseParser::GetMessage() const { return mMessage; }
 
 std::vector<char> ResponseParser::GetMessageToVector() {
   std::vector<char> message;

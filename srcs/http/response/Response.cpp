@@ -11,17 +11,17 @@ int Response::GetVersionMinor() const { return mVersionMinor; }
 
 unsigned int Response::GetStatusCode() const { return mStatusCode; }
 
-std::string Response::GetStatus() const { return mStatus; }
+std::string const &Response::GetStatus() const { return mStatus; }
 
-std::multimap<std::string, std::string> &Response::GetHeaders() {
+std::multimap<std::string, std::string> const &Response::GetHeaders() const {
   return mHeaders;
 }
 
-std::string Response::GetBody() const { return mBody; }
+std::string const &Response::GetBody() const { return mBody; }
 
 bool Response::GetKeepAlive() const { return mKeepAlive; }
 
-std::string Response::GetFilename() const { return mFilename; }
+std::string const &Response::GetFilename() const { return mFilename; }
 
 void Response::InsertHeader(const std::string &key, const std::string &value) {
   mHeaders.insert(std::pair<std::string, std::string>(key, value));

@@ -11,15 +11,15 @@ public:
   bool GetChunked() const;
   bool GetKeepAlive() const;
   int GetContentLength() const;
-  std::string GetHost() const;
-  std::string GetContentType() const;
+  std::string const &GetHost() const;
+  std::string const &GetContentType() const;
 
-  std::string GetMethod() const;
-  std::string GetUri() const;
+  std::string const &GetMethod() const;
+  std::string const &GetUri() const;
   int GetVersionMajor() const;
   int GetVersionMinor() const;
-  std::multimap<std::string, std::string> GetHeaders() const;
-  std::string GetContent() const;
+  std::multimap<std::string, std::string> const& GetHeaders() const;
+  std::string const &GetContent() const;
 
   void PushBackMethod(char &input);
   void PushBackUri(char &input);
