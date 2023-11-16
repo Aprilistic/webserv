@@ -35,42 +35,52 @@ void GetHandler::Handle(Http &http) {
   }
 
   switch (http.CheckPathType(resolvedPath)) {
-  case PATH_IS_DIRECTORY: {
+  case PATH_IS_DIRECTORY:
+  {
 
     std::vector<std::string> index = location->FindValue(location, "index");
     bool found = false;
     std::string fullPath;
 
-    for (size_t i = 0; i < index.size(); i++) {
+    for (size_t i = 0; i < index.size(); i++)
+    {
       // configfile에 index에 있는 파일을 resolvedPath에 붙이면서 파일인지 확인
       fullPath = resolvedPath + "/" + index[i]; // file
-      if (http.CheckPathType(fullPath) == PATH_IS_FILE) {
+      if (http.CheckPathType(fullPath) == PATH_IS_FILE)
+      {
         found = true;
         break;
       }
     }
     // 경로에 파일이 있다면
-    if (found) {
+    if (found)
+    {
       // fullPath에 저장된 파일 제공
       eStatusCode readStatus = http.ReadFile(fullPath);
-      if (readStatus != SUCCESSFUL_OK) {
+      if (readStatus != SUCCESSFUL_OK)
+      {
         Log(warn, "GetHandler: read error");
         return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
       }
 
       break;
-    } else {
+    }
+    else
+    {
       http.GetResponse().SetFilename("autoindex");
       // 경로에 파일이 없다면 autoindex 설정 확인
       std::vector<std::string> autoindex =
           location->FindValue(location, "autoindex");
 
-      if (autoindex.empty() == false && autoindex[0] == "on") {
+      if (autoindex.empty() == false && autoindex[0] == "on")
+      {
         // autoindex on 일때 처리 로직
-        http.GetResponse().SetBody(autoIndex(resolvedPath));
+        http.GetResponse().SetBody(autoIndex(resolvedPath, http.GetRequest().GetUri()));
         http.GetResponse().SetStatusCode(SUCCESSFUL_OK);
         break;
-      } else {
+      }
+      else
+      {
         // autoindex가 off 일때 처리 로직
         Log(warn, "GetHandler: autoindex off");
         return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
@@ -78,23 +88,28 @@ void GetHandler::Handle(Http &http) {
     }
     break;
   }
-  case PATH_IS_FILE: {
+  case PATH_IS_FILE:
+  {
     eStatusCode readStatus = http.ReadFile(resolvedPath);
-    if (readStatus != SUCCESSFUL_OK) {
+    if (readStatus != SUCCESSFUL_OK)
+    {
       Log(warn, "GetHandler: read error");
       return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
     }
     break;
   }
-  case PATH_INACCESSIBLE: { // 권한에러
+  case PATH_INACCESSIBLE:
+  { // 권한에러
     Log(warn, "GetHandler: PATH_INACCESSIBLE");
     return (http.ErrorHandle(CLIENT_ERROR_FORBIDDEN));
   }
-  case PATH_NOT_FOUND: {
+  case PATH_NOT_FOUND:
+  {
     Log(warn, "GetHandler: PATH_NOT_FOUND");
     return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
   }
-  default: { // 언노운 파일
+  default:
+  { // 언노운 파일
     Log(warn, "GetHandler: default");
     return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
   }
@@ -103,23 +118,79 @@ void GetHandler::Handle(Http &http) {
   http.SendResponse(SUCCESSFUL_OK);
 }
 
-std::string GetHandler::autoIndex(const std::string &path) {
-  DIR *dir = opendir(path.c_str());
-  if (dir == NULL) {
-    return ("");
+void GetHandler::alignAutoIndex(std::string &body, size_t minus_len, int to_align)
+{
+  const int size[] = {51, 20};
+  int align_size = size[to_align] - minus_len;
+
+  while (align_size)
+  {
+    body += " ";
+    --align_size;
   }
+}
 
-  std::string html = "<html><head><title>Index of " + path +
-                     "</title></head><body><h1>Index of " + path +
-                     "</h1><hr><pre>";
+std::string GetHandler::autoIndex(const std::string &path,
+                                  const std::string uri)
+{
+  /* 각 파일에 대한 내용을 추가 */
+  struct stat file_info;
+  DIR *dirStream;
+  struct dirent *dirInfo;
+  std::string fileName;
+  std::string filePath;
+  std::string fileSize;
+  std::string body;
+  static char modifiedTime[18];
 
-  struct dirent *entry;
-  while ((entry = readdir(dir)) != NULL) {
-    html += "<a href=\"" + std::string(entry->d_name) + "\">" +
-            std::string(entry->d_name) + "</a><br>";
+  // 제목 추가
+  body += "<html>\n"
+          "<head><title>Index of " +
+          uri + "</title></head>\n"
+                "<body>\n"
+                "<h1>Index of " +
+          uri + "</h1>\n"
+                "<hr><pre><a href=\"../\">../</a>\n";
+
+  dirStream = ::opendir(path.c_str());
+  for (int i = 0; i < 2; ++i)
+    dirInfo = ::readdir(dirStream);
+
+  while ((dirInfo = ::readdir(dirStream)) != NULL)
+  {
+    std::cerr << "hi" << '\n';
+    fileName = dirInfo->d_name;
+    filePath = path + "/" + fileName;
+
+    if (stat(filePath.c_str(), &file_info) == 0)
+    {
+      if (file_info.st_mode & S_IFDIR)
+        fileName += '/';
+
+      // 파일 링크 추가
+      body += "<a href=\"" + fileName + "\">" + fileName + "</a>";
+
+      // 공백 추가 + 생성 시간 추가
+      alignAutoIndex(body, fileName.length(), AUTOINDEX_ALIGN_FILE_NAME);
+      strftime(modifiedTime, sizeof(modifiedTime), "%d-%b-%Y %R",
+               gmtime(&file_info.st_birthtimespec.tv_sec));
+      body += modifiedTime;
+
+      // 공백 추가 + 파일 크기 추가
+      if (file_info.st_mode & S_IFDIR)
+        fileSize = "-";
+      else
+        fileSize = ToString(file_info.st_size);
+      alignAutoIndex(body, fileSize.length(), AUTOINDEX_ALIGN_FILE_SIZE);
+      body += fileSize;
+
+      body += "\n";
+    }
   }
-  html += "</pre><hr></body></html>";
+  ::closedir(dirStream);
 
-  closedir(dir);
-  return (html);
+  body += "</pre><hr></body>\n"
+          "</html>\n";
+
+  return (body);
 }

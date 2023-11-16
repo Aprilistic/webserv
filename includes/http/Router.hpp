@@ -33,6 +33,10 @@ private:
     AUTOINDEX_ALIGN_FILE_NAME,
     AUTOINDEX_ALIGN_FILE_SIZE
   };
+
+  void alignAutoIndex(std::string &body, size_t minus_len, int to_align);
+  std::string autoIndex(const std::string &path,
+                                    const std::string uri);
 };
 
 class PostHandler : public IRequestHandler {
