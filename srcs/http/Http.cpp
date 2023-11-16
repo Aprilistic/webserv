@@ -110,7 +110,7 @@ eStatusCode Http::CheckPathType(const std::string &path) {
   } else if (info.st_mode & S_IFREG) {
     return (PATH_IS_FILE); // 파일 Regular file
   } else {
-    return (PATH_UNKNOWN); // 디렉토리도 파일도 아닌 타입(소켓, 파이프, 심볼릭
+    return (PATH_UNKNOWN); // 디렉토리도 파일도 아닌 타입(소켓, 파이프, 심볼릭)
   }
 }
 
@@ -286,7 +286,7 @@ bool Http::checkLimitExcept() {
       mPort, mRequest.GetHost(), mRequest.GetUri(), mRequest.GetMethod());
 
   std::vector<std::string> limitExceptValue =
-      location->FindValue(location, "limit_except"); // 초기화가 필요합니다.
+      location->FindValue(location, "limit_except");
   if (limitExceptValue.size()) {
     if (std::find(limitExceptValue.begin(), limitExceptValue.end(),
                   mRequest.GetMethod()) == limitExceptValue.end()) {

@@ -98,8 +98,6 @@ void CGI::setAllEnv() {
   // PATH_INFO: CGI 스크립트에 전달되는 추가적인 경로 정보.
   setenv("PATH_INFO", tmp.GetUri().c_str(), 1);
 
-  // PATH_TRANSLATED: PATH_INFO에 대응하는 실제 파일 경로.
-
   // QUERY_STRING: URL에서 '?' 뒤에 오는 쿼리 문자열.
   std::size_t pos = tmp.GetUri().find("?");
   if (pos != std::string::npos) {
@@ -143,6 +141,7 @@ void CGI::setAllEnv() {
   // SERVER_SOFTWARE: 서버의 소프트웨어 이름과 버전.
   setenv("SERVER_SOFTWARE", "", 1);
 
+  // HTTP_XXX: HTTP 요청 헤더.
   std::multimap<std::string, std::string> headers = tmp.GetHeaders();
   for (std::multimap<std::string, std::string>::iterator it = headers.begin();
        it != headers.end(); ++it) {

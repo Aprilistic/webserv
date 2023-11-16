@@ -60,6 +60,6 @@ std::string Response::Inspect() const {
     stream << it->first << ": " << it->second << "\n";
   }
 
-  // stream << mBody << "\n";
+  stream << mBody << "\n";
   return stream.str();
 }

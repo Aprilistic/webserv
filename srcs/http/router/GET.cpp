@@ -84,8 +84,6 @@ void GetHandler::Handle(Http &http) {
       Log(warn, "GetHandler: read error");
       return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
     }
-    // 파일 탐색 실패 -> http.ErrorHandle(port, CLIENT_ERROR_NOT_FOUN, socketD);
-    // 404;
     break;
   }
   case PATH_INACCESSIBLE: { // 권한에러
