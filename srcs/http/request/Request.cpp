@@ -14,23 +14,23 @@ bool Request::GetKeepAlive() const { return mKeepAlive; }
 
 int Request::GetContentLength() const { return mContentLength; }
 
-std::string Request::GetHost() const { return mHost; }
+std::string const& Request::GetHost() const { return mHost; }
 
-std::string Request::GetContentType() const { return mContentType; }
+std::string const& Request::GetContentType() const { return mContentType; }
 
-std::string Request::GetMethod() const { return mMethod; }
+std::string const& Request::GetMethod() const { return mMethod; }
 
-std::string Request::GetUri() const { return mUri; }
+std::string const& Request::GetUri() const { return mUri; }
 
 int Request::GetVersionMajor() const { return mVersionMajor; }
 
 int Request::GetVersionMinor() const { return mVersionMinor; }
 
-std::multimap<std::string, std::string> Request::GetHeaders() const {
+std::multimap<std::string, std::string> const& Request::GetHeaders() const {
   return mHeaders;
 }
 
-std::string Request::GetContent() const { return mContent; }
+std::string const& Request::GetContent() const { return mContent; }
 
 void Request::PushBackMethod(char &c) { mMethod.push_back(c); }
 

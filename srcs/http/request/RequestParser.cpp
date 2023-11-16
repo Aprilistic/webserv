@@ -413,4 +413,4 @@ inline bool RequestParser::isSpecial(int c) {
 // Check if a byte is a digit.
 inline bool RequestParser::isDigit(int c) { return c >= '0' && c <= '9'; }
 
-std::string RequestParser::GetRemainingBuffer() { return mRemainingBuffer; }
+std::string const &RequestParser::GetRemainingBuffer() const { return mRemainingBuffer; }

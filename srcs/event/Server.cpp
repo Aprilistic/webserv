@@ -8,8 +8,7 @@
 Server::Server(int port) : mPort(port) {
   mSocket = socket(AF_INET, SOCK_STREAM, 0);
   if (mSocket < 0) {
-    throw std::runtime_error("Error: socket() creation failed: " +
-                             std::string(strerror(errno)));
+    throw std::runtime_error("Error: socket() creation failed");
   }
   Log(info, "Server: Socket " + ToString(mSocket) + " is created");
 
@@ -23,20 +22,17 @@ Server::Server(int port) : mPort(port) {
   int optval = 1;
   if (setsockopt(mSocket, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval)) <
       0) {
-    throw std::runtime_error("Error: Failed to set socket option: " +
-                             std::string(strerror(errno)));
+    throw std::runtime_error("Error: Failed to set socket option");
   }
 
   if (bind(mSocket, (struct sockaddr *)&mAddr, sizeof(mAddr)) < 0) {
-    throw std::runtime_error("Error: Failed to bind the socket: " +
-                             std::string(strerror(errno)));
+    throw std::runtime_error("Error: Failed to bind the socket");
   }
   Log(info, "Server: Socket " + ToString(mSocket) + " is binded at port " +
                 ToString(mPort));
 
   if (listen(mSocket, SOMAXCONN /* backlog size*/) < 0) {
-    throw std::runtime_error("Error: Failed to listen on the socket: " +
-                             std::string(strerror(errno)));
+    throw std::runtime_error("Error: Failed to listen on the socket");
   }
 
   Log(info, "Server: Socket " + ToString(mSocket) + " is listening");
@@ -74,8 +70,7 @@ void Server::EventHandler(struct kevent &currentEvent) {
 void Server::readHandler() {
   int socket = accept(mSocket, NULL, NULL);
   if (socket == -1) {
-    Log(warn,
-        "Server: Failed to accept new client");
+    Log(warn, "Server: Failed to accept new client");
     return;
   }
   Log(info, "Server: New client " + ToString(socket) + " is accepted");

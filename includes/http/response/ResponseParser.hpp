@@ -17,7 +17,7 @@ public:
 
   std::string MakeResponseMessage(Http &http, eStatusCode state);
 
-  std::string GetMessage() const;
+  std::string const &GetMessage() const;
   std::vector<char> GetMessageToVector();
 
 private:

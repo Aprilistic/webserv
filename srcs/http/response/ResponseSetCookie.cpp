@@ -108,7 +108,7 @@ void ResponseParser::setCookie(Http &http) {
 
   std::ofstream ofs(cookieFileName.c_str(), std::ios::out | std::ios::trunc);
   if (ofs.is_open()) {
-    std::multimap<std::string, std::string>::iterator it =
+    std::multimap<std::string, std::string>::const_iterator it =
         http.GetResponse().GetHeaders().find("Date");
     std::string responseTime = it->second;
     ofs << responseTime;

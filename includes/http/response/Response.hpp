@@ -11,11 +11,11 @@ public:
   int GetVersionMajor() const;
   int GetVersionMinor() const;
   unsigned int GetStatusCode() const;
-  std::string GetStatus() const;
-  std::multimap<std::string, std::string> &GetHeaders();
-  std::string GetBody() const;
+  std::string const &GetStatus() const;
+  std::multimap<std::string, std::string> const &GetHeaders() const;
+  std::string const &GetBody() const;
   bool GetKeepAlive() const;
-  std::string GetFilename() const;
+  std::string const &GetFilename() const;
 
   void InsertHeader(const std::string &key, const std::string &value);
 

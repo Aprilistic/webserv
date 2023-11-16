@@ -9,7 +9,7 @@ public:
   ~RequestParser();
 
   eStatusCode Parse(Request &req, const char *begin, const char *end);
-  std::string GetRemainingBuffer(void);
+  std::string const &GetRemainingBuffer(void) const;
 
 private:
   static bool
