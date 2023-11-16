@@ -45,16 +45,13 @@ eStatusCode Connection::readFromSocket() {
   ssize_t bytesRead;
   char tmp[RECV_BUFFER_SIZE];
   do {
-    errno = 0;
     bytesRead = recv(mSocket, tmp, RECV_BUFFER_SIZE, 0);
     mRecvBuffer.insert(mRecvBuffer.end(), tmp, tmp + bytesRead);
 
   } while (bytesRead > 0);
 
   if (bytesRead == -1) {
-    if (errno == EWOULDBLOCK || errno == EAGAIN) {
-      return (READ_OK);
-    }
+    return (READ_OK);
   }
   disconnect();
   return (SERVER_ERROR_INTERNAL_SERVER_ERROR);
