@@ -92,7 +92,7 @@ print("""
         <a href="./index.html" class="nav-logo">Nuts</a>
         <nav class="nav-links">
             <a href="./test.html">Updates</a>
-            <a href="./AboutNuts.html">About Nuts</a>
+            <a href="./about_nuts.html">About Nuts</a>
         </nav>
     </header>
     <div class="cookie-info">

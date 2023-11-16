@@ -118,7 +118,7 @@ nav ul li a:hover {
 }
 
 .cast-section li {
-    font-size: 1.2em; /* 글자 크기 */
+    font-size: 1em; /* 글자 크기 */
     margin-bottom: 10px; /* 아이템 간 마진 */
 }
 
