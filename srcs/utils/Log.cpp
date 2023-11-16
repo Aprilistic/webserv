@@ -109,4 +109,5 @@ void Log(LogLevel level, std::string message) {
     std::cout << PURPLE << message << RESET << std::endl;
     break;
   }
+  }
 }
