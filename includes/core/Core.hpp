@@ -15,7 +15,6 @@
 #include <thread>
 #include <vector>
 
-#include <cassert>
 #include <csignal>
 
 // External functs
