@@ -95,27 +95,38 @@ nav ul li a:hover {
 .the-story-of-webserv a:hover {
     text-decoration: none;
 }
-/* Style for the plot section */
-#plot {
-    color: white; /* Assuming you want white text */
-    text-align: center; /* Center the text */
-    position: absolute;
-    top: 50%; /* Position at the center of the page */
-    left: 50%;
-    transform: translate(-50%, -50%); /* Align the center of the section to the center of the page */
-    width: 100%; /* Full width */
+
+/* Cast 섹션 스타일 */
+.cast-section {
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+    position: relative; /* 필요에 따라 조정 */
+    text-align: center; /* 가운데 정렬 */
+    color: white; /* 텍스트 색상 */
+    padding: 50px 0; /* 위아래 패딩 */
 }
 
-#plot h1 {
-    font-size: 3em; /* Large font size for the title */
-    margin-bottom: 0.5em; /* Spacing between the title and content */
+.cast-section h1 {
+    font-size: 3em; /* 제목 크기 */
+    margin-bottom: 20px; /* 제목 아래 마진 */
 }
 
-#plot p {
-    font-family: sans-serif;
-    font-size: 1em; /* Regular font size for the content */
-    font-weight: 100; /* Lighter font weight for the content */
-    line-height: 1.5;
-    max-width: 600px; /* Maximum width of the content text */
-    margin: auto; /* Center the content block */
+.cast-section ul {
+    list-style: none; /* 리스트 스타일 제거 */
+    padding: 0; /* 패딩 제거 */
+}
+
+.cast-section li {
+    font-size: 1.2em; /* 글자 크기 */
+    margin-bottom: 10px; /* 아이템 간 마진 */
+}
+
+.cast-section .name {
+    font-weight: bold; /* 이름 볼드 처리 */
+}
+
+.cast-section .role {
+	font-family: sans-serif;
+    font-weight: lighter; /* 역할 얇은 폰트 처리 */
 }

@@ -7,7 +7,7 @@ body, html {
 
 .background-image {
     /* 배경 이미지 URL을 사용자가 원하는 이미지 경로로 변경 */
-    background-image: url('../back.jpg');
+    background-image: url('../images/back.jpg');
     background-size: cover;
     background-position: center;
     height: 100%;
