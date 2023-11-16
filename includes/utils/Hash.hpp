@@ -7,6 +7,6 @@
 #include <string>
 
 unsigned long simpleHash(const std::string &str);
-std::string generateUniqueHash(const std::string &uriPath);
+std::string GenerateUniqueHash(const std::string &uriPath);
 
 #endif

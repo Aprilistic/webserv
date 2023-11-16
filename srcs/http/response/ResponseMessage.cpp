@@ -33,11 +33,11 @@ std::vector<char> ResponseParser::GetMessageToVector() {
 
 void ResponseParser::setStatusLine(Response &resp) {
   mMessage += "HTTP/";
-  mMessage += toString(resp.GetVersionMajor());
+  mMessage += ToString(resp.GetVersionMajor());
   mMessage += ".";
-  mMessage += toString(resp.GetVersionMinor());
+  mMessage += ToString(resp.GetVersionMinor());
   mMessage += SP;
-  mMessage += toString(resp.GetStatusCode());
+  mMessage += ToString(resp.GetStatusCode());
   mMessage += SP;
   mMessage += resp.GetStatus() + CRLF;
 }

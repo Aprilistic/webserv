@@ -8,7 +8,7 @@ std::string requestLog(const Request &request) {
   log += request.GetUri();
   if (!request.GetContent().empty()) {
     log += " | ";
-    log += toString(request.GetContent().size()) + " bytes";
+    log += ToString(request.GetContent().size()) + " bytes";
   }
   log += "]";
   return log;
@@ -17,7 +17,7 @@ std::string requestLog(const Request &request) {
 std::string responseLog(const Response &response) {
   std::string log;
 
-  log += "[" + toString(response.GetStatusCode()) + " ";
+  log += "[" + ToString(response.GetStatusCode()) + " ";
   log += response.GetStatus() + " | ";
   if (response.GetBody().size() > 20) {
     if (response.GetBody().find("\n") && response.GetBody().find("\n") < 20) {
@@ -54,6 +54,11 @@ void timeWithLevel(LogLevel level) {
   case error:
     levelStr += RED;
     levelStr += "error";
+    levelStr += RESET;
+    break;
+  case debug:
+    levelStr += PURPLE;
+    levelStr += "debug";
     levelStr += RESET;
     break;
   }
@@ -98,6 +103,10 @@ void Log(LogLevel level, std::string message) {
   }
   case error: {
     std::cout << RED << message << RESET << std::endl;
+    break;
+  }
+  case debug: {
+    std::cout << PURPLE << message << RESET << std::endl;
     break;
   }
   }

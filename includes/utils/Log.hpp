@@ -5,9 +5,9 @@
 
 class Http;
 
-enum LogLevel { info, warn, error};
+enum LogLevel { info, warn, error, debug };
 
-enum LogType { request, response};
+enum LogType { request, response };
 
 void Log(LogLevel level, LogType type, Http &http);
 

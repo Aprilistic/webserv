@@ -15,6 +15,7 @@ public:
   std::multimap<std::string, std::string> &GetHeaders();
   std::string GetBody() const;
   bool GetKeepAlive() const;
+  std::string GetFilename() const;
 
   void InsertHeader(const std::string &key, const std::string &value);
 
@@ -24,6 +25,7 @@ public:
   void SetStatus(const std::string &status);
   void SetBody(const std::string &body);
   void SetKeepAlive(bool keepAlive);
+  void SetFilename(const std::string &filename);
 
   std::string Inspect() const;
 
@@ -34,10 +36,7 @@ private:
   std::string mStatus;
   std::multimap<std::string, std::string> mHeaders;
   std::string mBody;
-
-public:
   bool mKeepAlive;
-
   std::string mFilename;
 };
 

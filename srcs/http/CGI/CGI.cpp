@@ -23,7 +23,8 @@ void CGI::EventHandler(struct kevent &currentEvent) {
 void CGI::processHandler(struct kevent &currentEvent) {
   if ((currentEvent.fflags & NOTE_EXIT) == 0) {
     struct kevent event;
-    EV_SET(&event, mPid, EVFILT_PROC, EV_ADD | EV_ENABLE | EV_ONESHOT, NOTE_EXIT, 0, this);
+    EV_SET(&event, mPid, EVFILT_PROC, EV_ADD | EV_ENABLE | EV_ONESHOT,
+           NOTE_EXIT, 0, this);
     kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
     return;
   }
@@ -63,7 +64,6 @@ void CGI::processHandler(struct kevent &currentEvent) {
   unlink(mOutputFileName.c_str());
 
   // 응답 보내기
-
   mHttp.SendResponse(statusCode);
 }
 
@@ -76,8 +76,6 @@ void CGI::setAllEnv() {
     return (mHttp.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
   }
 
-  std::vector<std::string> server_name =
-      location->FindValue(location, "server_name");
   Request tmp = mHttp.GetRequest();
   std::stringstream ss;
 
@@ -99,8 +97,6 @@ void CGI::setAllEnv() {
 
   // PATH_INFO: CGI 스크립트에 전달되는 추가적인 경로 정보.
   setenv("PATH_INFO", tmp.GetUri().c_str(), 1);
-
-  // PATH_TRANSLATED: PATH_INFO에 대응하는 실제 파일 경로.
 
   // QUERY_STRING: URL에서 '?' 뒤에 오는 쿼리 문자열.
   std::size_t pos = tmp.GetUri().find("?");
@@ -127,20 +123,12 @@ void CGI::setAllEnv() {
   // REQUEST_METHOD: 클라이언트의 요청 방식(GET, POST, HEAD 등).
   setenv("REQUEST_METHOD", tmp.GetMethod().c_str(), 1);
 
-  // SCRIPT_NAME: 실행되는 CGI 스크립트의 이름.
-  std::string cgiPass = "";
-  Node *configNode = Common::mConfigMap->GetConfigNode(
-      mHttp.GetPort(), mHttp.GetRequest().GetHost(),
-      mHttp.GetRequest().GetUri(), mHttp.GetRequest().GetMethod());
-  if (configNode == NULL) {
-    Log(warn, "CGI: configNode is NULL");
-    return (mHttp.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
-  }
-  cgiPass = location->FindValue(location, "cgi_pass")[0];
-  setenv("SCRIPT_NAME", cgiPass.c_str(), 1);
-
   // SERVER_NAME: 서버의 호스트 이름.
-  setenv("SERVER_NAME", server_name[0].c_str(), 1);
+  std::vector<std::string> server_name =
+      location->FindValue(location, "server_name");
+  if (!server_name.empty()) {
+    setenv("SERVER_NAME", server_name[0].c_str(), 1);
+  }
 
   // SERVER_PORT: 서버의 포트 번호.
   ss.clear();
@@ -153,6 +141,7 @@ void CGI::setAllEnv() {
   // SERVER_SOFTWARE: 서버의 소프트웨어 이름과 버전.
   setenv("SERVER_SOFTWARE", "", 1);
 
+  // HTTP_XXX: HTTP 요청 헤더.
   std::multimap<std::string, std::string> headers = tmp.GetHeaders();
   for (std::multimap<std::string, std::string>::iterator it = headers.begin();
        it != headers.end(); ++it) {
@@ -207,19 +196,23 @@ eStatusCode CGI::cgiResponseParsing(std::string &response) {
   }
 
   // cgi 헤더에서 status code 가져오기
-  std::string statusHeader = headers["Status"];
-  statusHeader = statusHeader.substr(0, statusHeader.find(" "));
+  eStatusCode statusCode = SUCCESSFUL_OK;
+  if (!headers.empty()) {
+    if (headers.count("Status") != 0) {
+      std::string statusHeader = headers["Status"];
+      statusHeader = statusHeader.substr(0, statusHeader.find(" "));
 
-  eStatusCode statusCode =
-      static_cast<eStatusCode>(std::atoi(statusHeader.c_str()));
+      statusCode = static_cast<eStatusCode>(std::atoi(statusHeader.c_str()));
 
-  // headers에서 status 헤더 제거
-  headers.erase("Status");
+      // headers에서 status 헤더 제거
+      headers.erase("Status");
+    }
 
-  // response에 cgi 헤더 추가
-  for (std::map<std::string, std::string>::iterator it = headers.begin();
-       it != headers.end(); ++it) {
-    mHttp.GetResponse().InsertHeader(it->first, it->second);
+    // response에 cgi 헤더 추가
+    for (std::map<std::string, std::string>::iterator it = headers.begin();
+         it != headers.end(); ++it) {
+      mHttp.GetResponse().InsertHeader(it->first, it->second);
+    }
   }
 
   mHttp.GetResponse().SetBody(body);
@@ -230,7 +223,7 @@ eStatusCode CGI::cgiResponseParsing(std::string &response) {
 void CGI::CgiHandle() {
   static int cnt;
   // 요청 내용을 파일에 쓰기 위한 ofstream 객체 생성
-  std::string tmpFileName = "cgi_request_" + toString(cnt);
+  std::string tmpFileName = "cgi_request_" + ToString(cnt);
   mRequestFileName = "./tmp/" + tmpFileName + ".txt";
   std::ofstream requestFile(mRequestFileName.c_str(),
                             std::ios::out | std::ios::trunc);
@@ -244,7 +237,7 @@ void CGI::CgiHandle() {
   requestFile.close(); // 파일 쓰기 완료 후 닫기
 
   // CGI 스크립트 결과를 받을 파일 생성
-  tmpFileName = "cgi_output_" + toString(cnt++);
+  tmpFileName = "cgi_output_" + ToString(cnt++);
   mOutputFileName = "./tmp/" + tmpFileName + ".txt";
 
   // CGI 스크립트 실행을 위한 프로세스 생성
@@ -268,7 +261,14 @@ void CGI::CgiHandle() {
       mHttp.ErrorHandle(CLIENT_ERROR_NOT_FOUND);
       exit(EXIT_FAILURE);
     }
-    std::string cgiPass = location->FindValue(location, "cgi_pass")[0];
+    std::vector<std::string> cgiPassValue =
+        location->FindValue(location, "cgi_pass");
+    if (cgiPassValue.empty()) {
+      Log(warn, "CGI: cgiPassValue is NULL");
+      mHttp.ErrorHandle(CLIENT_ERROR_NOT_FOUND);
+      exit(EXIT_FAILURE);
+    }
+    std::string cgiPass = cgiPassValue[0];
 
     char *argv[] = {(char *)cgiPass.c_str(), NULL};
     execve(argv[0], argv, environ);
@@ -278,7 +278,8 @@ void CGI::CgiHandle() {
     // 부모 프로세스
     fcntl(mPid, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
     struct kevent event;
-    EV_SET(&event, mPid, EVFILT_PROC, EV_ADD | EV_ENABLE | EV_ONESHOT, NOTE_EXIT, 0, this);
+    EV_SET(&event, mPid, EVFILT_PROC, EV_ADD | EV_ENABLE | EV_ONESHOT,
+           NOTE_EXIT, 0, this);
     kevent(Common::mKqueue, &event, 1, NULL, 0, NULL);
   }
 }

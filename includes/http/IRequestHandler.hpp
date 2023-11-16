@@ -11,8 +11,6 @@ class IRequestHandler {
 public:
   virtual void Handle(Http &http) = 0;
   virtual ~IRequestHandler() {}
-
-private:
 };
 
 #endif

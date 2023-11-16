@@ -14,6 +14,10 @@ void Http::RedirectURI() {
 
   std::vector<std::string> redirectValues =
       location->FindValue(location, "return");
+  if (redirectValues.empty()) {
+    Log(warn, "Http: redirectValues is NULL");
+    return (ErrorHandle(CLIENT_ERROR_NOT_FOUND));
+  }
 
   eStatusCode state =
       static_cast<eStatusCode>(std::atoi(redirectValues[0].c_str()));
@@ -40,7 +44,6 @@ void Http::ErrorHandle(eStatusCode errorStatus) {
         errorPagePath = configErrorPageValues.back();
         ReadFile(errorPagePath);
         SendResponse(errorStatus);
-        // errorPagePath response
         return;
       }
     }
@@ -51,7 +54,7 @@ void Http::ErrorHandle(eStatusCode errorStatus) {
 }
 
 eStatusCode Http::ReadFile(const std::string &path) {
-  GetResponse().mFilename = path;
+  GetResponse().SetFilename(path);
 
   std::ifstream file(path.c_str(), std::ios::in | std::ios::binary);
   if (file.is_open()) {
@@ -70,7 +73,7 @@ eStatusCode Http::WriteFile(std::string &path, std::string &data,
                             eStatusCode pathType) {
   if (pathType == PATH_IS_DIRECTORY) {
     // create random file name
-    std::string fileName = "post_" + generateUniqueHash(path);
+    std::string fileName = "post_" + GenerateUniqueHash(path);
 
     path = path + "/" + fileName;
   }
@@ -107,7 +110,7 @@ eStatusCode Http::CheckPathType(const std::string &path) {
   } else if (info.st_mode & S_IFREG) {
     return (PATH_IS_FILE); // 파일 Regular file
   } else {
-    return (PATH_UNKNOWN); // 디렉토리도 파일도 아닌 타입(소켓, 파이프, 심볼릭
+    return (PATH_UNKNOWN); // 디렉토리도 파일도 아닌 타입(소켓, 파이프, 심볼릭)
   }
 }
 
@@ -182,8 +185,6 @@ void Http::HandleRequestType() {
 
 void Http::handleCGIRequest() {
   SharedPtr<CGI> cgiRequest(new CGI(*this));
-  // CGI *cgiRequest = new CGI(*this);
-  // CGI cgiRequest(*this);
   mCGIList.push_back(cgiRequest);
   cgiRequest->CgiHandle();
 }
@@ -285,7 +286,7 @@ bool Http::checkLimitExcept() {
       mPort, mRequest.GetHost(), mRequest.GetUri(), mRequest.GetMethod());
 
   std::vector<std::string> limitExceptValue =
-      location->FindValue(location, "limit_except"); // 초기화가 필요합니다.
+      location->FindValue(location, "limit_except");
   if (limitExceptValue.size()) {
     if (std::find(limitExceptValue.begin(), limitExceptValue.end(),
                   mRequest.GetMethod()) == limitExceptValue.end()) {

@@ -181,9 +181,6 @@ void Node::nodeError(const std::string &msg) {
     currentNode = currentNode->mParent;
   }
   currentNode->deleteTree();
-  // delete (currentNode);
-
-  // delete(Common::mConfigTree);
   throw std::runtime_error(msg);
 }
 

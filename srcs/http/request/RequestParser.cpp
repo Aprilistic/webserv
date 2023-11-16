@@ -192,7 +192,7 @@ eStatusCode RequestParser::consume(Request &req, const char *begin,
       break;
     case HeaderValue:
       if (input == '\r') {
-        if (req.GetMethod() == "POST" || req.GetMethod() == "PUT") {
+        if (req.GetMethod() == "POST") {
           if (strcasecmp(mHeaderName.c_str(), "Content-Length") == 0) {
             req.SetContentLength(atoi(mHeaderValue.c_str()));
             mContentsize = atoi(mHeaderValue.c_str());

@@ -9,9 +9,7 @@ private:
   size_t *_count;
 
 public:
-  SharedPtr(T *ptr = NULL) : _ptr(ptr), _count(new size_t(1)) {
-    (*_count) = 1;
-  }
+  SharedPtr(T *ptr = NULL) : _ptr(ptr), _count(new size_t(1)) { (*_count) = 1; }
 
   SharedPtr(const SharedPtr &orig) : _ptr(orig._ptr), _count(orig._count) {
     (*_count)++;

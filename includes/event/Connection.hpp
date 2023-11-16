@@ -17,6 +17,7 @@ private:
   void readHandler();
   void writeHandler();
   void disconnect();
+
 private:
   int mSocket;
   int mPort;

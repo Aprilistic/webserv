@@ -26,7 +26,7 @@ WebServer::WebServer(const std::string &path)
     mGood = false;
     return;
   }
-} 
+}
 
 bool WebServer::IsGood(void) const { return (mGood); }
 

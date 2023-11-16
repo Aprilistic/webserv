@@ -61,6 +61,7 @@ fclean : clean
 	rm -rf $(TMP_DIR) $(COOKIE_DIR)
 	rm -f webserv
 	rm -f leaks.txt
+	rm -f ./www/example/post_*
 
 re : 
 	make fclean

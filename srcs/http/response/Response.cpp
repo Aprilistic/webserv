@@ -21,6 +21,8 @@ std::string Response::GetBody() const { return mBody; }
 
 bool Response::GetKeepAlive() const { return mKeepAlive; }
 
+std::string Response::GetFilename() const { return mFilename; }
+
 void Response::InsertHeader(const std::string &key, const std::string &value) {
   mHeaders.insert(std::pair<std::string, std::string>(key, value));
 }
@@ -43,6 +45,10 @@ void Response::SetBody(const std::string &body) { mBody = body; }
 
 void Response::SetKeepAlive(bool keepAlive) { mKeepAlive = keepAlive; }
 
+void Response::SetFilename(const std::string &filename) {
+  mFilename = filename;
+}
+
 std::string Response::Inspect() const {
   std::stringstream stream;
   stream << "HTTP/" << mVersionMajor << "." << mVersionMinor << " "
@@ -54,6 +60,6 @@ std::string Response::Inspect() const {
     stream << it->first << ": " << it->second << "\n";
   }
 
-  // stream << mBody << "\n";
+  stream << mBody << "\n";
   return stream.str();
 }
