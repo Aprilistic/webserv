@@ -28,7 +28,11 @@ public:
   virtual void Handle(Http &http);
 
 private:
-  std::string autoIndex(const std::string &path);
+  enum e_autoindex
+  {
+    AUTOINDEX_ALIGN_FILE_NAME,
+    AUTOINDEX_ALIGN_FILE_SIZE
+  };
 };
 
 class PostHandler : public IRequestHandler {
