@@ -121,12 +121,15 @@ void ResponseParser::setMandatoryHeaderFields(Http &http) {
   http.GetResponse().InsertHeader("Server", "*u*king webserv");
 
   // Content-Length
-  std::string contentLength = ToString(http.GetResponse().GetBody().size());
-  http.GetResponse().InsertHeader("Content-Length", contentLength);
+  if (http.GetResponse().GetBody().size() != 0) {
+    std::string contentLength = ToString(http.GetResponse().GetBody().size());
+    http.GetResponse().InsertHeader("Content-Length", contentLength);
+  }
 
   // Content-Type
   if (http.GetResponse().GetHeaders().find("Content-Type") ==
-      http.GetResponse().GetHeaders().end()) {
+          http.GetResponse().GetHeaders().end() &&
+      http.GetResponse().GetBody().size() != 0) {
     std::string contentType = getFileType(http);
     http.GetResponse().InsertHeader("Content-Type", contentType);
   }
