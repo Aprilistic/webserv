@@ -67,7 +67,8 @@ void GetHandler::Handle(Http &http) {
 
       if (autoindex.empty() == false && autoindex[0] == "on") {
         // autoindex on 일때 처리 로직
-        http.GetResponse().SetBody(autoIndex(resolvedPath));
+        http.GetResponse().SetBody(
+            autoIndex(resolvedPath, http.GetRequest().GetUri()));
         http.GetResponse().SetStatusCode(SUCCESSFUL_OK);
         break;
       } else {
@@ -103,23 +104,76 @@ void GetHandler::Handle(Http &http) {
   http.SendResponse(SUCCESSFUL_OK);
 }
 
-std::string GetHandler::autoIndex(const std::string &path) {
-  DIR *dir = opendir(path.c_str());
-  if (dir == NULL) {
-    return ("");
+void GetHandler::alignAutoIndex(std::string &body, size_t minus_len,
+                                int to_align) {
+  const int size[] = {51, 20};
+  int alignSize = size[to_align] - minus_len;
+
+  while (alignSize) {
+    body += " ";
+    --alignSize;
   }
+}
 
-  std::string html = "<html><head><title>Index of " + path +
-                     "</title></head><body><h1>Index of " + path +
-                     "</h1><hr><pre>";
+std::string GetHandler::autoIndex(const std::string &path,
+                                  const std::string uri) {
+  /* 각 파일에 대한 내용을 추가 */
+  struct stat file_info;
+  DIR *dirStream;
+  struct dirent *dirInfo;
+  std::string fileName;
+  std::string filePath;
+  std::string fileSize;
+  std::string body;
+  static char modifiedTime[18];
 
-  struct dirent *entry;
-  while ((entry = readdir(dir)) != NULL) {
-    html += "<a href=\"" + std::string(entry->d_name) + "\">" +
-            std::string(entry->d_name) + "</a><br>";
+  // 제목 추가
+  body += "<html>\n"
+          "<head><title>Index of " +
+          uri +
+          "</title></head>\n"
+          "<body>\n"
+          "<h1>Index of " +
+          uri +
+          "</h1>\n"
+          "<hr><pre><a href=\"../\">../</a>\n";
+
+  dirStream = ::opendir(path.c_str());
+  for (int i = 0; i < 2; ++i)
+    dirInfo = ::readdir(dirStream);
+
+  while ((dirInfo = ::readdir(dirStream)) != NULL) {
+    fileName = dirInfo->d_name;
+    filePath = path + "/" + fileName;
+
+    if (stat(filePath.c_str(), &file_info) == 0) {
+      if (file_info.st_mode & S_IFDIR)
+        fileName += '/';
+
+      // 파일 링크 추가
+      body += "<a href=\"" + fileName + "\">" + fileName + "</a>";
+
+      // 공백 추가 + 생성 시간 추가
+      alignAutoIndex(body, fileName.length(), AUTOINDEX_ALIGN_FILE_NAME);
+      strftime(modifiedTime, sizeof(modifiedTime), "%d-%b-%Y %R",
+               gmtime(&file_info.st_birthtimespec.tv_sec));
+      body += modifiedTime;
+
+      // 공백 추가 + 파일 크기 추가
+      if (file_info.st_mode & S_IFDIR)
+        fileSize = "-";
+      else
+        fileSize = ToString(file_info.st_size);
+      alignAutoIndex(body, fileSize.length(), AUTOINDEX_ALIGN_FILE_SIZE);
+      body += fileSize;
+
+      body += "\n";
+    }
   }
-  html += "</pre><hr></body></html>";
+  ::closedir(dirStream);
 
-  closedir(dir);
-  return (html);
+  body += "</pre><hr></body>\n"
+          "</html>\n";
+
+  return (body);
 }
