@@ -47,3 +47,6 @@ tmp/*
 # cookie
 cookie
 cookie/*
+
+#files
+*post_*
