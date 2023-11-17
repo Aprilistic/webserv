@@ -143,11 +143,7 @@ void Http::SetRequest(eStatusCode state, std::vector<char> &RecvBuffer) {
     eStatusCode ParseState = mRequestParser.Parse(
         mRequest, mBuffer.c_str(), mBuffer.c_str() + mBuffer.size());
 
-    if (ParseState == PARSING_ERROR) {
-      mBuffer.clear();
-      Log(error, "Http: Parsing error");
-      return (ErrorHandle(ParseState));
-    } else if (ParseState == PARSING_INCOMPLETED) {
+    if (ParseState == PARSING_INCOMPLETED) {
       mBuffer.clear();
       return;
     } else if (ParseState == PARSING_COMPLETED) {
@@ -164,6 +160,9 @@ void Http::SetRequest(eStatusCode state, std::vector<char> &RecvBuffer) {
       mBuffer = mRequestParser.GetRemainingBuffer();
       Log(info, request, *this);
       HandleRequestType();
+    } else {
+      mBuffer.clear();
+      return (ErrorHandle(ParseState));
     }
   }
 }
