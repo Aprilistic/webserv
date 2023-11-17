@@ -58,27 +58,12 @@ http {
 }
 ```
 
-**A Bottom-up Approach**
 
-![conf_BU.jpg](images/conf_BU.jpg)
+| | |
+|:------------|:------------|
+| ![A Bottom-up Approach]([images/conf_BU.jpg](https://github.com/Aprilistic/webserv/blob/readme/images/conf_BU.jpg?raw=true))<br>**A Bottom-up Approach**<br>In the initialization process, a web server parses the configuration in a tree shape. This allows each location configure to override specific settings like Nginx. Regex is partially implemented. `(*, $)`<br>This is implemented in `Config.{hpp, cpp}` in less than 100 lines. | ![A Top-down Approach](images/conf_TD.jpg)<br>**A Top-down Approach**<br>After making the tree, the configuration is being mapped into `std::<map>`. This approach is to optimize the configuration access time of each HTTP request. The searching is processed in several steps:<br>1. Port<br>2. Hostname<br>3. Location<br>By using this method, the access time is reduced from $O(N)$ to $O(lg N)$.<br>This is implemented in `ConfigMap.{hpp, cpp}` |
 
-In the initialization process, a web server parses the configuration in a tree shape. This allows each location configure to override specific settings like Nginx. Regex is partially implemented. (*, $)
 
-This is implemented in `Config.{hpp, cpp}` less than 100 lines.
-
-**A Top-down Approach**
-
-![conf_TD.jpg](images/conf_TD.jpg)
-
-After making the tree, the configuration is being mapped into `std::<map>`. This approach is to optimize the configuration access time of each HTTP request. The searching is processed in a several steps. 
-
-1. Port
-2. Hostname
-3. Location
-
-By using this method, the access time is reduced from $O(N)$ to $O(lg  N)$. 
-
-This is implemented in `ConfigMap.{hpp, cpp}`
 
 ### Event Driven Architecture (I/O Multiplexing)
 
