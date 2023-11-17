@@ -71,12 +71,13 @@ http {
 **Flowchart**
 ![flow_normal](https://github.com/Aprilistic/webserv/assets/70141850/ab8c7438-23ea-43b6-95f7-ab509b581843)
 
-
 This is how this program flows. Server, client sockets and children’s PID are registered to kqueue. 
 
 | | |
-|:------------|:------------|
-| ![flow_kqueue](https://github.com/Aprilistic/webserv/assets/70141850/9bf7799f-167b-426c-a0ea-a89b39f443f3)<br> | `class Server, Connection, CGI` inherits `class IEventHandler` which has `virtual void EventHandler()`. When an event is caught, it calls `EventHandler()` thus to call corresponding function in each class. |
+|:------------:|:------------|
+| <img src="https://github.com/Aprilistic/webserv/assets/70141850/9bf7799f-167b-426c-a0ea-a89b39f443f3" width="1500"> | `class Server, Connection, CGI` inherits `class IEventHandler` which has `virtual void EventHandler()`. When an event is caught, it calls `EventHandler()` thus to call corresponding function in each class. |
+
+
 
 
 ## Key Features
@@ -121,6 +122,11 @@ Ensure you have a macOS environment and a C++ 98 compiler.
 1. Clone the repository: `git clone [repository link]`
 2. Compile the project: `make re` at the root directory.
 3. Run the server: `./webserv configs/example.conf`
+
+| | |
+|:------------|:------------|
+|<img width="1232" alt="Screen Shot 2023-11-17 at 5 03 56 PM" src="https://github.com/Aprilistic/webserv/assets/70141850/f839c1f6-718d-4f6f-8a41-b40d72b6338d">|<img width="1017" alt="Screen Shot 2023-11-17 at 5 11 50 PM" src="https://github.com/Aprilistic/webserv/assets/70141850/686ea972-5db8-431f-8a1a-5bdca42a490f">
+|
 
 
 ## Results and Discussion
