@@ -61,7 +61,8 @@ http {
 
 | | |
 |:------------|:------------|
-| ![A Bottom-up Approach]([images/conf_BU.jpg]([https://github.com/Aprilistic/webserv/blob/readme/images/conf_BU.jpg?raw=true](https://raw.githubusercontent.com/Aprilistic/webserv/readme/images/conf_BU.jpg?token=GHSAT0AAAAAACKGCTGB7D3SXKOJT4HUHJFCZKXGAAA)))<br>**A Bottom-up Approach**<br>In the initialization process, a web server parses the configuration in a tree shape. This allows each location configure to override specific settings like Nginx. Regex is partially implemented. `(*, $)`<br>This is implemented in `Config.{hpp, cpp}` in less than 100 lines. | ![A Top-down Approach](images/conf_TD.jpg)<br>**A Top-down Approach**<br>After making the tree, the configuration is being mapped into `std::<map>`. This approach is to optimize the configuration access time of each HTTP request. The searching is processed in several steps:<br>1. Port<br>2. Hostname<br>3. Location<br>By using this method, the access time is reduced from $O(N)$ to $O(lg N)$.<br>This is implemented in `ConfigMap.{hpp, cpp}` |
+| ![A Bottom-up Approach](images/conf_BU.jpg)<br>**A Bottom-up Approach**<br>In the initialization process, a web server parses the configuration in a tree shape. This allows each location configure to override specific settings like Nginx. Regex is partially implemented. `(*, $)`<br>This is implemented in `Config.{hpp, cpp}` in less than 100 lines. | ![A Top-down Approach](images/conf_TD.jpg)<br>**A Top-down Approach**<br>After making the tree, the configuration is being mapped into `std::<map>`. This approach is to optimize the configuration access time of each HTTP request. The searching is processed in several steps:<br>1. Port<br>2. Hostname<br>3. Location<br>By using this method, the access time is reduced from $O(N)$ to $O(lg N)$.<br>This is implemented in `ConfigMap.{hpp, cpp}` |
+
 
 
 
@@ -73,9 +74,10 @@ http {
 
 This is how this program flows. Server, client sockets and children’s PID are registered to kqueue. 
 
-![flow_kqueue.svg](images/flow_kqueue.svg)
+| | |
+|:------------|:------------|
+| ![flow_kqueue.svg](images/flow_kqueue.svg) | `class Server, Connection, CGI` inherits `class IEventHandler` which has `virtual void EventHandler()`. When an event is caught, it calls `EventHandler()` thus to call corresponding function in each class. |
 
-`class Server, Connection, CGI` inherits `class IEventHandler` which has `virtual void EventHandler()`. When an event is caught, it calls `EventHandler()` thus to call corresponding function in each class.
 
 ## Key Features
 
