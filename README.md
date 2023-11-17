@@ -1,8 +1,5 @@
 # README.md
 
-Status: Not started
-Select: 팀
-
 # Webserv
 
 **HTTP/1.1 compatible web server in C++ using I/O multiplexing.**
@@ -63,7 +60,7 @@ http {
 
 **A Bottom-up Approach**
 
-![conf_BU.jpg](README%20md%200eef534ff27f4160bc404c85f57fb66d/conf_BU.jpg)
+![conf_BU.jpg](iamges/conf_BU.jpg)
 
 In the initialization process, a web server parses the configuration in a tree shape. This allows each location configure to override specific settings like Nginx. Regex is partially implemented. (*, $)
 
@@ -71,7 +68,7 @@ This is implemented in `Config.{hpp, cpp}` less than 100 lines.
 
 **A Top-down Approach**
 
-![conf_TD.jpg](README%20md%200eef534ff27f4160bc404c85f57fb66d/conf_TD.jpg)
+![conf_TD.jpg](images/conf_TD.jpg)
 
 After making the tree, the configuration is being mapped into `std::<map>`. This approach is to optimize the configuration access time of each HTTP request. The searching is processed in a several steps. 
 
@@ -87,11 +84,11 @@ This is implemented in `ConfigMap.{hpp, cpp}`
 
 **Flowchart**
 
-![This is how this program flows. Server, client sockets and children’s PID are registered to kqueue. ](README%20md%200eef534ff27f4160bc404c85f57fb66d/mermaid-diagram-2023-11-17-131716.svg)
+![This is how this program flows. Server, client sockets and children’s PID are registered to kqueue. ](images/flow_normal.svg)
 
 This is how this program flows. Server, client sockets and children’s PID are registered to kqueue. 
 
-![mermaid-diagram-2023-11-17-133617.svg](README%20md%200eef534ff27f4160bc404c85f57fb66d/mermaid-diagram-2023-11-17-133617.svg)
+![flow_kqueue.svg](images/flow_kqueue.svg)
 
 `class Server, Connection, CGI` inherits `class IEventHandler` which has `virtual void EventHandler()`. When an event is caught, it calls `EventHandler()` thus to call corresponding function in each class.
 
@@ -138,24 +135,12 @@ Ensure you have a macOS environment and a C++ 98 compiler.
 2. Compile the project: `make re` at the root directory.
 3. Run the server: `./webserv configs/example.conf`
 
-# Installation and Usage
-
-## Requirements
-
-- macOS
-- C++ 98 compiler
-
-## Usage
-
-1. Clone this repo
-2. Command `make re` in the root of the repository.
-3. Run the server with configuration file. e.g. `./webserv configs/example.conf`
 
 ## Results and Discussion
 
 This project was a deep dive into web server mechanics, leveraging C++ with OOP and I/O multiplexing. Our journey was marked by constant problem-solving and code refinement, enhancing our collaboration and communication skills. Despite some initial challenges, the final product is a testament to our perseverance and commitment to learning.
 
-# Acknowledgements
+## Acknowledgements
 
 **Nginx**
 
@@ -173,6 +158,6 @@ This project was a deep dive into web server mechanics, leveraging C++ with OOP 
 
 [Kernel Queue: The Complete Guide On The Most Essential Technology For High-Performance I/O](https://habr.com/en/articles/600123/)
 
-# License
+## License
 
 MIT License
