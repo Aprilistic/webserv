@@ -61,7 +61,7 @@ http {
 
 | | |
 |:------------|:------------|
-| ![A Bottom-up Approach](images/conf_BU.jpg)<br>**A Bottom-up Approach**<br>In the initialization process, a web server parses the configuration in a tree shape. This allows each location configure to override specific settings like Nginx. Regex is partially implemented. `(*, $)`<br>This is implemented in `Config.{hpp, cpp}` in less than 100 lines. | ![A Top-down Approach](images/conf_TD.jpg)<br>**A Top-down Approach**<br>After making the tree, the configuration is being mapped into `std::<map>`. This approach is to optimize the configuration access time of each HTTP request. The searching is processed in several steps:<br>1. Port<br>2. Hostname<br>3. Location<br>By using this method, the access time is reduced from $O(N)$ to $O(lg N)$.<br>This is implemented in `ConfigMap.{hpp, cpp}` |
+| ![conf_BU](https://github.com/Aprilistic/webserv/assets/70141850/4293129e-b683-4cfc-a829-0836b5d16d84)<br>**A Bottom-up Approach**<br>In the initialization process, a web server parses the configuration in a tree shape. This allows each location configure to override specific settings like Nginx. Regex is partially implemented. `(*, $)`<br>This is implemented in `Config.{hpp, cpp}` in less than 100 lines. | ![conf_TD](https://github.com/Aprilistic/webserv/assets/70141850/196cce23-ee08-4f72-b501-dfa125c39498)<br>**A Top-down Approach**<br>After making the tree, the configuration is being mapped into `std::<map>`. This approach is to optimize the configuration access time of each HTTP request. The searching is processed in several steps:<br>1. Port<br>2. Hostname<br>3. Location<br>By using this method, the access time is reduced from $O(N)$ to $O(lg N)$.<br>This is implemented in `ConfigMap.{hpp, cpp}` |
 
 
 
@@ -69,14 +69,14 @@ http {
 ### Event Driven Architecture (I/O Multiplexing)
 
 **Flowchart**
+![flow_normal](https://github.com/Aprilistic/webserv/assets/70141850/ab8c7438-23ea-43b6-95f7-ab509b581843)
 
-![This is how this program flows. Server, client sockets and children’s PID are registered to kqueue. ](images/flow_normal.svg)
 
 This is how this program flows. Server, client sockets and children’s PID are registered to kqueue. 
 
 | | |
 |:------------|:------------|
-| ![flow_kqueue.svg](images/flow_kqueue.svg) | `class Server, Connection, CGI` inherits `class IEventHandler` which has `virtual void EventHandler()`. When an event is caught, it calls `EventHandler()` thus to call corresponding function in each class. |
+| ![flow_kqueue](https://github.com/Aprilistic/webserv/assets/70141850/9bf7799f-167b-426c-a0ea-a89b39f443f3)<br> | `class Server, Connection, CGI` inherits `class IEventHandler` which has `virtual void EventHandler()`. When an event is caught, it calls `EventHandler()` thus to call corresponding function in each class. |
 
 
 ## Key Features
