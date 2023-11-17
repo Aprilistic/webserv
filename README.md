@@ -60,7 +60,7 @@ http {
 
 **A Bottom-up Approach**
 
-![conf_BU.jpg](iamges/conf_BU.jpg)
+![conf_BU.jpg](images/conf_BU.jpg)
 
 In the initialization process, a web server parses the configuration in a tree shape. This allows each location configure to override specific settings like Nginx. Regex is partially implemented. (*, $)
 
