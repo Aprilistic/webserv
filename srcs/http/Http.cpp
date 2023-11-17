@@ -75,7 +75,7 @@ eStatusCode Http::WriteFile(std::string &path, std::string &data,
     // create random file name
     std::string fileName = "post_" + GenerateUniqueHash(path) + ".txt";
 
-    path = path + "/" + fileName;
+    path += fileName;
   }
 
   std::fstream file;
