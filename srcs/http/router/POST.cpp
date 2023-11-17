@@ -73,5 +73,7 @@ void PostHandler::Handle(Http &http) {
   }
   }
 
+  http.GetResponse().SetBody(resolvedPath);
+  http.GetResponse().InsertHeader("Content-Type", "text/plain");
   http.SendResponse(status);
 }
