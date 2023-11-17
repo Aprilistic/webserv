@@ -18,20 +18,16 @@ void GetHandler::Handle(Http &http) {
   // alias가 없는 경우 location 이 / 라면 기본 설정에 정의되어 있는 index.html
   // 그 외의 다른 location의 경우 404
 
+  std::string resolvedPath = http.GetRequest().GetUri();
   if (alias.empty()) {
     if (uri[0] == "/") {
-      Log(warn, "GetHandler: uri is /");
       return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
     }
-  }
-  // alias 있는 경우
-  // 구한 경로가 디렉토리인지 파일인지 권한에러인지 언노운파일인지 확인하는 로직
-  std::string resolvedPath = http.GetRequest().GetUri();
-
-  size_t pos = resolvedPath.find(uri[0]);
-  if (pos != std::string::npos) {
-    // resolvedPath = alias + uri
-    resolvedPath.replace(pos, uri[0].size(), alias[0]);
+  } else {
+    size_t pos = resolvedPath.find(uri[0]);
+    if (pos != std::string::npos) {
+      resolvedPath.replace(pos, uri[0].size(), alias[0]);
+    }
   }
 
   switch (http.CheckPathType(resolvedPath)) {

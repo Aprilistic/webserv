@@ -35,18 +35,17 @@ void PostHandler::Handle(Http &http) {
   std::vector<std::string> alias = location->FindValue(location, "alias");
 
   // file path 구하기
+  std::string resolvedPath = http.GetRequest().GetUri();
   if (alias.empty()) {
     if (uri[0] == "/") {
-      // nginx는 404 Not found 반환
       Log(warn, "PostHandler: uri is /");
       return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
     }
-  }
-
-  std::string resolvedPath = http.GetRequest().GetUri();
-  size_t pos = resolvedPath.find(uri[0]);
-  if (pos != std::string::npos) {
-    resolvedPath.replace(pos, uri[0].size(), alias[0]);
+  } else {
+    size_t pos = resolvedPath.find(uri[0]);
+    if (pos != std::string::npos) {
+      resolvedPath.replace(pos, uri[0].size(), alias[0]);
+    }
   }
 
   // 데이터 처리
