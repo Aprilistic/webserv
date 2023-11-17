@@ -109,23 +109,23 @@ This is how this program flows. Server, client sockets and children’s PID are 
 
 **Class Destruction**
 
-Every connection with client has to be removed when the connection is lost. So resolve this problem we implemented smart pointer : sharedPtr since C++ 98 does not support smart pointer
+Every connection with a client has to be removed when the connection is lost. To resolve this problem we implemented smart pointer: sharedPtr since C++ 98 does not support smart pointer
 
 `**Fork()**`
 
-We did not notice the regulation about `fork()` and POSIX system calls in requirements. We wanted to make this program to support multiprocessing(multiple workers), multithreading(thread pool). continuous configuration change like Nginx. So, we had to abandon the coolest code that we’ve ever wrote 😂. 
+We did not notice the regulation about `fork()` and POSIX system calls in requirements. We wanted to make this program to support multiprocessing(multiple workers), and multithreading(thread pool). continuous configuration change like Nginx. So, we had to abandon the coolest code that we’ve ever written 😂.
 
-Our program is single-process except CGI. Because of the event-driven structure, it was not easy to implement without using thread. But we could learn that `fork()`, `vfork()`, `pthread_create()` are so similar each other. They are using `clone()` in Linux and the difference among them is memory management and PID handling.
+Our program is single-processed except for CGI. Because of the event-driven structure, it was not easy to implement without using thread. But we could learn that `fork()`, `vfork()`, and `pthread_create()` are so similar to each other. They are using clone() in Linux and the difference among them is memory management and PID handling.
 
 **Parsing**
 
 Configuration
 
-Parsing a configuration and checking syntax was challenging. We’ve set directive’s level flags (in `Node.cpp`) to make the code and logic as simpler as possible.
+Parsing a configuration and checking syntax was challenging. We’ve set directive level flags (in Node.cpp) to make the code and logic as simple as possible.
 
 HTTP request
 
-Parsing a HTTP request from the socket’s output was quite hard too. We used nekipelov’s httpparser and modified it to fit our usage. That helped us a lot. Thank you!
+Parsing an HTTP request from the socket’s output was quite hard too. We used Nekipelov’s httpparser and modified it to fit our usage. That helped us a lot. Thank you!
 
 ## Installation and Usage
 
@@ -144,7 +144,7 @@ This project was a deep dive into web server mechanics, leveraging C++ with OOP 
 
 **Nginx**
 
-[GitHub - nginx/nginx: An official read-only mirror of http://hg.nginx.org/nginx/ which is updated hourly. Pull requests on GitHub cannot be accepted and will be automatically closed. The proper way to submit changes to nginx is via the nginx development mailing list, see http://nginx.org/en/docs/contributing_changes.html](https://github.com/nginx/nginx)
+[GitHub - nginx/nginx](https://github.com/nginx/nginx)
 
 **RFC 2616**
 
