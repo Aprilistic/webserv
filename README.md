@@ -58,10 +58,9 @@ http {
 }
 ```
 
-
 | | |
 |:------------|:------------|
-| ![conf_BU](https://github.com/Aprilistic/webserv/assets/70141850/4293129e-b683-4cfc-a829-0836b5d16d84)<br>**A Bottom-up Approach**<br>In the initialization process, a web server parses the configuration in a tree shape. This allows each location configure to override specific settings like Nginx. Regex is partially implemented. `(*, $)`<br>This is implemented in `Config.{hpp, cpp}` in less than 100 lines. | ![conf_TD](https://github.com/Aprilistic/webserv/assets/70141850/196cce23-ee08-4f72-b501-dfa125c39498)<br>**A Top-down Approach**<br>After making the tree, the configuration is being mapped into `std::<map>`. This approach is to optimize the configuration access time of each HTTP request. The searching is processed in several steps:<br>1. Port<br>2. Hostname<br>3. Location<br>By using this method, the access time is reduced from $O(N)$ to $O(lg N)$.<br>This is implemented in `ConfigMap.{hpp, cpp}` |
+| ![conf_BU](https://github.com/Aprilistic/webserv/assets/70141850/9cfa9fe6-2863-4f8c-b0a3-ca3a2740906e)<br>**A Bottom-up Approach**<br>In the initialization process, a web server parses the configuration in a tree shape. This allows each location configure to override specific settings like Nginx. Regex is partially implemented. `(*, $)`<br>This is implemented in `Config.{hpp, cpp}` in less than 100 lines. | ![conf_TD](https://github.com/Aprilistic/webserv/assets/70141850/1f6a16a0-2cfb-437b-8e9f-410a7231de7c)<br>**A Top-down Approach**<br>After making the tree, the configuration is being mapped into `std::<map>`. This approach is to optimize the configuration access time of each HTTP request. The searching is processed in several steps:<br>1. Port<br>2. Hostname<br>3. Location<br>By using this method, the access time is reduced from $O(N)$ to $O(lg N)$.<br>This is implemented in `ConfigMap.{hpp, cpp}` |
 
 
 
@@ -69,14 +68,14 @@ http {
 ### Event Driven Architecture (I/O Multiplexing)
 
 **Flowchart**
-![flow_normal](https://github.com/Aprilistic/webserv/assets/70141850/ab8c7438-23ea-43b6-95f7-ab509b581843)
+![flow_normal](https://github.com/Aprilistic/webserv/assets/70141850/de80c768-c20d-4720-a9d4-26b9c586ed36)
+
 
 This is how this program flows. Server, client sockets and children’s PID are registered to kqueue. 
 
 | | |
 |:------------:|:------------|
-| <img src="https://github.com/Aprilistic/webserv/assets/70141850/9bf7799f-167b-426c-a0ea-a89b39f443f3" width="1500"> | `class Server, Connection, CGI` inherits `class IEventHandler` which has `virtual void EventHandler()`. When an event is caught, it calls `EventHandler()` thus to call corresponding function in each class. |
-
+| <img src="https://github.com/Aprilistic/webserv/assets/70141850/7444669d-2314-4b32-b502-4e7d16157e71" width="1500"> | `class Server, Connection, CGI` inherits `class IEventHandler` which has `virtual void EventHandler()`. When an event is caught, it calls `EventHandler()` thus to call corresponding function in each class. |
 
 
 
@@ -125,7 +124,7 @@ Ensure you have a macOS environment and a C++ 98 compiler.
 
 | | |
 |:------------|:------------|
-|<img width="1232" alt="Screen Shot 2023-11-17 at 5 03 56 PM" src="https://github.com/Aprilistic/webserv/assets/70141850/f839c1f6-718d-4f6f-8a41-b40d72b6338d">|<img width="1232" alt="Screen Shot 2023-11-17 at 5 11 50 PM" src="https://github.com/Aprilistic/webserv/assets/70141850/686ea972-5db8-431f-8a1a-5bdca42a490f">
+|<img width="1232" alt="Screen Shot 2023-11-17 at 5 03 56 PM" src="https://github.com/Aprilistic/webserv/assets/70141850/6b71d699-e0bb-40cf-afe7-26f002839b51">|<img width="1017" alt="Screen Shot 2023-11-17 at 5 11 50 PM" src="https://github.com/Aprilistic/webserv/assets/70141850/9627ec1f-00ec-4578-a759-8aaf13e5fc89">
 |
 
 
