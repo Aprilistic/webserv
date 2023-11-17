@@ -60,59 +60,37 @@ http {
 
 | | |
 |:------------|:------------|
-| ![conf_BU](https://github.com/Aprilistic/webserv/assets/70141850/9cfa9fe6-2863-4f8c-b0a3-ca3a2740906e)<br>**A Bottom-up Approach**<br>In the initialization process, a web server parses the configuration in a tree shape. This allows each location configure to override specific settings like Nginx. Regex is partially implemented. `(*, $)`<br>This is implemented in `Config.{hpp, cpp}` in less than 100 lines. | ![conf_TD](https://github.com/Aprilistic/webserv/assets/70141850/1f6a16a0-2cfb-437b-8e9f-410a7231de7c)<br>**A Top-down Approach**<br>After making the tree, the configuration is being mapped into `std::<map>`. This approach is to optimize the configuration access time of each HTTP request. The searching is processed in several steps:<br>1. Port<br>2. Hostname<br>3. Location<br>By using this method, the access time is reduced from $O(N)$ to $O(lg N)$.<br>This is implemented in `ConfigMap.{hpp, cpp}` |
+| ![conf_BU](https://github.com/Aprilistic/webserv/assets/70141850/9cfa9fe6-2863-4f8c-b0a3-ca3a2740906e)<br>**A Bottom-up Approach**<br>In the initialization process, a web server parses the configuration in a tree shape. This allows each location configuration to override specific settings like Nginx. Regex is partially implemented. `(*, $)`<br>This is implemented in `Config.{hpp, cpp}` in less than 100 lines. | ![conf_TD](https://github.com/Aprilistic/webserv/assets/70141850/1f6a16a0-2cfb-437b-8e9f-410a7231de7c)<br>**A Top-down Approach**<br>After making the tree, the configuration is being mapped into `std::<map>`. This approach is to optimize the configuration access time of each HTTP request. The search is processed in several steps:<br>1. Port<br>2. Hostname<br>3. Location<br>By using this method, the access time is reduced from $O(N)$ to $O(log N)$.<br>This is implemented in `ConfigMap.{hpp, cpp}` |
 
 
 
 
-### Event Driven Architecture (I/O Multiplexing)
+### Event-Driven Architecture (I/O Multiplexing)
 
 **Flowchart**
 ![flow_normal](https://github.com/Aprilistic/webserv/assets/70141850/de80c768-c20d-4720-a9d4-26b9c586ed36)
 
 
-This is how this program flows. Server, client sockets and children’s PID are registered to kqueue. 
+This is how this program flows. Server, client sockets, and children’s PID are registered to kqueue. 
 
 | | |
 |:------------:|:------------|
-| <img src="https://github.com/Aprilistic/webserv/assets/70141850/7444669d-2314-4b32-b502-4e7d16157e71" width="1500"> | `class Server, Connection, CGI` inherits `class IEventHandler` which has `virtual void EventHandler()`. When an event is caught, it calls `EventHandler()` thus to call corresponding function in each class. |
+| <img src="https://github.com/Aprilistic/webserv/assets/70141850/7444669d-2314-4b32-b502-4e7d16157e71" width="1500"> | `class Server, Connection, CGI` inherits `class IEventHandler` which has `virtual void EventHandler()`. When an event is caught, it calls `EventHandler()` thus calling the corresponding function in each class. |
 
 
 
 ## Key Features
 
-- **HTTP/1.1 Compliant**: Supports GET, POST, DELETE methods, along with features like HTTP pipelining and cookies.
+- **HTTP/1.1 Compliant**: Supports GET, POST, and DELETE methods, along with features like HTTP pipelining and cookies.
 - **Nginx-like Configuration**: Tree-shaped parsing for nested bracket `{}` configurations, resembling Nginx.
 - **Efficient Configuration Access**: A sophisticated mapping system reduces access time from O(N) to O(log N).
 
 ## Challenges and Solutions
 
-- **Class Destruction**: Implemented smart pointers for efficient connection management, adapting to C++ 98's limitations.
+- **Class Destruction**: Implemented smart pointers for efficient object management, adapting to C++ 98's limitations.
 - **Forking and Multithreading**: Refined our approach to meet project requirements, gaining insights into process creation and management in Linux.
-- **Parsing Complexity**: Developed efficient parsing strategies for both configuration files and HTTP requests, enhancing our problem-solving skills.
-...
+- **Parsing Complexity**: Developed efficient parsing strategies for both configuration files and HTTP requests. For configuration parsing, we've used bitmask to make the logic as simple as possible. For HTTP request paring, we used Nekipelov’s httpparser and modified it to fit our usage. That helped us a lot. Thank you!
 
-## Challenges and Solutions
-
-**Class Destruction**
-
-Every connection with a client has to be removed when the connection is lost. To resolve this problem we implemented smart pointer: sharedPtr since C++ 98 does not support smart pointer
-
-`**Fork()**`
-
-We did not notice the regulation about `fork()` and POSIX system calls in requirements. We wanted to make this program to support multiprocessing(multiple workers), and multithreading(thread pool). continuous configuration change like Nginx. So, we had to abandon the coolest code that we’ve ever written 😂.
-
-Our program is single-processed except for CGI. Because of the event-driven structure, it was not easy to implement without using thread. But we could learn that `fork()`, `vfork()`, and `pthread_create()` are so similar to each other. They are using clone() in Linux and the difference among them is memory management and PID handling.
-
-**Parsing**
-
-Configuration
-
-Parsing a configuration and checking syntax was challenging. We’ve set directive level flags (in Node.cpp) to make the code and logic as simple as possible.
-
-HTTP request
-
-Parsing an HTTP request from the socket’s output was quite hard too. We used Nekipelov’s httpparser and modified it to fit our usage. That helped us a lot. Thank you!
 
 ## Installation and Usage
 
