@@ -102,7 +102,7 @@ Ensure you have a macOS environment and a C++ 98 compiler.
 
 | | |
 |:------------|:------------|
-|<img width="1232" alt="Screen Shot 2023-11-17 at 5 03 56 PM" src="https://github.com/Aprilistic/webserv/assets/70141850/6b71d699-e0bb-40cf-afe7-26f002839b51">|<img width="1017" alt="Screen Shot 2023-11-17 at 5 11 50 PM" src="https://github.com/Aprilistic/webserv/assets/70141850/9627ec1f-00ec-4578-a759-8aaf13e5fc89">
+|<img width="1500" alt="Screen Shot 2023-11-17 at 5 03 56 PM" src="https://github.com/Aprilistic/webserv/assets/70141850/6b71d699-e0bb-40cf-afe7-26f002839b51">|<img width="1500" alt="Screen Shot 2023-11-17 at 5 11 50 PM" src="https://github.com/Aprilistic/webserv/assets/70141850/9627ec1f-00ec-4578-a759-8aaf13e5fc89">
 |
 
 
