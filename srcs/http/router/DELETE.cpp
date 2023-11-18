@@ -33,7 +33,7 @@ void DeleteHandler::Handle(Http &http) {
   case PATH_IS_DIRECTORY:
   case PATH_IS_FILE: {
     if (std::remove(resolvedPath.c_str()) == 0) {
-      return;
+      break;
     } else {
       Log(warn, "DeleteHandler: remove error");
       return (http.ErrorHandle(SERVER_ERROR_INTERNAL_SERVER_ERROR));
