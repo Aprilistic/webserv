@@ -35,14 +35,13 @@ void ConfigMap::PortMap::AddServerConfig(Node *serverNode) {
 }
 
 Node *ConfigMap::PortMap::GetConfigNode(const std::string &hostname,
-                                        const std::string &uri,
-                                        const std::string &method) {
+                                        const std::string &uri) {
   Node *configNode = NULL;
 
   // Search URI in hostname config
   HostnameMap::iterator it = mHostnameConfigs.find(hostname);
   if (it != mHostnameConfigs.end()) {
-    configNode = searchInServerConfig(&(it->second), uri, method);
+    configNode = searchInServerConfig(&(it->second), uri);
     if (configNode != NULL) {
       return configNode;
     }
@@ -51,7 +50,7 @@ Node *ConfigMap::PortMap::GetConfigNode(const std::string &hostname,
   // If not found, search URI in default server config
   else {
     if (&(it->second) != mDefaultServer) {
-      configNode = searchInServerConfig(mDefaultServer, uri, method);
+      configNode = searchInServerConfig(mDefaultServer, uri);
       if (configNode != NULL) {
         return configNode;
       }
@@ -71,24 +70,7 @@ const std::vector<int> ConfigMap::GetPorts() const {
   return mPorts;
 }
 
-bool checkCGIMethod(const std::string &method, Node *locationNode) {
-  std::vector<std::string> &cgiLimits =
-      locationNode->mDirectives["limit_except"];
-
-  if (cgiLimits.size() == 0) {
-    return true;
-  }
-
-  for (size_t i = 0; i < cgiLimits.size(); i++) {
-    if (cgiLimits[i] == method) {
-      return true;
-    }
-  }
-  return false;
-}
-
-Node *ConfigMap::PortMap::miniPCRE(UriMap *uriConfigs, const std::string uri,
-                                   const std::string &method) {
+Node *ConfigMap::PortMap::miniPCRE(UriMap *uriConfigs, const std::string uri) {
   std::string currentUri = uri;
   std::string longestMatchedUri = "";
   Node *longestMatchedNode = NULL;
@@ -106,8 +88,7 @@ Node *ConfigMap::PortMap::miniPCRE(UriMap *uriConfigs, const std::string uri,
     }
     if (configUri[0] == '*') {
       configUri = configUri.substr(1, configUri.size());
-      if (currentUri.find(configUri) != std::string::npos &&
-          checkCGIMethod(method, it->second)) {
+      if (currentUri.find(configUri) != std::string::npos) {
         if (configUri.size() > longestMatchedUri.size()) {
           longestMatchedUri = configUri;
           longestMatchedNode = it->second;
@@ -115,8 +96,7 @@ Node *ConfigMap::PortMap::miniPCRE(UriMap *uriConfigs, const std::string uri,
       }
     } else if (configUri[configUri.size() - 1] == '$') {
       configUri = configUri.substr(0, configUri.size() - 1);
-      if (currentUri.find(configUri) == currentUri.size() - configUri.size() &&
-          checkCGIMethod(method, it->second)) {
+      if (currentUri.find(configUri) == currentUri.size() - configUri.size()) {
         if (configUri.size() > longestMatchedUri.size()) {
           longestMatchedUri = configUri;
           longestMatchedNode = it->second;
@@ -158,12 +138,11 @@ Node *ConfigMap::PortMap::longestMatchedNode(UriMap *uriConfigs,
 }
 
 Node *ConfigMap::PortMap::searchInServerConfig(UriMap *uriConfigs,
-                                               const std::string &uri,
-                                               const std::string &method) {
+                                               const std::string &uri) {
   std::string currentUri = uri;
   Node *locationNode = NULL;
 
-  locationNode = miniPCRE(uriConfigs, uri, method);
+  locationNode = miniPCRE(uriConfigs, uri);
   if (locationNode != NULL) {
     return locationNode;
   }
@@ -212,11 +191,10 @@ ConfigMap::ConfigMap(Node *configTree) {
 }
 
 Node *ConfigMap::GetConfigNode(int port, const std::string &hostname,
-                               const std::string &uri,
-                               const std::string &method) {
+                               const std::string &uri) {
   if (mPortConfigs.find(port) == mPortConfigs.end()) {
     return NULL;
   }
 
-  return mPortConfigs[port].GetConfigNode(hostname, uri, method);
+  return mPortConfigs[port].GetConfigNode(hostname, uri);
 }

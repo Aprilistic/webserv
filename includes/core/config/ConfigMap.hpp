@@ -12,7 +12,7 @@ public:
 
   ConfigMap(Node *configTree);
   Node *GetConfigNode(int port, const std::string &hostname,
-                      const std::string &uri, const std::string &method);
+                      const std::string &uri);
   const std::vector<int> GetPorts() const;
 
 private:
@@ -21,16 +21,12 @@ private:
     PortMap();
 
     void AddServerConfig(Node *serverNode);
-    Node *GetConfigNode(const std::string &hostname, const std::string &uri,
-                        const std::string &method);
+    Node *GetConfigNode(const std::string &hostname, const std::string &uri);
 
   private:
-    bool checkCGIMethos(const std::string &method, Node *locationNode);
-    Node *miniPCRE(UriMap *uriConfigs, const std::string uri,
-                   const std::string &method);
+    Node *miniPCRE(UriMap *uriConfigs, const std::string uri);
     Node *longestMatchedNode(UriMap *uriConfigs, const std::string uri);
-    Node *searchInServerConfig(UriMap *uriConfigs, const std::string &uri,
-                               const std::string &method);
+    Node *searchInServerConfig(UriMap *uriConfigs, const std::string &uri);
     UriMap makeUriMap(Node *serverNode);
     void addLocationNode(UriMap *uriConfigs, Node *locationNode);
 
