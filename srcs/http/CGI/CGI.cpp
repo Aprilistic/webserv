@@ -70,7 +70,7 @@ void CGI::processHandler(struct kevent &currentEvent) {
 void CGI::setAllEnv() {
   Node *location = Common::mConfigMap->GetConfigNode(
       mHttp.GetPort(), mHttp.GetRequest().GetHost(),
-      mHttp.GetRequest().GetUri(), mHttp.GetRequest().GetMethod());
+      mHttp.GetRequest().GetUri());
   if (location == NULL) {
     Log(warn, "CGI: location is NULL");
     return (mHttp.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
@@ -255,7 +255,7 @@ void CGI::CgiHandle() {
     // cgi pass 가져오기
     Node *location = Common::mConfigMap->GetConfigNode(
         mHttp.GetPort(), mHttp.GetRequest().GetHost(),
-        mHttp.GetRequest().GetUri(), mHttp.GetRequest().GetMethod());
+        mHttp.GetRequest().GetUri());
     if (location == NULL) {
       Log(warn, "CGI: location is NULL");
       mHttp.ErrorHandle(CLIENT_ERROR_NOT_FOUND);

@@ -3,8 +3,7 @@
 void DeleteHandler::Handle(Http &http) {
   // URI로 리소스 위치 확인
   Node *location = Common::mConfigMap->GetConfigNode(
-      http.GetPort(), http.GetRequest().GetHost(), http.GetRequest().GetUri(),
-      http.GetRequest().GetMethod());
+      http.GetPort(), http.GetRequest().GetHost(), http.GetRequest().GetUri());
   if (location == NULL) {
     Log(warn, "DeleteHandler: location is NULL");
     return (http.ErrorHandle(CLIENT_ERROR_NOT_FOUND));
