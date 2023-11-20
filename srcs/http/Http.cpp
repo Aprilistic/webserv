@@ -174,6 +174,14 @@ void Http::SendResponse(eStatusCode state) {
 }
 
 void Http::HandleRequestType() {
+  eStatusCode state = priorityHeaders();
+  if (state == REDIRECT) {
+    return RedirectURI(); // redirect 처리
+  } else if (state != PRIORITY_HEADER_OK) {
+    Log(warn, "Http: Priority header error");
+    return ErrorHandle(state);
+  }
+
   if (IsCgiRequest()) {
     handleCGIRequest();
   } else {
@@ -183,19 +191,12 @@ void Http::HandleRequestType() {
 
 void Http::handleCGIRequest() {
   SharedPtr<CGI> cgiRequest(new CGI(*this));
+
   mCGIList.push_back(cgiRequest);
   cgiRequest->CgiHandle();
 }
 
 void Http::handleHTTPRequest() {
-  eStatusCode state = priorityHeaders();
-  if (state == REDIRECT) {
-    return RedirectURI(); // redirect 처리
-  } else if (state != PRIORITY_HEADER_OK) {
-    Log(warn, "Http: Priority header error");
-    return ErrorHandle(state);
-  }
-
   IRequestHandler *method = Router::Routing(*this);
 
   method->Handle(*this);
