@@ -14,7 +14,7 @@
 /* context */
 #define HTTP (NONE_LEVEL | CREATE_NODE)
 #define SERVER (HTTP_LEVEL | CREATE_NODE)
-#define LOCATION (SERVER_LEVEL | CREATE_NODE)
+#define LOCATION (SERVER_LEVEL | LOCATION_LEVEL | CREATE_NODE)
 /* http server location */
 #define ERROR_PAGE (HTTP_LEVEL | SERVER_LEVEL | LOCATION_LEVEL | DIRECTIVE)
 #define CLIENT_MAX_BODY_SIZE                                                   \
