@@ -19,11 +19,11 @@ Server::Server(int port) : mPort(port) {
   mAddr.sin_port = htons(mPort);
   mAddr.sin_addr.s_addr = htonl(0);
 
-  int optval = 1;
-  if (setsockopt(mSocket, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval)) <
-      0) {
-    throw std::runtime_error("Error: Failed to set socket option");
-  }
+  // int optval = 1;
+  // if (setsockopt(mSocket, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval)) <
+  //     0) {
+  //   throw std::runtime_error("Error: Failed to set socket option");
+  // }
 
   if (bind(mSocket, (struct sockaddr *)&mAddr, sizeof(mAddr)) < 0) {
     throw std::runtime_error("Error: Failed to bind the socket");
