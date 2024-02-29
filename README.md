@@ -9,7 +9,8 @@
 Webserv is crafted as part of the challenging curriculum at School 42, focusing on developing a HTTP server in C++ 98. Key requirements include:
 
 - Non-blocking socket read/write using `poll()`(or equivalent).
-- Ensuring the server never hangs indefinitely.
+- Ensure the server never blocks(non-blocking I/O is necessary).
+- Ensure the server never hangs indefinitely.
 - Ability to serve a fully static website.
 - Support for GET, POST, and DELETE methods.
 - Capability to listen to multiple ports.
@@ -77,13 +78,17 @@ This is how this program flows. Server, client sockets, and children’s PID are
 |:------------:|:------------|
 | <img src="https://github.com/Aprilistic/webserv/assets/70141850/7444669d-2314-4b32-b502-4e7d16157e71" width="1500"> | `class Server, Connection, CGI` inherits `class IEventHandler` which has `virtual void EventHandler()`. When an event is caught, it calls `EventHandler()` thus calling the corresponding function in each class. |
 
+## Server never falls into blocking I/O
 
+- **Server can process multiple requests simultaneously**: We used `pipe()` to communicate with CGI processes. Whenever the buffer is full, the server registers an event(`EVFILT_WRITE`) to `kqueue` and moves on to another event in `kqueue`
+- **An idea from round-robin algorithm**: Since we can queue events by using `kqueue(epoll)`, the server slices its I/O. However, we did not set timeout to maximize throughput.
 
 ## Key Features
 
 - **HTTP/1.1 Compliant**: Supports GET, POST, and DELETE methods, along with features like HTTP pipelining and cookies.
 - **Nginx-like Configuration**: Tree-shaped parsing for nested bracket `{}` configurations, resembling Nginx.
 - **Efficient Configuration Access**: A sophisticated mapping system reduces access time from O(N) to O(log N).
+- **Unblocking I/O**: Since the server should support multiple requests simultaneously, I/O never falls into blocking mode. 
 
 ## Challenges and Solutions
 
