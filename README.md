@@ -115,7 +115,7 @@ Ensure you have a macOS environment and a C++ 98 compiler.
 ### Performance
 ![Picture1](https://github.com/user-attachments/assets/9c03fc6d-2afc-40fe-99d6-37b0135051fb)
 
-#### We achieved approximately 43% of NGINX's performance on the siege test.
+#### We achieved approximately 43% of NGINX's performance on the Siege test.
 
 
 This project was a deep dive into web server mechanics, leveraging C++ with OOP and I/O multiplexing. Our journey was marked by constant problem-solving and code refinement, enhancing our collaboration and communication skills. Despite some initial challenges, the final product is a testament to our perseverance and commitment to learning.
